@@ -1,0 +1,98 @@
+.conta-container {
+    min-height: 100vh;
+    background-color: var(--background-color, #f5f5f5);
+  }
+  
+  .conta-content {
+    padding: 2rem 0;
+  }
+  
+  .conta-content h1 {
+    color: var(--text-color, #333);
+    margin-bottom: 2rem;
+    font-size: 2rem;
+  }
+  
+  .conta-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+  }
+  
+  .conta-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .avatar {
+    font-size: 5rem;
+    color: var(--primary-color, #007bff);
+    margin-bottom: 1rem;
+  }
+  
+  .conta-header h2 {
+    color: var(--text-color, #333);
+    font-size: 1.5rem;
+  }
+  
+  .conta-info {
+    margin-bottom: 2rem;
+  }
+  
+  .info-group {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color, #eee);
+  }
+  
+  .info-group:last-child {
+    border-bottom: none;
+  }
+  
+  .info-group label {
+    display: block;
+    color: var(--text-muted, #666);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .info-group p {
+    color: var(--text-color, #333);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  
+  .conta-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .btn-primary, .btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-color, #007bff);
+    color: white;
+    border: none;
+  }
+  
+  .btn-secondary {
+    background-color: var(--secondary-color, #6c757d);
+    color: white;
+    border: none;
+  }
+  
+  .btn-primary:hover, .btn-secondary:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  } 
