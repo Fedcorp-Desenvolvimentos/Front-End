@@ -1,12 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-// import { useTheme } from '../../contexts/ThemeContext';
 import '../styles/Dropdown.css';
 
 const Dropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-//   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -28,14 +26,15 @@ const Dropdown = () => {
   return (
     <div className="dropdown" ref={dropdownRef}>
       <button 
-        className="btn-primary dropdown-toggle" 
+        className="dropdown-btn" 
         type="button" 
         onClick={toggleDropdown}
       >
         <i className="bi bi-three-dots-vertical"></i>
         Opções
       </button>
-      <ul className={`dropdown-menu ${isOpen ? 'show' : ''}`}>
+
+      <ul className={`dropdown-content ${isOpen ? 'show' : ''}`}>
         <li>
           <Link to="/conta" className="dropdown-item" onClick={() => setIsOpen(false)}>
             <i className="bi bi-person-circle"></i>
@@ -54,20 +53,13 @@ const Dropdown = () => {
             Cadastrar Usuários
           </Link>
         </li>
+
         <li><hr className="dropdown-divider" /></li>
-        {/* <li>
-          <button 
-            className="dropdown-item" 
-            onClick={() => {
-              toggleTheme();
-              setIsOpen(false);
-            }}
-          >
-            <i className={`bi bi-${theme === 'light' ? 'moon' : 'sun'}-fill`}></i>
-            {theme === 'light' ? 'Modo Escuro' : 'Modo Claro'}
-          </button>
-        </li> */}
+
+        {/* botão de troca de tema pode ser adicionado aqui */}
+
         <li><hr className="dropdown-divider" /></li>
+
         <li>
           <Link to="/login" className="dropdown-item" onClick={() => setIsOpen(false)}>
             <i className="bi bi-door-open-fill"></i>
@@ -79,4 +71,4 @@ const Dropdown = () => {
   );
 };
 
-export default Dropdown; 
+export default Dropdown;

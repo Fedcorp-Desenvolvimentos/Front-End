@@ -1,61 +1,83 @@
+/* Forçar que o dropdown fique à direita do container pai imediato */
 .dropdown {
-    position: relative;
-  }
-  
-  .dropdown-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .dropdown-menu {
-    position: absolute;
-    right: 0;
-    top: calc(100% + 0.5rem);
-    background-color: white;
-    border-radius: 4px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 0.5rem 0;
-    min-width: 200px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-    z-index: 1000;
-  }
-  
-  .dropdown-menu.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-  }
-  
-  .dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    color: var(--text-color, #333);
-    text-decoration: none;
-    transition: background-color 0.3s;
-    cursor: pointer;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-    font-size: 0.9rem;
-  }
-  
-  .dropdown-item:hover {
-    background-color: var(--background-hover, #f5f5f5);
-  }
-  
-  .dropdown-divider {
-    margin: 0.5rem 0;
-    border-top: 1px solid var(--border-color, #eee);
-  }
-  
-  .dropdown-item i {
-    font-size: 1.1rem;
-    color: var(--icon-color, #666);
-  } 
+  position: absolute; /* TROCA de relative para absolute */
+  top: 0;
+  right: 2rem; /* Ajuste de margem da direita - ou 0 se quiser colado */
+  display: flex;
+  align-items: center;
+  z-index: 99;
+  margin-top: 1rem;
+}
+
+/* Botão de dropdown estilizado */
+.dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+/* Hover no botão */
+.dropdown-btn:hover {
+  background-color: #0b5ed7;
+}
+
+/* Container do menu dropdown */
+.dropdown-content {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background-color: #fff;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+  min-width: 220px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 10;
+  list-style: none;
+  padding-left: 0;
+}
+
+/* Classe de ativação do menu */
+.dropdown-content.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Estilo dos itens */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.3s;
+  cursor: pointer;
+}
+
+/* Hover nos itens */
+.dropdown-item:hover {
+  background-color: #0b5ed7;
+  color: white;
+}
+
+/* Linha divisória */
+.dropdown-divider {
+  border: none;
+  height: 1px;
+  background-color: #eee;
+  margin: 0.5rem 0;
+}

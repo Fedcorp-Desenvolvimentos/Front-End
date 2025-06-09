@@ -1,11 +1,9 @@
 import React from 'react';
-import Navbar from '../../Navbar/Navbar';
 import '../../styles/Config.css';
 
 const Config = () => {
   return (
     <div className="config-container">
-      <Navbar />
       <main className="config-content">
         <div className="container">
           <h1>Configurações</h1>
