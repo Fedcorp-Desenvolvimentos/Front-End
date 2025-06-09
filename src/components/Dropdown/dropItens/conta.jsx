@@ -1,11 +1,11 @@
 import React from 'react';
-import Navbar from '../../Navbar/Navbar';
+
 import '../../styles/conta.css';
 
 const Conta = () => {
   return (
     <div className="conta-container">
-      <Navbar />
+  
       <main className="conta-content">
         <div className="container">
           <h1>Minha Conta</h1>

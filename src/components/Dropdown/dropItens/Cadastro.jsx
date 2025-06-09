@@ -1,11 +1,9 @@
 import React from 'react';
-import Navbar from '../../Navbar/Navbar';
 import '../../styles/Cadastro.css';
 
 const Cadastro = () => {
   return (
     <div className="cadastro-container">
-      <Navbar />
       <main className="cadastro-content">
         <div className="container">
           <h1>Cadastro de Usuários</h1>
