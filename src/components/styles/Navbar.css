@@ -17,7 +17,8 @@
 
 .logo {
   height: 40px;
-  margin-right: 0.5rem;
+  margin-right: 1.5rem;
+  margin-left: 1rem;
 }
 
 /* Navegação */
@@ -55,3 +56,37 @@
 .btn:hover {
   background-color: #0b5ed7;
 }
+
+ 
+  .navbar-brand img.logo {
+    width: 15.3rem;
+    height: auto;
+    transition: transform 0.3s ease;
+  }
+  
+  .navbar-brand img.logo:hover {
+    transform: scale(1.1);
+  }
+  
+  .navbar-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .navbar-nav {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 1rem;
+  }
+  
+  .nav-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-link {
+    text-decoration: none;
+  }

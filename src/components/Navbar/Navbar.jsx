@@ -7,7 +7,7 @@ function Navbar() {
     <nav className="navbar border-bottom">
       <div className="container">
         {/* Logo */}
-        <a className="navbar-brand d-flex align-items-center" href="../Home/home.html">
+        <a className="navbar-brand d-flex align-items-center" href="../Home">
           <img src="../public/imagens/logo.png" alt="Logo" className="logo me-2" />
         </a>
 
@@ -34,7 +34,7 @@ function Navbar() {
             </li>
 
             <li className="nav-item">
-              <a className="nav-link" href="../Consultas/consulta-end.html">
+              <a className="nav-link" href="../Consultas/consultaEnd.jsx">
                 <button type="button" className="btn">
                   <i className="bi bi-geo-alt-fill"></i>
                   Consultar Endereço
