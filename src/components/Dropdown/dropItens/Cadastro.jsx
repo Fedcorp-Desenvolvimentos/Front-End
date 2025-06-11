@@ -1,114 +1,132 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '../../styles/Cadastro.css';
 
-const Cadastro = () => {
+function Cadastro() {
+  const [usuarios, setUsuarios] = useState([]);
+  const [novoUsuario, setNovoUsuario] = useState({
+    nome: '',
+    email: '',
+    nivelAcesso: '',
+    senha: ''
+  });
+  const [erroCadastro, setErroCadastro] = useState('');
+
+  useEffect(() => {
+    // Exemplo de usuários mockados para visualização
+    const usuariosMock = [
+      { nome: 'João da Silva', email: 'joao@email.com', nivelAcesso: 'admin' },
+      { nome: 'Maria Oliveira', email: 'maria@email.com', nivelAcesso: 'usuario' }
+    ];
+
+    axios.get('/api/usuarios')
+      .then(response => {
+        const data = Array.isArray(response.data) ? response.data : [];
+        setUsuarios(data.length > 0 ? data : usuariosMock);
+      })
+      .catch(() => {
+        // Em caso de erro na API, utiliza mock
+        setUsuarios(usuariosMock);
+      });
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNovoUsuario(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setErroCadastro('');
+
+    axios.post('/api/usuarios', novoUsuario)
+      .then(response => {
+        setUsuarios(prev => [...prev, response.data]);
+        setNovoUsuario({ nome: '', email: '', nivelAcesso: '', senha: '' });
+      })
+      .catch(() => {
+        setErroCadastro('Erro ao cadastrar usuário. Verifique os dados e tente novamente.');
+      });
+  };
+
   return (
-    <div className="cadastro-container">
-      <main className="cadastro-content">
-        <div className="container">
-          <h1>Cadastro de Usuários</h1>
-          
-          {/* Formulário de Cadastro */}
-          <div className="cadastro-card">
-            <form className="cadastro-form">
+    <main className="cadastro-content">
+      <h1 className="page-title">
+        <i className="bi bi-person-plus-fill"></i> Cadastro de Usuários
+      </h1>
+
+      <div className="container">
+        <div className="cadastro-grid">
+          <section className="cadastro-card">
+            <h2 className="section-title">
+              <i className="bi bi-person-circle"></i> Novo Usuário
+            </h2>
+
+            <form className="cadastro-form" onSubmit={handleSubmit} style={{ gap: '1rem' }}>
               <div className="form-group">
                 <label htmlFor="nome">Nome Completo</label>
-                <input type="text" id="nome" className="form-control" required />
+                <input
+                  type="text"
+                  id="nome"
+                  name="nome"
+                  value={novoUsuario.nome}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div className="form-group">
                 <label htmlFor="email">Email</label>
-                <input type="email" id="email" className="form-control" required />
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={novoUsuario.email}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div className="form-group">
-                <label htmlFor="nivel">Nível de Acesso</label>
-                <select id="nivel" className="form-control" required>
+                <label htmlFor="nivelAcesso">Nível de Acesso</label>
+                <select
+                  id="nivelAcesso"
+                  name="nivelAcesso"
+                  value={novoUsuario.nivelAcesso}
+                  onChange={handleChange}
+                  required
+                >
                   <option value="">Selecione um nível</option>
                   <option value="admin">Administrador</option>
-                  <option value="user">Usuário</option>
-                  <option value="viewer">Visualizador</option>
+                  <option value="usuario">Usuário</option>
                 </select>
               </div>
 
               <div className="form-group">
                 <label htmlFor="senha">Senha</label>
-                <input type="password" id="senha" className="form-control" required />
+                <input
+                  type="password"
+                  id="senha"
+                  name="senha"
+                  value={novoUsuario.senha}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="confirmarSenha">Confirmar Senha</label>
-                <input type="password" id="confirmarSenha" className="form-control" required />
-              </div>
+              {erroCadastro && (
+                <div className="mensagem-erro">
+                  <i className="bi bi-exclamation-circle-fill"></i> {erroCadastro}
+                </div>
+              )}
 
-              <div className="form-actions">
-                <button type="submit" className="btn-primary">
-                  <i className="bi bi-person-plus"></i>
-                  Cadastrar Usuário
-                </button>
-                <button type="reset" className="btn-secondary">
-                  <i className="bi bi-x-circle"></i>
-                  Limpar
-                </button>
-              </div>
+              <button type="submit" className="btn-submit">Cadastrar</button>
             </form>
-          </div>
-
-          {/* Lista de Usuários */}
-          <div className="usuarios-list">
-            <h2>Usuários Cadastrados</h2>
-            <div className="table-responsive">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Nível</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>João Silva</td>
-                    <td>joao@exemplo.com</td>
-                    <td>Administrador</td>
-                    <td><span className="status-badge active">Ativo</span></td>
-                    <td>
-                      <div className="action-buttons">
-                        <button className="btn-icon" title="Editar">
-                          <i className="bi bi-pencil"></i>
-                        </button>
-                        <button className="btn-icon" title="Excluir">
-                          <i className="bi bi-trash"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Maria Santos</td>
-                    <td>maria@exemplo.com</td>
-                    <td>Usuário</td>
-                    <td><span className="status-badge active">Ativo</span></td>
-                    <td>
-                      <div className="action-buttons">
-                        <button className="btn-icon" title="Editar">
-                          <i className="bi bi-pencil"></i>
-                        </button>
-                        <button className="btn-icon" title="Excluir">
-                          <i className="bi bi-trash"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          </section>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
-};
+}
 
-export default Cadastro; 
+export default Cadastro;

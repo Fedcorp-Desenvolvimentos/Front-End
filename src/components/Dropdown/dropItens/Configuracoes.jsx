@@ -1,95 +1,183 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../../styles/Config.css';
+import { Link } from 'react-router-dom';
 
 const Config = () => {
+  const [activeTab, setActiveTab] = useState('perfil');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [editandoPerfil, setEditandoPerfil] = useState(false);
+  const [editandoSenha, setEditandoSenha] = useState(false);
+
+  // Mock como placeholders
+  const placeholderNome = 'Nome do Usuário';
+  const placeholderCpf = 'Número do CPF';
+  const placeholderEmail = 'E-mail do Usuário';
+
+  const [nome, setNome] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [email, setEmail] = useState('');
+
+  const [senhaAtual, setSenhaAtual] = useState('');
+  const [novaSenha, setNovaSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
+
+  const [showSenhaAtual, setShowSenhaAtual] = useState(false);
+  const [showNovaSenha, setShowNovaSenha] = useState(false);
+  const [showConfirmaSenha, setShowConfirmaSenha] = useState(false);
+
+  const handleSalvarPerfil = (e) => {
+    e.preventDefault();
+    setSuccessMessage('Dados da conta atualizados com sucesso!');
+    setEditandoPerfil(false);
+    setTimeout(() => setSuccessMessage(''), 3000);
+  };
+
+  const handleSalvarSenha = (e) => {
+    e.preventDefault();
+    setSuccessMessage('Senha alterada com sucesso!');
+    setEditandoSenha(false);
+    setTimeout(() => setSuccessMessage(''), 3000);
+  };
+
   return (
     <div className="config-container">
-      <main className="config-content">
-        <div className="container">
-          <h1>Configurações</h1>
-          <div className="config-grid">
-            {/* Configurações de Aparência */}
-            <div className="config-card">
-              <div className="config-header">
-                <i className="bi bi-palette"></i>
-                <h2>Aparência</h2>
-              </div>
-              <div className="config-body">
-                <div className="config-item">
-                  <label>Tema</label>
-                  <select className="form-select">
-                    <option value="light">Claro</option>
-                    <option value="dark">Escuro</option>
-                    <option value="system">Sistema</option>
-                  </select>
-                </div>
-                <div className="config-item">
-                  <label>Fonte</label>
-                  <select className="form-select">
-                    <option value="default">Padrão</option>
-                    <option value="large">Grande</option>
-                    <option value="small">Pequena</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+      <h2 className="config-title">Configurações da Conta</h2>
+      <div className="config-wrapper">
+        <aside className="config-sidebar">
+          <button className={`tab-button ${activeTab === 'perfil' ? 'active' : ''}`} onClick={() => setActiveTab('perfil')}>
+            <i className="bi bi-person-circle"></i> Perfil
+          </button>
+          <button className={`tab-button ${activeTab === 'senha' ? 'active' : ''}`} onClick={() => setActiveTab('senha')}>
+            <i className="bi bi-lock"></i> Alterar Senha
+          </button>
+          <Link to="/Home" className="tab-button voltar">
+            <i className="bi bi-arrow-left-circle"></i> Voltar
+          </Link>
+        </aside>
 
-            {/* Configurações de Notificações */}
-            <div className="config-card">
-              <div className="config-header">
-                <i className="bi bi-bell"></i>
-                <h2>Notificações</h2>
-              </div>
-              <div className="config-body">
-                <div className="config-item">
-                  <label className="switch-label">
-                    <span>Notificações por Email</span>
-                    <div className="form-check form-switch">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </label>
-                </div>
-                <div className="config-item">
-                  <label className="switch-label">
-                    <span>Alertas do Sistema</span>
-                    <div className="form-check form-switch">
-                      <input className="form-check-input" type="checkbox" checked />
-                    </div>
-                  </label>
-                </div>
-              </div>
+        <section className="config-form">
+          {successMessage && (
+            <div className="success-message">
+              <i className="bi bi-check-circle-fill"></i> {successMessage}
             </div>
+          )}
 
-            {/* Configurações de Privacidade */}
-            <div className="config-card">
-              <div className="config-header">
-                <i className="bi bi-shield-lock"></i>
-                <h2>Privacidade</h2>
-              </div>
-              <div className="config-body">
-                <div className="config-item">
-                  <label className="switch-label">
-                    <span>Histórico de Buscas</span>
-                    <div className="form-check form-switch">
-                      <input className="form-check-input" type="checkbox" checked />
-                    </div>
-                  </label>
+          {activeTab === 'perfil' ? (
+            <>
+              <h3><i className="bi bi-gear"></i> Editar Conta</h3>
+              <form onSubmit={handleSalvarPerfil}>
+                <label>Nome:</label>
+                <input
+                  type="text"
+                  placeholder={placeholderNome}
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  disabled={!editandoPerfil}
+                  className={editandoPerfil ? 'editando' : ''}
+                />
+
+                <label>CPF:</label>
+                <input
+                  type="text"
+                  placeholder={placeholderCpf}
+                  value={cpf}
+                  onChange={(e) => setCpf(e.target.value)}
+                  disabled={!editandoPerfil}
+                  className={editandoPerfil ? 'editando' : ''}
+                />
+
+                <label>E-mail:</label>
+                <input
+                  type="email"
+                  placeholder={placeholderEmail}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={!editandoPerfil}
+                  className={editandoPerfil ? 'editando' : ''}
+                />
+
+                <div className="button-group">
+                  <button
+                    type="button"
+                    className="btn danger"
+                    onClick={() => setEditandoPerfil(true)}
+                  >
+                    <i className="bi bi-pencil"></i> Editar
+                  </button>
+
+                  {editandoPerfil && (
+                    <button type="submit" className="btn primary">
+                      <i className="bi bi-save"></i> Salvar
+                    </button>
+                  )}
                 </div>
-                <div className="config-item">
-                  <label className="switch-label">
-                    <span>Compartilhar Dados</span>
-                    <div className="form-check form-switch">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </label>
+              </form>
+            </>
+          ) : (
+            <>
+              <h3><i className="bi bi-key"></i> Alterar Senha</h3>
+              <form onSubmit={handleSalvarSenha}>
+                <label>Senha Atual:</label>
+                <div className="input-with-icon">
+                  <input
+                    type={showSenhaAtual ? 'text' : 'password'}
+                    placeholder="Senha Atual"
+                    value={senhaAtual}
+                    onChange={(e) => setSenhaAtual(e.target.value)}
+                    disabled={!editandoSenha}
+                    className={editandoSenha ? 'editando' : ''}
+                  />
+                  <i className={`bi ${showSenhaAtual ? 'bi-eye-slash' : 'bi-eye'}`} onClick={() => setShowSenhaAtual(!showSenhaAtual)} />
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+
+                <label>Nova Senha:</label>
+                <div className="input-with-icon">
+                  <input
+                    type={showNovaSenha ? 'text' : 'password'}
+                    placeholder="Nova Senha"
+                    value={novaSenha}
+                    onChange={(e) => setNovaSenha(e.target.value)}
+                    disabled={!editandoSenha}
+                    className={editandoSenha ? 'editando' : ''}
+                  />
+                  <i className={`bi ${showNovaSenha ? 'bi-eye-slash' : 'bi-eye'}`} onClick={() => setShowNovaSenha(!showNovaSenha)} />
+                </div>
+
+                <label>Confirmar Senha:</label>
+                <div className="input-with-icon">
+                  <input
+                    type={showConfirmaSenha ? 'text' : 'password'}
+                    placeholder="Confirmar Nova Senha"
+                    value={confirmarSenha}
+                    onChange={(e) => setConfirmarSenha(e.target.value)}
+                    disabled={!editandoSenha}
+                    className={editandoSenha ? 'editando' : ''}
+                  />
+                  <i className={`bi ${showConfirmaSenha ? 'bi-eye-slash' : 'bi-eye'}`} onClick={() => setShowConfirmaSenha(!showConfirmaSenha)} />
+                </div>
+
+                <div className="button-group">
+                  <button
+                    type="button"
+                    className="btn danger"
+                    onClick={() => setEditandoSenha(true)}
+                  >
+                    <i className="bi bi-pencil"></i> Editar
+                  </button>
+
+                  {editandoSenha && (
+                    <button type="submit" className="btn primary">
+                      <i className="bi bi-save"></i> Salvar
+                    </button>
+                  )}
+                </div>
+              </form>
+            </>
+          )}
+        </section>
+      </div>
     </div>
   );
 };
 
-export default Config; 
+export default Config;
