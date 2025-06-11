@@ -98,9 +98,9 @@
 /* Botão */
 .btn-primary {
   background-color: transparent;
-  color: #0d6efd;
+  color: #0d6efd !important;
   padding: 0.5rem 1.2rem;
-  border: 2px solid #0d2d5c;
+  border: 2px solid #0d6efd;
   border-radius: 6px;
   text-decoration: none;
   justify-content: center;
@@ -109,8 +109,9 @@
 }
 
 .btn-primary:hover {
-  background-color: #0d57b8;
-  color: #ffffff;
+  background-color: #0d6efd;
+  color: #ffffff !important;
+  border: 2px solid #0d6efd;
 }
 
 /* Responsividade */

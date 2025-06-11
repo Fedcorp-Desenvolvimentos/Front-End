@@ -37,14 +37,14 @@ const Dropdown = () => {
       <ul className={`dropdown-content ${isOpen ? 'show' : ''}`}>
         <li>
           <Link to="/conta" className="dropdown-item" onClick={() => setIsOpen(false)}>
-            <i className="bi bi-person-circle"></i>
-            Conta
+            <i className="bi bi-gear"></i>
+            Configurações
           </Link>
         </li>
         <li>
           <Link to="/config" className="dropdown-item" onClick={() => setIsOpen(false)}>
-            <i className="bi bi-gear"></i>
-            Configurações
+            <i className=" bi bi-person-circle"></i>
+            Conta
           </Link>
         </li>
         <li>

@@ -1,92 +1,174 @@
 .config-container {
-    min-height: 100vh;
-    background-color: var(--background-color, #f5f5f5);
-  }
+  padding: 1rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.config-title {
+  text-align: center;
+  font-size: 1.75rem;
+  margin-bottom: 2rem;
+  color: #212529;
+}
+
+.config-wrapper {
+  display: flex;
+  max-width: 1000px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.config-sidebar {
+  width: 220px;
+  border-right: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-button {
+  padding: 1rem;
+  text-align: left;
+  border: none;
+  background: none;
+  font-size: 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #dee2e6;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tab-button:hover,
+.tab-button.active {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.tab-button.voltar {
+  margin-top: auto;
+}
+
+.config-form {
+  flex: 1;
+  padding: 2rem;
+}
+
+.config-form h3 {
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.config-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.config-form input {
+  padding: 0.6rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.btn.danger {
+  background-color: #fff;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+}
+
+.btn.danger:hover {
+  background-color: #dc3545;
+  color: #fff;
   
-  .config-content {
-    padding: 2rem 0;
-  }
-  
-  .config-content h1 {
-    color: var(--text-color, #333);
-    margin-bottom: 2rem;
-    font-size: 2rem;
-  }
-  
-  .config-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-  }
-  
-  .config-card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
-  }
-  
-  .config-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color, #eee);
-  }
-  
-  .config-header i {
-    font-size: 1.5rem;
-    color: var(--primary-color, #007bff);
-  }
-  
-  .config-header h2 {
-    color: var(--text-color, #333);
-    font-size: 1.25rem;
-    margin: 0;
-  }
-  
-  .config-body {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .config-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .config-item label {
-    color: var(--text-color, #333);
-    font-size: 0.9rem;
-  }
-  
-  .form-select {
-    padding: 0.5rem;
-    border: 1px solid var(--border-color, #ddd);
-    border-radius: 4px;
-    background-color: white;
-    color: var(--text-color, #333);
-    font-size: 0.9rem;
-  }
-  
-  .switch-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-  }
-  
-  .form-check-input {
-    width: 3rem;
-    height: 1.5rem;
-    margin: 0;
-    cursor: pointer;
-  }
-  
-  .form-check-input:checked {
-    background-color: var(--primary-color, #007bff);
-    border-color: var(--primary-color, #007bff);
-  } 
+}
+
+.success-message {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border: 1px solid #badbcc;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+
+/* Destaque para inputs em modo edição */
+input.editando {
+  border: 2px solid #0d6efd !important;
+  background-color: #ffffff !important;
+  color: #000 !important;
+}
+
+
+/* Estilo para inputs com ícone */
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon input {
+  width: 100%;
+  padding-right: 2rem;
+}
+
+.input-with-icon i {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #555;
+}
+
+/* Remove aparência de link padrão no botão "Voltar" */
+.tab-button.voltar {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  background-color: transparent;
+  color: inherit;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  margin-top: 20rem;
+}
+
+.tab-button.voltar:hover {
+  background-color: #0d6efd;
+  color: #fff;
+}
