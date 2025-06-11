@@ -29,9 +29,9 @@ const ConfigConta = () => {
       <main className="conta-content">
         <div className="config-usuarios-wrapper">
         <aside className="config-sidebar">
-          <button className={`tab-button`}>
-          <i className="bi bi-person-plus-fill"></i> Cadastrar Usuário
-          </button>
+          <Link to="/cadastro" className="tab-button">
+            <i className="bi bi-person-plus-fill"></i> Cadastrar Usuário
+          </Link>
           <Link to="/Home" className="tab-button voltar">
             <i className="bi bi-arrow-left-circle"></i> Voltar
           </Link>
