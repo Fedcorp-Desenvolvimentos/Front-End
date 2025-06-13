@@ -115,6 +115,21 @@
   margin-bottom: 1.5rem;
 }
 
+.forgot-password {
+  display: block;
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #0F3D5D;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.forgot-password:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
 
 
 /* MOBILE FIRST */

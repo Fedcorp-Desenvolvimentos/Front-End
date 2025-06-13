@@ -57,6 +57,10 @@ const Login = () => {
               <button type="submit" className="loginButton">
                 Entrar
               </button>
+
+              <a href="/esqueci-senha" className="forgot-password">
+                Esqueceu sua senha?
+              </a>
             </form>
           </div>
         </div>
