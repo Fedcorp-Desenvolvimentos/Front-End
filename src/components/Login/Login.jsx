@@ -1,51 +1,68 @@
 import React, { useState } from 'react';
-import '../styles/Login.css';
+import '../styles/Login.css'; // caminho para CSS global
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Lógica de autenticação será implementada aqui
     console.log('Login attempt:', { email, senha });
   };
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <h1>Login</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">E-mail</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+    <>
+      <div className="gradient-bg"></div>
+
+      <div className="login-wrapper">
+        <div className="loginContainer">
+          <div className="loginBox">
+            <img
+              src="../public/imagens/logo.png"
+              alt="Fedcorp Logo"
+              className="logoImg"
             />
+
+            <h2 className="titlePortal">BigCorp</h2>
+            <p className="pPortal">Insira seus dados para acessar a plataforma</p>
+
+            {error && <p className="error">{error}</p>}
+
+            <form onSubmit={handleSubmit}>
+              <div className="inputGroup">
+                <label htmlFor="email">E-mail:</label>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="Digite seu e-mail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="inputGroup">
+                <label htmlFor="senha">Senha:</label>
+                <input
+                  type="password"
+                  id="senha"
+                  placeholder="Digite sua senha"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  required
+                />
+              </div>
+
+              <button type="submit" className="loginButton">
+                Entrar
+              </button>
+            </form>
           </div>
-          <div className="form-group">
-            <label htmlFor="senha">Senha</label>
-            <input
-              type="password"
-              id="senha"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              required
-            />
-          </div>
-          <button type="submit" className="login-button">
-            Entrar
-          </button>
-        </form>
-        <a href="/esqueci-senha" className="forgot-password">
-          Esqueceu sua senha?
-        </a>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export default Login; 
+export default Login;
