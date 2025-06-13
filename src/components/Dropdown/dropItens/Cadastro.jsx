@@ -54,14 +54,15 @@ function Cadastro() {
       <h1 className="config-title">Configurações da Plataforma</h1>
 
       <div className="cadastro-layout">
-      <aside className="config-sidebar">
-      <button className={`tab-button ${activeTab === 'cadastro' ? 'active' : ''}`} onClick={() => setActiveTab('cadastro')}>
-          <i className="bi bi-person-plus-fill"></i> Cadastro de Usuário
+        <aside className="sidebar">
+          <button className={`tab-button ${activeTab === 'cadastro' ? 'active' : ''}`} onClick={() => setActiveTab('cadastro')}>
+            <i className="bi bi-person-plus-fill"></i> Cadastro de Usuário
           </button>
           <Link to="/Home" className="tab-button voltar">
             <i className="bi bi-arrow-left-circle"></i> Voltar
           </Link>
         </aside>
+
 
         <section className="cadastro-card">
           <h2 className="section-title">

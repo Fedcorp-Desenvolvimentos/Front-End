@@ -41,7 +41,7 @@
 }
 
 .tab-button:hover {
-  background-color: #f0f0f0;
+  background-color: #006eff;
 }
 
 .config-card {
@@ -183,6 +183,7 @@
 }
 
 .tab-button:hover {
-  background-color: #f0f0f0;
+  background-color: #006eff !important;
+  color: white;
   text-decoration: none; /* garante que o sublinhado não volte */
 }
