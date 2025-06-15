@@ -169,15 +169,18 @@
   flex-direction: column;
 }
 
-.tab-button {
+.btn-primary {
   display: flex;
+  justify-content: center;
   align-items: center;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border: none;
+  padding: 0 1.5rem; /* igual ao confirmar */
+  font-size: 0.95rem;
+  border: solid 1px #006eff;
   background-color: transparent;
-  color: inherit;
-  text-decoration: none; /* remove o sublinhado */
+  color: #006eff;
+  border-radius: 8px;
+  height: 50px;
+  min-width: 120px; /* força o tamanho igual ao outro botão */
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
@@ -186,4 +189,25 @@
   background-color: #006eff !important;
   color: white;
   text-decoration: none; /* garante que o sublinhado não volte */
+}
+
+.btn-secondary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1.5rem; /* igual ao confirmar */
+  font-size: 0.95rem;
+  border: solid 1px #dc3545;
+  background-color: transparent;
+  color: #dc3545;
+  border-radius: 8px;
+  height: 50px;
+  min-width: 120px; /* força o tamanho igual ao outro botão */
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #dc3545 !important;
+  color: white;
 }
