@@ -42,6 +42,8 @@
 
 .tab-button:hover {
   background-color: #006eff;
+  color: white;
+  text-decoration: none;
 }
 
 .config-card {
@@ -93,7 +95,8 @@
   background-color: #f1f3f5;
 }
 
-.user-table th, .user-table td {
+.user-table th,
+.user-table td {
   text-align: left;
   padding: 0.75rem;
   border-bottom: 1px solid #eee;
@@ -113,7 +116,6 @@
   color: #dc3545;
   cursor: pointer;
 }
-
 
 /* Modal */
 .modal-overlay {
@@ -169,26 +171,38 @@
   flex-direction: column;
 }
 
+
+/* Botões padrão */
 .btn-primary {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 1.5rem; /* igual ao confirmar */
-  font-size: 0.95rem;
-  border: solid 1px #006eff;
-  background-color: transparent;
-  color: #006eff;
-  border-radius: 8px;
-  height: 50px;
-  min-width: 120px; /* força o tamanho igual ao outro botão */
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  background-color: #006eff;
+  color: white !important;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
-.tab-button:hover {
-  background-color: #006eff !important;
+
+.btn-primary:hover {
+  background-color: #0056d2;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #dc3545;
   color: white;
-  text-decoration: none; /* garante que o sublinhado não volte */
 }
 
 .btn-secondary {
