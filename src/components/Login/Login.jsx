@@ -1,15 +1,35 @@
 import React, { useState } from 'react';
-import '../styles/Login.css'; // caminho para CSS global
+import '../styles/Login.css';
+import { UserService } from '../../services/userService';
 
 const Login = () => {
   const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Login attempt:', { email, senha });
+ const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const payload = { email, password };
+
+    try {
+      const response = await UserService.login(payload);
+      localStorage.setItem('accessToken', response.access);
+      localStorage.setItem('refreshToken', response.refresh);
+      setUserData(response); 
+      window.location.href = "/Home";
+    } catch (err) {
+      setError(err.response?.data?.message || 'Falha no login. Verifique suas credenciais.');
+      console.error('Erro de login:', err);
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   return (
     <>
@@ -48,8 +68,8 @@ const Login = () => {
                   type="password"
                   id="senha"
                   placeholder="Digite sua senha"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>

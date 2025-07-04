@@ -25,19 +25,28 @@ function Navbar() {
 
             {/* botão dados */}
             <li className="nav-item">
-              <a className="nav-link" href="../Consultas/consulta-pf.html">
+              <a className="nav-link" href="../Consultas/ConsultaPf.jsx">
                 <button type="button" className="btn">
                   <i className="bi bi-clipboard2-minus-fill"></i>
-                  Consultar dados
+                  Consultar Dados
                 </button>
               </a>
             </li>
 
             <li className="nav-item">
-              <a className="nav-link" href="../Consultas/consultaEnd.jsx">
+              <a className="nav-link" href="../Components/Consultas/ConsultaEnd">
                 <button type="button" className="btn">
                   <i className="bi bi-geo-alt-fill"></i>
                   Consultar Endereço
+                </button>
+              </a>
+            </li>
+
+            <li className="nav-item">
+              <a className="nav-link" href="../Consultas/ConsultaPf.jsx">
+                <button type="button" className="btn">
+                  <i className="bi bi-clipboard2-minus-fill"></i>
+                  Consultar em Massa
                 </button>
               </a>
             </li>
