@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/Consulta.css';
 import { ConsultaService } from '../../services/consultaService'; // Importe o serviço de consultas
+import { FileSpreadsheet } from 'lucide-react';
 
 const ConsultaEnd = () => {
   // Estado para controlar qual formulário está ativo ('cep' ou 'chaves')
@@ -159,6 +160,22 @@ const ConsultaEnd = () => {
           </div>
           <h5>Chaves Alternativas</h5>
         </div>
+
+             {/* Card Consulta em Massa */}
+             <div
+          className={`card card-option ${activeForm === 'massa' ? 'active' : ''}`}
+          onClick={() => {
+            setActiveForm('massa');
+            setError(null);
+            setResultado(null);
+          }}
+        >
+          <div className="icon-container">
+            <FileSpreadsheet size={35} />
+          </div>
+          <h5>Consulta em Massa</h5>
+        </div>
+      
       </div>
 
       {activeForm === 'cep' && (
@@ -227,12 +244,104 @@ const ConsultaEnd = () => {
         </form>
       )}
 
-      {resultado && (
-        <div className="resultado-container">
-          <h3>Resultado da Consulta:</h3>
-          <pre>{JSON.stringify(resultado, null, 2)}</pre>
+  {/* Conteúdo Consulta em Massa */}
+  {activeForm === 'massa' && (
+        <div className="form-massa-container">
+          <button
+            type="button"
+            onClick={() => document.getElementById('input-massa').click()}
+          >
+            Importar Planilha
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const link = document.createElement('a');
+              link.href = '/planilha-modelo.xlsx';
+              link.download = 'planilha-modelo.xlsx';
+              link.click();
+            }}
+          >
+            Baixar Planilha Modelo
+          </button>
+          <input
+            type="file"
+            id="input-massa"
+            accept=".xlsx, .xls"
+            style={{ display: 'none' }}
+            onChange={e => {
+              const arquivo = e.target.files[0];
+              if (arquivo) console.log('Importou:', arquivo.name);
+              // chamar aqui para baixar a planilha quando tiver o modelo definido
+            }}
+          />
+
+          <button
+              type="button"
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = '/planilha-resultado.xlsx';
+                link.download = 'planilha-resultado.xlsx';
+                link.click();
+              }}
+          >
+            Exportar Resultado
+          </button>
         </div>
       )}
+
+
+      {resultado?.resultado_api && (
+        <div className="card-resultado">
+          <h4>Resultado da busca realizada</h4>
+
+          <label>Endereço:</label>
+          <input
+            type="text"
+            value={
+              `${resultado.resultado_api.street}`
+            }
+            disabled
+          />
+
+          <label>Bairro:</label>
+          <input
+            type="text"
+            value={
+              `${resultado.resultado_api.neighborhood}`
+            }
+            disabled
+          />
+
+          <label>Cidade:</label> 
+          <input
+            type="text"
+            value={
+              `${resultado.resultado_api.city}`
+            }
+            disabled
+          />
+
+          <label>UF:</label>
+          <input
+            type="text"
+            value={
+              `${resultado.resultado_api.state}`
+            }
+            disabled
+          />
+
+          <label>CEP:</label>
+          <input
+            type="text"
+            value={
+              `${resultado.resultado_api.cep}`
+            }
+            disabled
+          />
+        </div>
+      )}
+
     </div>
   );
 };

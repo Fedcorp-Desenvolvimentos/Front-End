@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import '../styles/Consulta.css';
-import { ConsultaService } from '../../services/consultaService'; 
-
+import { ConsultaService } from '../../services/consultaService';
+import { FileSpreadsheet } from 'lucide-react';
 
 const ConsultaPF = () => {
-  
+
   const [activeForm, setActiveForm] = useState('cpf');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resultado, setResultado] = useState(null);
 
-  
   const [formData, setFormData] = useState({
     cpf: '',
     nome: '',
@@ -19,7 +18,6 @@ const ConsultaPF = () => {
     email: '',
     telefone: ''
   });
-
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -42,19 +40,18 @@ const ConsultaPF = () => {
     }));
   };
 
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
-    setResultado(null); 
+    setResultado(null);
 
     let payload = {};
     let isFormValid = true;
     let validationErrorMessage = '';
 
     if (activeForm === 'cpf') {
-    
+
       if (formData.cpf.length !== 11) {
         validationErrorMessage = 'Por favor, insira um CPF válido com 11 dígitos.';
         isFormValid = false;
@@ -64,10 +61,9 @@ const ConsultaPF = () => {
           parametro_consulta: formData.cpf,
         };
       }
-    } else if (activeForm === 'chaves') {
-      
 
-    
+    } else if (activeForm === 'chaves') {
+
       if (!formData.nome.trim() && !formData.dataNascimento.trim() && !formData.uf.trim() && !formData.email.trim() && !formData.telefone.trim()) {
         validationErrorMessage = 'Por favor, preencha pelo menos um campo para busca de CPF por chaves alternativas.';
         isFormValid = false;
@@ -76,8 +72,6 @@ const ConsultaPF = () => {
         // O `realizarConsulta` que temos espera 'tipo_consulta' e 'parametro_consulta'.
         // Para chaves alternativas, o ideal seria um novo `tipo_consulta`
         // E o `parametro_consulta` seria um JSON stringificado do formData.
-
-      
 
         payload = {
           tipo_consulta: 'busca_cpf_alternativa',
@@ -116,11 +110,12 @@ const ConsultaPF = () => {
       <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
 
       <div className="card-options-wrapper">
+        {/* Card Consulta por CPF */}
         <div
           className={`card card-option ${activeForm === 'cpf' ? 'active' : ''}`}
           onClick={() => {
             setActiveForm('cpf');
-            setFormData({ ...formData, cpf: '' }); 
+            setFormData({ ...formData, cpf: '' });
             setError(null);
             setResultado(null);
           }}
@@ -134,12 +129,13 @@ const ConsultaPF = () => {
           <h5>Consulta por CPF</h5>
         </div>
 
+        {/* Card Chaves Alternativas */}
         <div
           className={`card card-option ${activeForm === 'chaves' ? 'active' : ''}`}
           onClick={() => {
             setActiveForm('chaves');
-            setFormData({ 
-              cpf: '', 
+            setFormData({
+              cpf: '',
               nome: '',
               dataNascimento: '',
               uf: '',
@@ -158,8 +154,24 @@ const ConsultaPF = () => {
           </div>
           <h5>Chaves Alternativas</h5>
         </div>
+
+        {/* Card Consulta em Massa */}
+        <div
+          className={`card card-option ${activeForm === 'massa' ? 'active' : ''}`}
+          onClick={() => {
+            setActiveForm('massa');
+            setError(null);
+            setResultado(null);
+          }}
+        >
+          <div className="icon-container">
+            <FileSpreadsheet size={35} />
+          </div>
+          <h5>Consulta em Massa</h5>
+        </div>
       </div>
 
+      {/* Formulário CPF */}
       {activeForm === 'cpf' && (
         <form className="form-container" onSubmit={handleSubmit}>
           <label htmlFor="cpf-input">Digite o documento</label>
@@ -167,7 +179,7 @@ const ConsultaPF = () => {
             type="text"
             id="cpf-input"
             name="cpf"
-            value={formData.cpf} 
+            value={formData.cpf}
             onChange={handleFormChange}
             placeholder="Digite o CPF (apenas números)"
             required
@@ -177,6 +189,7 @@ const ConsultaPF = () => {
         </form>
       )}
 
+      {/* Formulário Chaves Alternativas */}
       {activeForm === 'chaves' && (
         <form className="form-container" onSubmit={handleSubmit}>
           <label htmlFor="nome">Nome</label>
@@ -235,10 +248,86 @@ const ConsultaPF = () => {
         </form>
       )}
 
-      {resultado && (
-        <div className="resultado-container">
-          <h3>Resultado da Consulta:</h3>
-          <pre>{JSON.stringify(resultado, null, 2)}</pre>
+      {/* Conteúdo Consulta em Massa */}
+      {activeForm === 'massa' && (
+        <div className="form-massa-container">
+          <button
+            type="button"
+            onClick={() => document.getElementById('input-massa').click()}
+          >
+            Importar Planilha
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const link = document.createElement('a');
+              link.href = '/planilha-modelo.xlsx';
+              link.download = 'planilha-modelo.xlsx';
+              link.click();
+            }}
+          >
+            Baixar Planilha Modelo
+          </button>
+          <input
+            type="file"
+            id="input-massa"
+            accept=".xlsx, .xls"
+            style={{ display: 'none' }}
+            onChange={e => {
+              const arquivo = e.target.files[0];
+              if (arquivo) console.log('Importou:', arquivo.name);
+              // chamar aqui para baixar a planilha quando tiver o modelo definido
+            }}
+          />
+
+          <button
+              type="button"
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = '/planilha-resultado.xlsx';
+                link.download = 'planilha-resultado.xlsx';
+                link.click();
+              }}
+          >
+            Exportar Resultado
+          </button>
+        </div>
+      )}
+
+      {/* Resultado da Consulta */}
+      {resultado?.resultado_api && (
+        <div className="card-resultado">
+          <h4>Resultado da busca realizada</h4>
+
+          <label>Nome:</label>
+          <input type="text" value={resultado.resultado_api.result.name} disabled />
+
+          <label>CPF:</label>
+          <input type="text" value={resultado.resultado_api.result.taxIdNumber} disabled />
+
+          <label>Idade:</label>
+          <input type="text" value={resultado.resultado_api.result.age} disabled />
+
+          <label>Data de Nascimento:</label>
+          <input
+            type="text"
+            value={`${resultado.resultado_api.result.CapturedBirthDateFromRFSource}`}
+            disabled
+          />
+
+          <label>Filiação:</label>
+          <input
+            type="text"
+            value={`${resultado.result.MotherName}`}
+            disabled
+          />
+
+          <label>Indicação de Óbito:</label>
+          <input
+            type="text"
+            value={`${resultado.resultado_api.result.HasObitIndication}`}
+            disabled
+          />
         </div>
       )}
     </div>
