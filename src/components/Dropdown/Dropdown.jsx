@@ -63,7 +63,7 @@ const Dropdown = () => {
 
         {/* botão de troca de tema pode ser adicionado aqui */}
 
-        <li><hr className="dropdown-divider" /></li>
+        {/* <li><hr className="dropdown-divider" /></li> */}
 
         <li>
           <Link to="/login" className="dropdown-item" onClick={() => setIsOpen(false)}>
