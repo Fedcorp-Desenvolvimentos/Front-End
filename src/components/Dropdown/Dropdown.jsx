@@ -25,9 +25,9 @@ const Dropdown = () => {
 
   return (
     <div className="dropdown" ref={dropdownRef}>
-      <button 
-        className="dropdown-btn" 
-        type="button" 
+      <button
+        className="dropdown-btn"
+        type="button"
         onClick={toggleDropdown}
       >
         <i className="bi bi-three-dots-vertical"></i>
@@ -54,12 +54,10 @@ const Dropdown = () => {
           </Link>
         </li>
 
-        <li>
-          <Link to="/" className="dropdown-item" onClick={() => setIsOpen(false)}>
-            <i className="bi bi-people-fill"></i>
-            Histórico
-          </Link>
-        </li>
+        <Link to="/historico" className="dropdown-item" onClick={() => setIsOpen(false)}>
+          <i className="bi bi-clock-history"></i>
+          Histórico
+        </Link>
 
         <li><hr className="dropdown-divider" /></li>
 

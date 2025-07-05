@@ -10,6 +10,7 @@ import Conta from './components/Dropdown/dropItens/conta';
 import Config from './components/Dropdown/dropItens/Configuracoes';
 import Cadastro from './components/Dropdown/dropItens/Cadastro';
 import DashboardLayout from './Layouts/DashboardLayout';
+import HistoricoPage from "./components/Dropdown/dropItens/HistoricoPage"; 
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/conta" element={<Conta />} />
           <Route path="/config" element={<Config />} />
           <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/historico" element={<HistoricoPage />} />
         </Route>
       </Routes>
     </Router>
