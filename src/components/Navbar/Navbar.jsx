@@ -26,30 +26,6 @@ function Navbar() {
               </Link>
             </li>
 
-            {/* Dropdown Consultar Dados */}
-            <li
-              className={`nav-item dropdown ${dropdownOpen ? "show" : ""}`}
-              onMouseEnter={() => setDropdownOpen(true)}
-              onMouseLeave={() => setDropdownOpen(false)}
-            >
-              <button type="button" className="btn nav-link">
-                <i className="bi bi-clipboard2-minus-fill"></i>
-                Consultar Dados
-              </button>
-              <ul className="dropdown-menu">
-                <li>
-                  <Link className="dropdown-item" to="/consulta-pf">
-                    Pessoa Física
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" to="/consulta-cnpj">
-                    Pessoa Jurídica
-                  </Link>
-                </li>
-              </ul>
-            </li>
-
             <li className="nav-item">
               <Link className="nav-link" to="/consulta-end">
                 <button type="button" className="btn">
@@ -66,6 +42,26 @@ function Navbar() {
                   Consulta em Massa
                 </button>
               </Link>
+            </li>
+
+                {/* Dropdown Consultar Dados */}
+                <li
+              className={`nav-item dropdown ${dropdownOpen ? "show" : ""}`}
+              onMouseEnter={() => setDropdownOpen(true)}
+              onMouseLeave={() => setDropdownOpen(false)}
+            >
+              <div className="nav-link btn d-flex align-items-center">
+                <i className="bi bi-clipboard2-minus-fill"></i>
+                Consultar Dados
+              </div>
+              <ul className="dropdown-menu">
+                <li>
+                  <Link className="dropdown-item" to="/consulta-pf">Pessoa Física</Link>
+                </li>
+                <li>
+                  <Link className="dropdown-item" to="/consulta-cnpj">Pessoa Jurídica</Link>
+                </li>
+              </ul>
             </li>
           </ul>
 

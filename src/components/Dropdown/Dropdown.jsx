@@ -54,6 +54,13 @@ const Dropdown = () => {
           </Link>
         </li>
 
+        <li>
+          <Link to="/" className="dropdown-item" onClick={() => setIsOpen(false)}>
+            <i className="bi bi-people-fill"></i>
+            Histórico
+          </Link>
+        </li>
+
         <li><hr className="dropdown-divider" /></li>
 
         {/* botão de troca de tema pode ser adicionado aqui */}
