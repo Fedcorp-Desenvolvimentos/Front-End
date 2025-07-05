@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "../styles/Navbar.css";
 import Dropdown from "../Dropdown/Dropdown";
 
 function Navbar() {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
   return (
     <nav className="navbar border-bottom">
       <div className="container">
@@ -15,40 +18,54 @@ function Navbar() {
           <ul className="navbar-nav">
             {/* Botão início */}
             <li className="nav-item">
-              <a className="nav-link active" href="./Home">
+              <Link className="nav-link" to="/home">
                 <button type="button" className="btn">
                   <i className="bi bi-house-door-fill"></i>
                   Início
                 </button>
-              </a>
+              </Link>
             </li>
 
-            {/* botão dados */}
-            <li className="nav-item">
-              <a className="nav-link" href="../Consultas/ConsultaPf.jsx">
-                <button type="button" className="btn">
-                  <i className="bi bi-clipboard2-minus-fill"></i>
-                  Consultar Dados
-                </button>
-              </a>
+            {/* Dropdown Consultar Dados */}
+            <li
+              className={`nav-item dropdown ${dropdownOpen ? "show" : ""}`}
+              onMouseEnter={() => setDropdownOpen(true)}
+              onMouseLeave={() => setDropdownOpen(false)}
+            >
+              <button type="button" className="btn nav-link">
+                <i className="bi bi-clipboard2-minus-fill"></i>
+                Consultar Dados
+              </button>
+              <ul className="dropdown-menu">
+                <li>
+                  <Link className="dropdown-item" to="/consulta-pf">
+                    Pessoa Física
+                  </Link>
+                </li>
+                <li>
+                  <Link className="dropdown-item" to="/consulta-cnpj">
+                    Pessoa Jurídica
+                  </Link>
+                </li>
+              </ul>
             </li>
 
             <li className="nav-item">
-              <a className="nav-link" href="../Components/Consultas/ConsultaEnd">
+              <Link className="nav-link" to="/consulta-end">
                 <button type="button" className="btn">
                   <i className="bi bi-geo-alt-fill"></i>
                   Consultar Endereço
                 </button>
-              </a>
+              </Link>
             </li>
 
             <li className="nav-item">
-              <a className="nav-link" href="../Consultas/ConsultaPf.jsx">
+              <Link className="nav-link" to="/consulta-pf">
                 <button type="button" className="btn">
-                  <i className="bi bi-clipboard2-minus-fill"></i>
-                  Consultar em Massa
+                  <i className="bi bi-ui-checks-grid"></i>
+                  Consulta em Massa
                 </button>
-              </a>
+              </Link>
             </li>
           </ul>
 

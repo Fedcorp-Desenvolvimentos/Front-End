@@ -1,63 +1,40 @@
-.navbar {
-  background-color: #f8f9fa;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2rem;
-  border-bottom: 1px solid #ddd;
-}
+/* =========================
+   NAVBAR GERAL
+   ========================= */
 
-.container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.logo {
-  height: 40px;
-  margin-right: 1.5rem;
-  margin-left: 1rem;
-}
-
-/* Navegação */
-.navbar-nav {
-  display: flex;
-  gap: 1rem;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-}
-
-.nav-link {
-  text-decoration: none;
-}
-
-.btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  cursor: pointer;
-  border-radius: 0.375rem;
-  background-color: #0d6efd;
-  color: white;
-  border: none;
-  transition: background-color 0.3s;
-}
-
-.btn:hover {
-  background-color: #0b5ed7;
-}
-
- 
+   .navbar {
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .navbar-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  /* =========================
+     LOGO
+     ========================= */
+  
+  .logo {
+    height: 40px;
+    margin-right: 1.5rem;
+    margin-left: 1rem;
+  }
+  
   .navbar-brand img.logo {
     width: 15.3rem;
     height: auto;
@@ -68,18 +45,16 @@
     transform: scale(1.1);
   }
   
-  .navbar-content {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
+  /* =========================
+     LINKS E BOTÕES
+     ========================= */
   
   .navbar-nav {
     display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
     gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
   }
   
   .nav-item {
@@ -90,3 +65,103 @@
   .nav-link {
     text-decoration: none;
   }
+  
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 0.375rem;
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    transition: background-color 0.3s;
+  }
+  
+  .btn:hover {
+    background-color: #0b5ed7;
+  }
+  
+  /* =========================
+     DROPDOWN “Consultar Dados”
+     ========================= */
+  
+  .nav-item.dropdown {
+    position: relative;
+  }
+  
+  /* Esconde o menu por padrão */
+  .nav-item.dropdown .dropdown-menu {
+    display: none;
+    opacity: 0;
+    transform: translateY(0.5rem);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+  
+  /* Exibe o menu apenas quando .show é adicionado pelo JS */
+  .nav-item.dropdown.show .dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Posiciona o menu centralizado abaixo do botão */
+  .nav-item.dropdown .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, 0.5rem);
+    transform-origin: top center;
+    min-width: 180px;
+    z-index: 1000;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 0;
+  }
+  
+  /* Itens do dropdown */
+  .nav-item.dropdown .dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    color: #007bff;
+    text-decoration: none;
+    text-align: left;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  
+  .nav-item.dropdown .dropdown-item:hover {
+    background-color: #0056b3;
+    color: #ffffff;
+  }
+  
+  /* Remove triângulo padrão do Bootstrap */
+  .nav-item.dropdown .dropdown-menu::before {
+    display: none;
+  }
+  
+  /* Botão dropdown com seta */
+  .nav-item.dropdown > .btn.nav-link {
+    padding-right: 1.25rem;
+    position: relative;
+  }
+  
+  .nav-item.dropdown > .btn.nav-link::after {
+    content: "▼";
+    font-size: 0.6rem;
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.2s;
+  }
+  
+  .nav-item.dropdown.show > .btn.nav-link::after {
+    transform: translateY(-50%) rotate(180deg);
+  }
+  
