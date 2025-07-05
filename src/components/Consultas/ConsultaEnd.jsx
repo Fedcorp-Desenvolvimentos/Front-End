@@ -293,6 +293,12 @@ const ConsultaEnd = () => {
     setMassConsultaMessage("");
   };
 
+
+  // ==============================================================================
+  //                                   HTML
+  // ==============================================================================
+
+
   return (
     <div className="consulta-container">
       <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
