@@ -32,34 +32,16 @@ api.interceptors.response.use(
       originalRequest &&
       !originalRequest._retry
     ) {
-      originalRequest._retry = true; // Marca como retentativa para evitar loops infinitos
-
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (refreshToken) {
-        try {
-         const refreshResponse = await axios.post(`${API_BASE_URL}/login/refresh/`, { refresh: refreshToken });
-         const newAccessToken = refreshResponse.data.access;
-         localStorage.setItem('accessToken', newAccessToken);
-         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-         return api(originalRequest); // Retenta a requisição original com o novo token
-
-          //console.warn(
-            //"Token de acesso expirado. Implemente a lógica de refresh de token aqui."
-          //);
-          // Por enquanto, podemos redirecionar para o login ou forçar o logout
-          
-        } catch (refreshError) {
-          console.error("Falha ao renovar o token:", refreshError);
-          // Força o logout se a renovação falhar
-          // window.location.href = '/login';
-        }
+      localStorage.clear() 
+      window.location.href="/login"
+    
       } else {
         console.warn(
           "Nenhum refresh token disponível. Redirecionando para o login."
         );
-        // window.location.href = '/login'; // Redireciona para a página de login
+        window.location.href = '/login';
       }
-    }
+    
 
     // Tratamento de erro padrão para outros erros HTTP
     const errorMessage =

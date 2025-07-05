@@ -1,91 +1,95 @@
-import React, { useState } from 'react';
-import '../styles/Consulta.css';
-import { ConsultaService } from '../../services/consultaService';
-import { FileSpreadsheet } from 'lucide-react';
+import React, { useState } from "react";
+import * as XLSX from "xlsx"; // Importe a biblioteca XLSX
+import "../styles/Consulta.css";
+import { ConsultaService } from "../../services/consultaService";
+import { FileSpreadsheet } from "lucide-react"; // Ícone para consulta em massa
+
+// Função auxiliar para obter o CSRF token (necessário se você usa autenticação de sessão Django)
+// Se você usa apenas Token/JWT Authentication, pode remover esta função e a linha relacionada.
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(name + "=")) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
 
 const ConsultaCNPJ = () => {
-
-  const [cnpj, setCnpj] = useState('');
-  const [activeForm, setActiveForm] = useState('cnpj');
+  const [cnpj, setCnpj] = useState("");
+  const [activeForm, setActiveForm] = useState("cnpj");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resultado, setResultado] = useState(null);
   const [formData, setFormData] = useState({
-    razaoSocial: '',
-    uf: '',
-    email: '',
-    telefone: ''
+    razaoSocial: "",
+    uf: "",
+    email: "",
+    telefone: "",
   });
 
+  // Estado para mensagens de feedback específicas da consulta em massa
+  const [massConsultaMessage, setMassConsultaMessage] = useState("");
+
   const handleCnpjChange = (e) => {
-    const rawCnpj = e.target.value.replace(/\D/g, '');
+    const rawCnpj = e.target.value.replace(/\D/g, "");
     setCnpj(rawCnpj);
   };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
-    setResultado(null);
+    setResultado(null); // Limpa o resultado da consulta anterior
+    setMassConsultaMessage(""); // Limpa mensagens de consulta em massa
 
     let payload = {};
     let isFormValid = true;
-    let validationErrorMessage = '';
+    let validationErrorMessage = "";
 
-    if (activeForm === 'cnpj') {
+    if (activeForm === "cnpj") {
       if (cnpj.length !== 14) {
-        validationErrorMessage = 'Por favor, insira um CNPJ válido com 14 dígitos.';
+        validationErrorMessage =
+          "Por favor, insira um CNPJ válido com 14 dígitos.";
         isFormValid = false;
       } else {
         payload = {
-          tipo_consulta: 'cnpj',
+          tipo_consulta: "cnpj",
           parametro_consulta: cnpj,
+          // 'origem' não é passado para consultas individuais, se sua API diferenciar
+          // origem: 'manual',
         };
       }
-    } else if (activeForm === 'chaves') {
-      // Lógica para o formulário de Chaves Alternativas
-      // O seu backend PRECISARÁ ter um endpoint ou lógica para lidar com este tipo de busca.
-      // Assumindo que o backend espera 'nome_empresa' ou 'razao_social' como tipo_consulta.
-      // E que pode aceitar os outros campos como filtros ou parâmetros de busca.
-
-      // Exemplo: Validação mínima para Razão Social
-      if (!formData.razaoSocial.trim() && !formData.uf.trim() && !formData.email.trim() && !formData.telefone.trim()) {
-        validationErrorMessage = 'Por favor, preencha pelo menos um campo para busca por chaves alternativas.';
+    } else if (activeForm === "chaves") {
+      if (
+        !formData.razaoSocial.trim() &&
+        !formData.uf.trim() &&
+        !formData.email.trim() &&
+        !formData.telefone.trim()
+      ) {
+        validationErrorMessage =
+          "Por favor, preencha pelo menos um campo para busca por chaves alternativas.";
         isFormValid = false;
       } else {
-        // IMPORTANTE: Aqui você define como o payload será enviado para o backend.
-        // O `realizarConsulta` que temos espera 'tipo_consulta' e 'parametro_consulta'.
-        // Para chaves alternativas, o ideal seria um novo `tipo_consulta` (ex: 'busca_avancada_cnpj')
-        // E o `parametro_consulta` seria um JSON stringificado ou o backend precisaria de outro endpoint.
-
-        // CENÁRIO 1: O BACKEND JÁ TEM UM TIPO DE CONSULTA ESPECÍFICO PARA ISSO
-        // Exemplo: Se o backend aceita `tipo_consulta: 'nome_empresa'` e `parametro_consulta: 'Razão Social'`
-        // OU se ele aceita `tipo_consulta: 'cnpj_alternativo'` e `parametro_consulta: {razaoSocial: '...', uf: '...'}`
-        // Essa é a maneira mais provável de funcionar com seu `realizarConsulta`.
-
-        // **Por favor, CONFIRME com seu backend qual tipo_consulta e formato de parametro_consulta ele espera para buscas por nome/chaves alternativas.**
-
-        // Por enquanto, vamos assumir um `tipo_consulta` genérico e o `parametro_consulta` como um objeto
-        // stringificado, esperando que o backend o desestruture.
-        // ESSA É UMA ADAPTAÇÃO TEMPORÁRIA E PODE NÃO SER A FORMA IDEAL PARA O SEU BACKEND.
-
         payload = {
-          tipo_consulta: 'busca_cnpj_alternativa', // <--- Este NOVO tipo_consulta precisa ser suportado pelo backend!
-          parametro_consulta: JSON.stringify(formData), // <--- Envia o objeto como string JSON
+          tipo_consulta: "busca_cnpj_alternativa",
+          parametro_consulta: JSON.stringify(formData),
+          // origem: 'manual',
         };
-
-        // CENÁRIO 2: SE O BACKEND TIVER UM ENDPOINT DIFERENTE PARA BUSCA AVANÇADA
-        // Se houver um endpoint como `/consultas/cnpj/buscar-alternativo/` que aceita
-        // um POST com {razaoSocial: '', uf: ''}, você faria:
-        // const response = await api.post('/consultas/cnpj/buscar-alternativo/', formData);
-        // E precisaria de uma nova função em `ConsultaService`.
       }
     }
 
@@ -96,14 +100,152 @@ const ConsultaCNPJ = () => {
     }
 
     try {
-      // Chama o serviço de consulta com o payload preparado
       const response = await ConsultaService.realizarConsulta(payload);
       setResultado(response);
-      console.log('Resultado da consulta:', response);
+      console.log("Resultado da consulta:", response);
     } catch (err) {
-      const errorMessage = err.response?.data?.detail || err.response?.data?.message || err.message || 'Erro ao realizar consulta.';
+      const errorMessage =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        err.message ||
+        "Erro ao realizar consulta.";
       setError(errorMessage);
-      console.error('Erro na consulta:', err.response?.data || err);
+      console.error("Erro na consulta:", err.response?.data || err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- NOVA LÓGICA PARA CONSULTA EM MASSA ---
+
+  // Função para lidar com o upload do arquivo Excel
+  const handleMassFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) {
+      setMassConsultaMessage("Por favor, selecione um arquivo para upload.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setResultado(null);
+    setMassConsultaMessage("Lendo planilha e preparando para consulta...");
+
+    const reader = new FileReader();
+
+    reader.onload = async (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0]; // Pega a primeira aba da planilha
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet); // Converte para array de objetos JSON
+
+        console.log("Dados da planilha importada:", jsonData);
+
+        // Certifique-se de que cada objeto tem a chave 'CNPJ'
+        const cnpjsParaConsulta = jsonData.map((row) => ({
+          CNPJ: String(row.CNPJ),
+        }));
+
+        // --- Obtém o token de autenticação do localStorage ---
+        // SUBSTITUA 'yourAuthTokenKey' pela CHAVE REAL que você usa no localStorage
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          setMassConsultaMessage(
+            "Erro: Token de autenticação não encontrado. Faça login novamente."
+          );
+          setLoading(false);
+          return;
+        }
+
+  
+        const requestBody = {
+          cnpjs: cnpjsParaConsulta,
+          origem_planilha: true, // Flag para indicar que a requisição veio da planilha
+        };
+
+        setMassConsultaMessage("Enviando CNPJs para processamento em massa...");
+        const response = await fetch("http://127.0.0.1:8000/planilha-cnpj/", {
+          // Endpoint que você configurou no Django
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (response.ok) {
+          const blob = await response.blob(); // O backend retorna um Blob (arquivo XLSX)
+          const url = window.URL.createObjectURL(new Blob([blob]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "planilha-resultado.xlsx"); // Nome do arquivo a ser baixado
+          document.body.appendChild(link);
+          link.click(); // Simula o clique para iniciar o download
+          link.parentNode.removeChild(link); // Remove o link após o download
+          setMassConsultaMessage(
+            "Processamento concluído! O download da planilha de resultados iniciou."
+          );
+        } else {
+          const errorText = await response.text(); // Tenta ler a mensagem de erro como texto
+          console.error("Erro ao enviar planilha para o backend:", errorText);
+          setMassConsultaMessage(
+            `Erro ao processar a planilha: ${errorText || "Erro desconhecido."}`
+          );
+        }
+      } catch (err) {
+        console.error("Erro na comunicação ou processamento do arquivo:", err);
+        setMassConsultaMessage(
+          `Erro inesperado: ${
+            err.message || "Verifique sua conexão e o formato do arquivo."
+          }`
+        );
+      } finally {
+        setLoading(false);
+        // Limpa o valor do input file para permitir o re-upload do mesmo arquivo
+        event.target.value = null;
+      }
+    };
+
+    reader.readAsArrayBuffer(file); // Lê o arquivo como um ArrayBuffer
+  };
+
+  // Função para baixar a planilha modelo
+  const handleDownloadModel = async () => {
+    setLoading(true);
+    setMassConsultaMessage("Baixando planilha modelo...");
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/modelo-cnpj",
+        {
+          method: "GET",
+        }
+      );
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "modelo-cnpj.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+        setMassConsultaMessage("Download do modelo concluído.");
+      } else {
+        const errorText = await response.text();
+        console.error("Erro ao baixar modelo:", errorText);
+        setMassConsultaMessage(
+          `Erro ao baixar modelo: ${errorText || "Erro desconhecido."}`
+        );
+      }
+    } catch (err) {
+      console.error("Erro na comunicação:", err);
+      setMassConsultaMessage(
+        "Erro na comunicação com o servidor para baixar o modelo."
+      );
     } finally {
       setLoading(false);
     }
@@ -115,16 +257,25 @@ const ConsultaCNPJ = () => {
 
       <div className="card-options-wrapper">
         <div
-          className={`card card-option ${activeForm === 'cnpj' ? 'active' : ''}`}
+          className={`card card-option ${
+            activeForm === "cnpj" ? "active" : ""
+          }`}
           onClick={() => {
-            setActiveForm('cnpj');
+            setActiveForm("cnpj");
             setError(null);
             setResultado(null);
+            setMassConsultaMessage(""); // Limpa mensagens ao trocar de aba
           }}
         >
           <div className="icon-container">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="white"
-              className="bi bi-building" viewBox="0 0 16 16">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="25"
+              height="25"
+              fill="white"
+              className="bi bi-building"
+              viewBox="0 0 16 16"
+            >
               <path d="M4 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zM7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zM4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z" />
               <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3z" />
             </svg>
@@ -133,15 +284,22 @@ const ConsultaCNPJ = () => {
         </div>
 
         <div
-          className={`card card-option ${activeForm === 'chaves' ? 'active' : ''}`}
+          className={`card card-option ${
+            activeForm === "chaves" ? "active" : ""
+          }`}
           onClick={() => {
-            setActiveForm('chaves');
+            setActiveForm("chaves");
             setError(null);
             setResultado(null);
+            setMassConsultaMessage(""); // Limpa mensagens ao trocar de aba
           }}
         >
           <div className="icon-container">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 16 16">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="white"
+              viewBox="0 0 16 16"
+            >
               <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5z" />
               <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5zM10 8a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0zm-6 4a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0zm4-3a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1" />
             </svg>
@@ -149,13 +307,16 @@ const ConsultaCNPJ = () => {
           <h5>Chaves Alternativas</h5>
         </div>
 
-          {/* Card Consulta em Massa */}
-          <div
-          className={`card card-option ${activeForm === 'massa' ? 'active' : ''}`}
+        {/* Card Consulta em Massa */}
+        <div
+          className={`card card-option ${
+            activeForm === "massa" ? "active" : ""
+          }`}
           onClick={() => {
-            setActiveForm('massa');
+            setActiveForm("massa");
             setError(null);
             setResultado(null);
+            setMassConsultaMessage(""); // Limpa mensagens ao trocar de aba
           }}
         >
           <div className="icon-container">
@@ -163,10 +324,9 @@ const ConsultaCNPJ = () => {
           </div>
           <h5>Consulta em Massa</h5>
         </div>
-      
       </div>
 
-      {activeForm === 'cnpj' && (
+      {activeForm === "cnpj" && (
         <form className="form-container" onSubmit={handleSubmit}>
           <label htmlFor="cnpj">Digite o documento</label>
           <input
@@ -177,13 +337,16 @@ const ConsultaCNPJ = () => {
             onChange={handleCnpjChange}
             placeholder="Digite o CNPJ"
             required
+            disabled={loading} // Desabilita enquanto estiver carregando
           />
-          <button type="submit" disabled={loading || cnpj.length !== 14}>Consultar</button>
+          <button type="submit" disabled={loading || cnpj.length !== 14}>
+            Consultar
+          </button>
           {error && <p className="error-message">{error}</p>}
         </form>
       )}
 
-      {activeForm === 'chaves' && (
+      {activeForm === "chaves" && (
         <form className="form-container" onSubmit={handleSubmit}>
           <label htmlFor="razaoSocial">Razão Social:</label>
           <input
@@ -193,6 +356,7 @@ const ConsultaCNPJ = () => {
             value={formData.razaoSocial}
             onChange={handleFormChange}
             placeholder="Digite a razão social"
+            disabled={loading}
           />
 
           <label htmlFor="uf">UF</label>
@@ -204,6 +368,7 @@ const ConsultaCNPJ = () => {
             onChange={handleFormChange}
             placeholder="Digite a UF"
             maxLength="2"
+            disabled={loading}
           />
           <label htmlFor="email">E-mail</label>
           <input
@@ -213,6 +378,7 @@ const ConsultaCNPJ = () => {
             value={formData.email}
             onChange={handleFormChange}
             placeholder="Digite o e-mail"
+            disabled={loading}
           />
           <label htmlFor="telefone">Telefone</label>
           <input
@@ -222,11 +388,17 @@ const ConsultaCNPJ = () => {
             value={formData.telefone}
             onChange={handleFormChange}
             placeholder="Digite o telefone"
-          // Você pode adicionar maxLength e pattern para telefone se quiser formatar/validar
+            disabled={loading}
           />
           <button
             type="submit"
-            disabled={loading || (!formData.razaoSocial.trim() && !formData.uf.trim() && !formData.email.trim() && !formData.telefone.trim())}
+            disabled={
+              loading ||
+              (!formData.razaoSocial.trim() &&
+                !formData.uf.trim() &&
+                !formData.email.trim() &&
+                !formData.telefone.trim())
+            }
           >
             Consultar
           </button>
@@ -234,118 +406,117 @@ const ConsultaCNPJ = () => {
         </form>
       )}
 
-      
       {/* Conteúdo Consulta em Massa */}
-      {activeForm === 'massa' && (
+      {activeForm === "massa" && (
         <div className="form-massa-container">
-          <button
-            type="button"
-            onClick={() => document.getElementById('input-massa').click()}
-          >
-            Importar Planilha
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              const link = document.createElement('a');
-              link.href = '/planilha-modelo.xlsx';
-              link.download = 'planilha-modelo.xlsx';
-              link.click();
-            }}
-          >
-            Baixar Planilha Modelo
-          </button>
+          {/* Oculta o input de arquivo e dispara-o através do clique do botão */}
           <input
             type="file"
             id="input-massa"
             accept=".xlsx, .xls"
-            style={{ display: 'none' }}
-            onChange={e => {
-              const arquivo = e.target.files[0];
-              if (arquivo) console.log('Importou:', arquivo.name);
-              // chamar aqui para baixar a planilha quando tiver o modelo definido
-            }}
+            style={{ display: "none" }}
+            onChange={handleMassFileUpload} // Atrela a nova função de upload aqui
+            disabled={loading}
           />
-
           <button
-              type="button"
-              onClick={() => {
-                const link = document.createElement('a');
-                link.href = '/planilha-resultado.xlsx';
-                link.download = 'planilha-resultado.xlsx';
-                link.click();
-              }}
+            type="button"
+            onClick={() => document.getElementById("input-massa").click()} // Dispara o input de arquivo
+            disabled={loading}
           >
-            Exportar Resultado
+            Importar Planilha de CNPJs
           </button>
+          <button
+            type="button"
+            onClick={handleDownloadModel} // Atrela a nova função de download do modelo aqui
+            disabled={loading}
+          >
+            Baixar Planilha Modelo
+          </button>
+
+          {/* Não é mais necessário um botão de "Exportar Resultado" avulso,
+              pois o download da planilha de resultados é automático após o processamento.
+              Você pode deixar um indicador ou mensagem.
+          */}
+          {loading && <p>Carregando...</p>}
+          {massConsultaMessage && (
+            <p className="message">{massConsultaMessage}</p>
+          )}
+          {error && <p className="error-message">{error}</p>}
         </div>
       )}
 
-
-      {resultado?.resultado_api && (
+      {/* Exibição do resultado de consulta individual (CNPJ ou Chaves Alternativas) */}
+      {activeForm !== "massa" && resultado?.resultado_api && (
         <div className="card-resultado">
           <h4>Resultado da busca realizada</h4>
 
           <label>Razão Social:</label>
-          <input type="text" value={resultado.resultado_api.razao_social || ''} disabled />
+          <input
+            type="text"
+            value={resultado.resultado_api.razao_social || ""}
+            disabled
+          />
 
           <label>CNPJ:</label>
-          <input type="text" value={resultado.resultado_api.cnpj || ''} disabled />
+          <input
+            type="text"
+            value={resultado.resultado_api.cnpj || ""}
+            disabled
+          />
 
           <label>Atividade:</label>
-          <input type="text" value={resultado.resultado_api.cnae_fiscal_descricao || ''} disabled />
+          <input
+            type="text"
+            value={resultado.resultado_api.cnae_fiscal_descricao || ""}
+            disabled
+          />
 
           <label>Endereço:</label>
           <input
             type="text"
-            value={
-              `${resultado.resultado_api.descricao_tipo_de_logradouro || ''} ${resultado.resultado_api.logradouro || ''}, ${resultado.resultado_api.numero || ''}`
-            }
+            value={`${
+              resultado.resultado_api.descricao_tipo_de_logradouro || ""
+            } ${resultado.resultado_api.logradouro || ""}, ${
+              resultado.resultado_api.numero || ""
+            }`}
             disabled
           />
 
           <label>Bairro:</label>
           <input
             type="text"
-            value={
-              `${resultado.resultado_api.bairro}`
-            }
+            value={`${resultado.resultado_api.bairro}`}
             disabled
           />
 
           <label>Munícipio:</label>
           <input
             type="text"
-            value={
-              `${resultado.resultado_api.municipio}`
-            }
+            value={`${resultado.resultado_api.municipio}`}
             disabled
           />
 
           <label>UF:</label>
-          <input
-            type="text"
-            value={
-              `${resultado.resultado_api.uf}`
-            }
-            disabled
-          />
+          <input type="text" value={`${resultado.resultado_api.uf}`} disabled />
 
           <label>CEP:</label>
           <input
             type="text"
-            value={
-              `${resultado.resultado_api.cep}`
-            }
+            value={`${resultado.resultado_api.cep}`}
             disabled
           />
 
-
           <label>Situação Cadastral:</label>
-          <input type="text" value={resultado.resultado_api.descricao_situacao_cadastral || 'Não informada'} disabled />
+          <input
+            type="text"
+            value={
+              resultado.resultado_api.descricao_situacao_cadastral ||
+              "Não informada"
+            }
+            disabled
+          />
         </div>
       )}
-
     </div>
   );
 };
