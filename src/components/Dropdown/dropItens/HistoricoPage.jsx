@@ -48,7 +48,6 @@ const HistoricoPage = () => {
               <th>Tipo</th>
               <th>Documento</th>
               <th>Usuário</th>
-              <th>Resultado</th>
             </tr>
           </thead>
           <tbody>
@@ -65,7 +64,6 @@ const HistoricoPage = () => {
                   <td>{item.tipo}</td>
                   <td>{item.doc}</td>
                   <td>{item.usuario}</td>
-                  <td>{item.resultado}</td>
                 </tr>
               ))
             )}
