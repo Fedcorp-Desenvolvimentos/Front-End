@@ -4,7 +4,7 @@ import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FileSpreadsheet } from "lucide-react"; // Ícone para consulta em massa
 
-
+const DJANGO_BACKEND_BASE_URL = "http://127.0.0.1:8000"
 const ConsultaCNPJ = () => {
   const [cnpj, setCnpj] = useState("");
   const [activeForm, setActiveForm] = useState("cnpj");
@@ -150,7 +150,7 @@ const ConsultaCNPJ = () => {
 
         setMassConsultaMessage("Enviando CNPJs para processamento em massa...");
         const response = await fetch(
-          "http://127.0.0.1:8000/processar-cnpj-planilha/",
+          `${DJANGO_BACKEND_BASE_URL}processar-cnpj-planilha/`,
           {
             // Endpoint que você configurou no Django
             method: "POST",
@@ -204,7 +204,7 @@ const ConsultaCNPJ = () => {
     setMassConsultaMessage("Baixando planilha modelo...");
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/planilha-modelo-cnpj",
+        `${DJANGO_BACKEND_BASE_URL}planilha-modelo-cnpj`,
         {
           method: "GET",
         }
@@ -421,10 +421,7 @@ const ConsultaCNPJ = () => {
             Baixar Planilha Modelo
           </button>
 
-          {/* Não é mais necessário um botão de "Exportar Resultado" avulso,
-              pois o download da planilha de resultados é automático após o processamento.
-              Você pode deixar um indicador ou mensagem.
-          */}
+        
           {loading && <p>Carregando...</p>}
           {massConsultaMessage && (
             <p className="message">{massConsultaMessage}</p>

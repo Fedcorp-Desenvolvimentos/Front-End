@@ -19,7 +19,6 @@ const Login = () => {
     try {
       const response = await UserService.login(payload);
       localStorage.setItem('accessToken', response.access);
-      localStorage.setItem('refreshToken', response.refresh);
       setUserData(response); 
       window.location.href = "/Home";
     } catch (err) {

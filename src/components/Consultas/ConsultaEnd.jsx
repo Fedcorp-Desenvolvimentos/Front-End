@@ -128,8 +128,7 @@ const ConsultaEnd = () => {
     }
   };
 
-  // --- NOVA LÓGICA PARA CONSULTA EM MASSA (CEP) ---
-  // FUNÇÃO ATUALIZADA PARA TRATAR O UPLOAD E LEITURA DO ARQUIVO
+ 
   const handleMassFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) {

@@ -6,6 +6,12 @@ const Dropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+const handleLogout =() =>{
+  setIsOpen(false)
+  localStorage.removeItem('accessToken');
+
+  }
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -66,7 +72,7 @@ const Dropdown = () => {
         <li><hr className="dropdown-divider" /></li>
 
         <li>
-          <Link to="/login" className="dropdown-item" onClick={() => setIsOpen(false)}>
+          <Link to="/login" className="dropdown-item" onClick={() => handleLogout()}>
             <i className="bi bi-door-open-fill"></i>
             Sair
           </Link>

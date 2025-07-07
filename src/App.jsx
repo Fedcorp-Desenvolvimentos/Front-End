@@ -11,7 +11,7 @@ import Config from './components/Dropdown/dropItens/Configuracoes';
 import Cadastro from './components/Dropdown/dropItens/Cadastro';
 import DashboardLayout from './Layouts/DashboardLayout';
 import HistoricoPage from "./components/Dropdown/dropItens/HistoricoPage"; 
-
+import PrivateRoute from './services/privateRoute';
 function App() {
   return (
     <Router>
@@ -22,7 +22,8 @@ function App() {
         <Route path="/esqueci-senha" element={<EsqueciSenha />} />
 
         {/* Páginas protegidas com layout */}
-        <Route element={<DashboardLayout />}>
+        <Route element={<PrivateRoute />}>
+        <Route element={<DashboardLayout />}> 
           <Route path="/home" element={<Home />} />
           <Route path="/consulta-pf" element={<ConsultaPF />} />
           <Route path="/consulta-end" element={<ConsultaEnd />} />
@@ -31,6 +32,7 @@ function App() {
           <Route path="/config" element={<Config />} />
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/historico" element={<HistoricoPage />} />
+        </Route>
         </Route>
       </Routes>
     </Router>

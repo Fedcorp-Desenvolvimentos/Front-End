@@ -92,7 +92,7 @@
   display: none;
   opacity: 0;
   transform: translateY(0.5rem);
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 /* Exibe o menu quando .show é adicionado */
