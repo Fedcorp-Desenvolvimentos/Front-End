@@ -145,12 +145,12 @@ const ConsultaCNPJ = () => {
 
         const requestBody = {
           cnpjs: cnpjsParaConsulta,
-          origem_planilha: true, // Flag para indicar que a requisição veio da planilha
+          origem: "planilha",
         };
 
         setMassConsultaMessage("Enviando CNPJs para processamento em massa...");
         const response = await fetch(
-          `${DJANGO_BACKEND_BASE_URL}processar-cnpj-planilha/`,
+          `${DJANGO_BACKEND_BASE_URL}/processar-cnpj-planilha/`,
           {
             // Endpoint que você configurou no Django
             method: "POST",
@@ -204,7 +204,7 @@ const ConsultaCNPJ = () => {
     setMassConsultaMessage("Baixando planilha modelo...");
     try {
       const response = await fetch(
-        `${DJANGO_BACKEND_BASE_URL}planilha-modelo-cnpj`,
+        `${DJANGO_BACKEND_BASE_URL}/planilha-modelo-cnpj`,
         {
           method: "GET",
         }

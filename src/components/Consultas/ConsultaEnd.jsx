@@ -103,7 +103,7 @@ const ConsultaEnd = () => {
     try {
       const response = await ConsultaService.realizarConsulta(payload);
       setResultado(response);
-      console.log("Resultado da consulta de endereço individual:", response);
+      
       if (
         response.mensagem === "Consulta realizada com sucesso." &&
         response.resultado_api
@@ -143,7 +143,7 @@ const ConsultaEnd = () => {
     setResultado(null);
     setMessage(null);
     setMassConsultaMessage("Lendo planilha e preparando para consulta...");
-    console.log("Arquivo selecionado:", file.name, file.type); // Log para depuração
+    
 
     const reader = new FileReader();
 
@@ -155,8 +155,7 @@ const ConsultaEnd = () => {
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet); // Converte para array de objetos JSON
 
-        console.log("Dados lidos da planilha:", jsonData); // Log para depuração
-
+        
         // Certifique-se de que cada objeto tem a chave 'CEP'
         const cepsParaConsulta = jsonData.map((row) => ({
           // Supondo que a coluna na planilha se chame 'CEP' (maiúsculas)
@@ -172,7 +171,7 @@ const ConsultaEnd = () => {
             return;
         }
 
-        console.log("CEPs prontos para consulta:", cepsValidos); // Log para depuração
+      
 
         // --- Obtém o token de autenticação do localStorage ---
         const token = localStorage.getItem("accessToken");
@@ -190,7 +189,7 @@ const ConsultaEnd = () => {
         };
 
         setMassConsultaMessage("Enviando CEPs para processamento em massa...");
-        console.log("Enviando request para:", `${DJANGO_BACKEND_BASE_URL}/processar-cep-planilha/`); // Log para depuração
+      
         const response = await fetch(
           `${DJANGO_BACKEND_BASE_URL}/processar-cep-planilha/`, // Ajuste este endpoint no Django
           {
@@ -215,7 +214,7 @@ const ConsultaEnd = () => {
           setMassConsultaMessage(
             "Processamento concluído! O download da planilha de resultados iniciou."
           );
-          console.log("Download iniciado com sucesso."); // Log para depuração
+          
         } else {
           let errorText = await response.text();
           try {
@@ -486,38 +485,38 @@ const ConsultaEnd = () => {
           <label>CEP:</label>
           <input
             type="text"
-            value={resultado.resultado_api.cep || ""}
+            value={resultado.resultado_api.cep || "N/A"}
             disabled
           />
 
           <label>Logradouro:</label>
           <input
             type="text"
-            value={resultado.resultado_api.logradouro || ""}
+            value={resultado.resultado_api.street || "N/A"}
             disabled
           />
 
           <label>Bairro:</label>
           <input
             type="text"
-            value={resultado.resultado_api.bairro || ""}
+            value={resultado.resultado_api.neighborhood || "N/A"}
             disabled
           />
 
           <label>Cidade:</label>
           <input
             type="text"
-            value={resultado.resultado_api.cidade || ""}
+            value={resultado.resultado_api.city || "N/A"}
             disabled
           />
 
           <label>UF:</label>
-          <input type="text" value={resultado.resultado_api.uf || ""} disabled />
+          <input type="text" value={resultado.resultado_api.state || "N/A"} disabled />
 
           <label>Complemento:</label>
           <input
             type="text"
-            value={resultado.resultado_api.complemento || ""}
+            value={resultado.resultado_api.complement || "N/A"}
             disabled
           />
         </div>
