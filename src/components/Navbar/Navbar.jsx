@@ -44,14 +44,14 @@ function Navbar() {
               </Link>
             </li>
 
-                {/* Dropdown Consultar Dados */}
-                <li
+            {/* Dropdown Consultar Dados */}
+            <li
               className={`nav-item dropdown ${dropdownOpen ? "show" : ""}`}
               onMouseEnter={() => setDropdownOpen(true)}
               onMouseLeave={() => setDropdownOpen(false)}
             >
               <div className="nav-link btn d-flex align-items-center">
-                <i className="bi bi-clipboard2-minus-fill"></i>
+                <i className="bi bi-clipboard2-minus-fill me-2"></i>
                 Consultar Dados
               </div>
               <ul className="dropdown-menu">
@@ -63,6 +63,7 @@ function Navbar() {
                 </li>
               </ul>
             </li>
+
           </ul>
 
           {/* Dropdown no canto direito */}
