@@ -1,26 +1,10 @@
 import React, { useState } from "react";
-// import * as XLSX from "xlsx"; // Importe a biblioteca XLSX
+import * as XLSX from "xlsx"; // Importe a biblioteca XLSX
 import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FileSpreadsheet } from "lucide-react"; // Ícone para consulta em massa
 
-// Função auxiliar para obter o CSRF token (necessário se você usa autenticação de sessão Django)
-// Se você usa apenas Token/JWT Authentication, pode remover esta função e a linha relacionada.
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== "") {
-    const cookies = document.cookie.split(";");
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.startsWith(name + "=")) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
-
+const DJANGO_BACKEND_BASE_URL = "http://127.0.0.1:8000"
 const ConsultaCNPJ = () => {
   const [cnpj, setCnpj] = useState("");
   const [activeForm, setActiveForm] = useState("cnpj");
@@ -141,7 +125,7 @@ const ConsultaCNPJ = () => {
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet); // Converte para array de objetos JSON
 
-        console.log("Dados da planilha importada:", jsonData);
+        
 
         // Certifique-se de que cada objeto tem a chave 'CNPJ'
         const cnpjsParaConsulta = jsonData.map((row) => ({
@@ -159,22 +143,24 @@ const ConsultaCNPJ = () => {
           return;
         }
 
-  
         const requestBody = {
           cnpjs: cnpjsParaConsulta,
-          origem_planilha: true, // Flag para indicar que a requisição veio da planilha
+          origem: "planilha",
         };
 
         setMassConsultaMessage("Enviando CNPJs para processamento em massa...");
-        const response = await fetch("http://127.0.0.1:8000/planilha-cnpj/", {
-          // Endpoint que você configurou no Django
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(requestBody),
-        });
+        const response = await fetch(
+          `${DJANGO_BACKEND_BASE_URL}/processar-cnpj-planilha/`,
+          {
+            // Endpoint que você configurou no Django
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
 
         if (response.ok) {
           const blob = await response.blob(); // O backend retorna um Blob (arquivo XLSX)
@@ -218,7 +204,7 @@ const ConsultaCNPJ = () => {
     setMassConsultaMessage("Baixando planilha modelo...");
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/modelo-cnpj",
+        `${DJANGO_BACKEND_BASE_URL}/planilha-modelo-cnpj`,
         {
           method: "GET",
         }
@@ -251,6 +237,9 @@ const ConsultaCNPJ = () => {
     }
   };
 
+  // ==============================================================================
+  //                                   HTML
+  // ==============================================================================
   return (
     <div className="consulta-container">
       <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
@@ -307,7 +296,6 @@ const ConsultaCNPJ = () => {
           <h5>Chaves Alternativas</h5>
         </div>
 
-        {/* Card Consulta em Massa */}
         <div
           className={`card card-option ${
             activeForm === "massa" ? "active" : ""
@@ -433,10 +421,7 @@ const ConsultaCNPJ = () => {
             Baixar Planilha Modelo
           </button>
 
-          {/* Não é mais necessário um botão de "Exportar Resultado" avulso,
-              pois o download da planilha de resultados é automático após o processamento.
-              Você pode deixar um indicador ou mensagem.
-          */}
+        
           {loading && <p>Carregando...</p>}
           {massConsultaMessage && (
             <p className="message">{massConsultaMessage}</p>

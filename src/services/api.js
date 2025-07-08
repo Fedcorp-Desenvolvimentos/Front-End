@@ -22,39 +22,33 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-
-    if (
-      error.response?.status === 401 &&
-      originalRequest &&
-      !originalRequest._retry
-    ) {
-      localStorage.clear() 
-      window.location.href="/login"
+    if (error.response && error.response.status === 401) {
+      console.warn("Erro 401: Token de acesso inválido ou expirado. Redirecionando para o login.");
+     
+      localStorage.removeItem('accessToken'); 
     
-      } else {
-        console.warn(
-          "Nenhum refresh token disponível. Redirecionando para o login."
-        );
-        window.location.href = '/login';
-      }
-    
+      window.location.href = "/login";
+      
+   
+      return Promise.reject(error);
+    } 
 
-    // Tratamento de erro padrão para outros erros HTTP
+
     const errorMessage =
       error.response?.data?.message ||
       error.message ||
       "Ocorreu um erro inesperado.";
+    
     console.error(
       `Erro da API: ${errorMessage}`,
       error.response?.status,
       error.response?.data
     );
 
-    // Rejeita o erro para que ele possa ser capturado pela função/componente que chamou
     return Promise.reject(error);
   }
 );
