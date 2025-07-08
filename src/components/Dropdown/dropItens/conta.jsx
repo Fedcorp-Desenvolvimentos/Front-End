@@ -184,7 +184,7 @@ const ConfigConta = () => {
               </select>
 
               <div className="modal-actions">
-                <button className="btn-secondary" onClick={() => setMostrarModalEdicao(false)}>
+                <button className="btn-primary" onClick={() => setMostrarModalEdicao(false)}>
                   Cancelar
                 </button>
                 <button className="btn-primary" onClick={salvarEdicaoUsuario}>
