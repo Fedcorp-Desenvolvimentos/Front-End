@@ -225,3 +225,29 @@
   background-color: #dc3545 !important;
   color: white;
 }
+
+.user-table td .btn-icon + .btn-icon {
+  margin-left: 0.5rem;
+}
+
+.modal-content input,
+.modal-content select {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  margin-top: 0.3rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  box-sizing: border-box;
+  outline: none;
+}
+
+/* Label dentro do modal */
+.modal-content label {
+  display: block;
+  font-weight: 500;
+  color: #333;
+  text-align: left;
+  margin-top: 1rem;
+}

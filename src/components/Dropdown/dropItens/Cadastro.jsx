@@ -118,6 +118,7 @@ function Cadastro() {
                 <option value="">Selecione o tipo de usuário</option>
                 <option value="admin">Administrador</option>
                 <option value="usuario">Usuário</option>
+                <option value="comercial">Comercial</option>
               </select>
             </div>
 

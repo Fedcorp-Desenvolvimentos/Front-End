@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../styles/Config.css';
 import { Link } from 'react-router-dom';
+import { UserService } from '../../../services/userService';
 
 const Config = () => {
   const [activeTab, setActiveTab] = useState('perfil');
@@ -8,11 +9,7 @@ const Config = () => {
   const [editandoPerfil, setEditandoPerfil] = useState(false);
   const [editandoSenha, setEditandoSenha] = useState(false);
 
-  // Mock como placeholders
-  const placeholderNome = 'Nome do Usuário';
-  const placeholderCpf = 'Número do CPF';
-  const placeholderEmail = 'E-mail do Usuário';
-
+  const [userId, setUserId] = useState(null);
   const [nome, setNome] = useState('');
   const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
@@ -25,16 +22,36 @@ const Config = () => {
   const [showNovaSenha, setShowNovaSenha] = useState(false);
   const [showConfirmaSenha, setShowConfirmaSenha] = useState(false);
 
-  const handleSalvarPerfil = (e) => {
+  useEffect(() => {
+    UserService.getMe()
+      .then((data) => {
+        setUserId(data.id);
+        setNome(data.nome || '');
+        setEmail(data.email || '');
+        setCpf(data.cpf || '');
+      })
+      .catch((error) => {
+        console.error('Erro ao buscar dados do usuário logado:', error);
+      });
+  }, []);
+
+  const handleSalvarPerfil = async (e) => {
     e.preventDefault();
-    setSuccessMessage('Dados da conta atualizados com sucesso!');
-    setEditandoPerfil(false);
-    setTimeout(() => setSuccessMessage(''), 3000);
+    try {
+      await UserService.updateUser(userId, { nome, cpf, email });
+      setSuccessMessage('Dados da conta atualizados com sucesso!');
+      setEditandoPerfil(false);
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Erro ao atualizar dados do usuário:', error);
+      setSuccessMessage('Erro ao atualizar os dados. Tente novamente.');
+    }
   };
 
   const handleSalvarSenha = (e) => {
     e.preventDefault();
-    setSuccessMessage('Senha alterada com sucesso!');
+    // Aqui você pode chamar uma API real de alteração de senha
+    setSuccessMessage('Senha alterada com sucesso! (mock)');
     setEditandoSenha(false);
     setTimeout(() => setSuccessMessage(''), 3000);
   };
@@ -69,42 +86,37 @@ const Config = () => {
                 <label>Nome:</label>
                 <input
                   type="text"
-                  placeholder={placeholderNome}
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
                   disabled={!editandoPerfil}
                   className={editandoPerfil ? 'editando' : ''}
+                  placeholder="Nome do Usuário"
                 />
 
                 <label>CPF:</label>
                 <input
                   type="text"
-                  placeholder={placeholderCpf}
                   value={cpf}
                   onChange={(e) => setCpf(e.target.value)}
                   disabled={!editandoPerfil}
                   className={editandoPerfil ? 'editando' : ''}
+                  placeholder="Número do CPF"
                 />
 
                 <label>E-mail:</label>
                 <input
                   type="email"
-                  placeholder={placeholderEmail}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={!editandoPerfil}
                   className={editandoPerfil ? 'editando' : ''}
+                  placeholder="E-mail do Usuário"
                 />
 
                 <div className="button-group">
-                  <button
-                    type="button"
-                    className="btn danger"
-                    onClick={() => setEditandoPerfil(true)}
-                  >
+                  <button type="button" className="btn danger" onClick={() => setEditandoPerfil(true)}>
                     <i className="bi bi-pencil"></i> Editar
                   </button>
-
                   {editandoPerfil && (
                     <button type="submit" className="btn primary">
                       <i className="bi bi-save"></i> Salvar
@@ -121,11 +133,11 @@ const Config = () => {
                 <div className="input-with-icon">
                   <input
                     type={showSenhaAtual ? 'text' : 'password'}
-                    placeholder="Senha Atual"
                     value={senhaAtual}
                     onChange={(e) => setSenhaAtual(e.target.value)}
                     disabled={!editandoSenha}
                     className={editandoSenha ? 'editando' : ''}
+                    placeholder="Senha Atual"
                   />
                   <i className={`bi ${showSenhaAtual ? 'bi-eye-slash' : 'bi-eye'}`} onClick={() => setShowSenhaAtual(!showSenhaAtual)} />
                 </div>
@@ -134,11 +146,11 @@ const Config = () => {
                 <div className="input-with-icon">
                   <input
                     type={showNovaSenha ? 'text' : 'password'}
-                    placeholder="Nova Senha"
                     value={novaSenha}
                     onChange={(e) => setNovaSenha(e.target.value)}
                     disabled={!editandoSenha}
                     className={editandoSenha ? 'editando' : ''}
+                    placeholder="Nova Senha"
                   />
                   <i className={`bi ${showNovaSenha ? 'bi-eye-slash' : 'bi-eye'}`} onClick={() => setShowNovaSenha(!showNovaSenha)} />
                 </div>
@@ -147,24 +159,19 @@ const Config = () => {
                 <div className="input-with-icon">
                   <input
                     type={showConfirmaSenha ? 'text' : 'password'}
-                    placeholder="Confirmar Nova Senha"
                     value={confirmarSenha}
                     onChange={(e) => setConfirmarSenha(e.target.value)}
                     disabled={!editandoSenha}
                     className={editandoSenha ? 'editando' : ''}
+                    placeholder="Confirmar Nova Senha"
                   />
                   <i className={`bi ${showConfirmaSenha ? 'bi-eye-slash' : 'bi-eye'}`} onClick={() => setShowConfirmaSenha(!showConfirmaSenha)} />
                 </div>
 
                 <div className="button-group">
-                  <button
-                    type="button"
-                    className="btn danger"
-                    onClick={() => setEditandoSenha(true)}
-                  >
+                  <button type="button" className="btn danger" onClick={() => setEditandoSenha(true)}>
                     <i className="bi bi-pencil"></i> Editar
                   </button>
-
                   {editandoSenha && (
                     <button type="submit" className="btn primary">
                       <i className="bi bi-save"></i> Salvar
