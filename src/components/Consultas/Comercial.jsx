@@ -27,11 +27,11 @@ const ConsultaComercial = () => {
 
   return (
     <div className="comercial-page d-flex flex-column align-items-center justify-content-center">
-      <h2 className="text-center mb-4 titulo-principal">Consulta Comercial</h2>
+      <h2 className="text-center mb-4 titulo-principal">
+      <i className="bi bi-briefcase-fill"></i> Consulta Comercial</h2>
 
       <div className="card form-card">
         <div className="card-body">
-          <h4 className="card-title text-center mb-3">Buscar Cliente Potencial</h4>
 
           <div className="mb-3">
             <label htmlFor="nome" className="form-label">Nome: </label>

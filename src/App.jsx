@@ -7,6 +7,7 @@ import ConsultaPF from './components/Consultas/ConsultaPF';
 import ConsultaEnd from './components/Consultas/ConsultaEnd';
 import ConsultaCNPJ from './components/Consultas/ConsultaCNPJ';
 import Comercial from './components/Consultas/Comercial';
+import Segurados from './components/Consultas/Segurados';
 import Conta from './components/Dropdown/dropItens/conta';
 import Config from './components/Dropdown/dropItens/Configuracoes';
 import Cadastro from './components/Dropdown/dropItens/Cadastro';
@@ -34,6 +35,7 @@ function App() {
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/historico" element={<HistoricoPage />} />
           <Route path="/consulta-comercial" element={<Comercial />} />
+          <Route path="/consulta-segurados" element={<Segurados />} />
         </Route>
         </Route>
       </Routes>
