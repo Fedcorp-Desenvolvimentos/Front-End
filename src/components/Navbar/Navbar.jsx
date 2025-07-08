@@ -36,10 +36,10 @@ function Navbar() {
             </li>
 
             <li className="nav-item">
-              <Link className="nav-link" to="/consulta-pf">
+              <Link className="nav-link" to="/consulta-comercial">
                 <button type="button" className="btn">
                   <i className="bi bi-ui-checks-grid"></i>
-                  Consulta em Massa
+                 Comercial
                 </button>
               </Link>
             </li>
