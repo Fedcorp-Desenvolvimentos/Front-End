@@ -1,7 +1,5 @@
-// src/pages/Login.js (ou onde quer que seu Login.js esteja)
-
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Importe useNavigate
+import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 import { useAuth } from '../../context/AuthContext'
 
@@ -10,34 +8,25 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false); // Mantemos o loading local para o formulário
+    const [loading, setLoading] = useState(false); 
 
-    const { login } = useAuth(); // <--- OBTENHA A FUNÇÃO login DO SEU CONTEXTO
-    const navigate = useNavigate(); // <--- INICIALIZE O HOOK useNavigate
+    const { login } = useAuth(); 
+    const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         setLoading(true);
         setError(null);
-
-        // Não precisamos mais do 'payload', a função 'login' do contexto já espera as credenciais
-        // const payload = { email, password };
-
         try {
-            // Chame a função login do contexto, passando email e password
-            const result = await login({ email, password }); // Use a função login do AuthContext
+            
+            const result = await login({ email, password }); 
 
             if (result.success) {
-                // Se o login for bem-sucedido, redireciona para a Home
-                navigate('/Home'); // <--- Use navigate para redirecionar
+                navigate('/Home'); 
             } else {
-                // Se o login falhar (resultado.success é false), exibe o erro
                 setError(result.error || 'Falha no login. Verifique suas credenciais.');
             }
         } catch (err) {
-            // Este catch deve ser mais genérico, pois a função `login` do contexto
-            // já está lidando com a maioria dos erros da API internamente.
-            // Aqui, podemos pegar erros inesperados que escaparam do contexto.
             setError('Ocorreu um erro inesperado durante o login.');
             console.error('Erro de login no componente:', err);
         } finally {
