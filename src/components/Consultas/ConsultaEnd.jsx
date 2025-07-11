@@ -1,7 +1,7 @@
 // ConsultaEnd.jsx
 
 import React, { useState } from "react";
-import * as XLSX from "xlsx"; // Importe a biblioteca XLSX para leitura no frontend
+// import * as XLSX from "xlsx"; // Importe a biblioteca XLSX para leitura no frontend
 import "../styles/Consulta.css"; // Verifique o caminho
 import { ConsultaService } from "../../services/consultaService"; // Verifique o caminho
 import { FileSpreadsheet } from "lucide-react";

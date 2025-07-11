@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import '../styles/Login.css';
 import { UserService } from '../../services/userService';
+import { FaEye, FaEyeSlash} from 'react-icons/fa'
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -61,16 +63,26 @@ const Login = () => {
                 />
               </div>
 
-              <div className="inputGroup">
+              <div className="inputGroup senhaGroup">
                 <label htmlFor="senha">Senha:</label>
-                <input
-                  type="password"
-                  id="senha"
-                  placeholder="Digite sua senha"
-                  value={password}
+                <div className="senhaWrapper">
+                  <input type={showPassword ? "text" : "password"}
+                  id='senha'
+                  placeholder='Digite sua senha'
+                  value={password} 
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                />
+                  />
+
+                  <button
+                  type='button'
+                  className='togglePassword'
+                  onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+                
               </div>
 
               <button type="submit" className="loginButton">
