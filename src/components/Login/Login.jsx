@@ -1,37 +1,42 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
-import { UserService } from '../../services/userService';
-import { FaEye, FaEyeSlash} from 'react-icons/fa'
+import { useAuth } from '../../context/con'
+
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState(null);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false); 
 
- const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    setError(null);
+    const { login } = useAuth(); 
+    const navigate = useNavigate();
 
-    const payload = { email, password };
-
-    try {
-      const response = await UserService.login(payload);
-      localStorage.setItem('accessToken', response.access);
-      setUserData(response); 
-      window.location.href = "/Home";
-    } catch (err) {
-      setError(err.response?.data?.message || 'Falha no login. Verifique suas credenciais.');
-      console.error('Erro de login:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setLoading(true);
+        setError(null);
 
 
+        try {
+            
+            const result = await login({ email, password }); 
+
+            if (result.success) {
+               
+                navigate('/Home'); 
+            } else {
+                
+                setError(result.error || 'Falha no login. Verifique suas credenciais.');
+            }
+        } catch (err) {
+            setError('Ocorreu um erro inesperado durante o login.');
+            console.error('Erro de login no componente:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
   return (
     <>
       <div className="gradient-bg"></div>
