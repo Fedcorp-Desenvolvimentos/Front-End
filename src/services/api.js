@@ -1,56 +1,41 @@
-import axios from "axios";
-
-const API_BASE_URL = "http://localhost:8000";
+// src/services/api.js
+import axios from 'axios';
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: 'http://localhost:8000/', // Mantenha sua URL do backend
+  withCredentials: true, // Importante para enviar e receber cookies
 });
 
-api.interceptors.request.use(
-  (config) => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+// --- ADICIONE ESTE CÓDIGO PARA TRATAR O CSRF ---
+// Função para obter o cookie CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Intercepta todas as requisições Axios
+api.interceptors.request.use(function (config) {
+    // Para métodos diferentes de GET, HEAD, OPTIONS
+    if (config.method !== 'get' && config.method !== 'head' && config.method !== 'options') {
+        const csrfToken = getCookie('csrftoken'); // Obtém o token do cookie 'csrftoken'
+        if (csrfToken) {
+            config.headers['X-CSRFToken'] = csrfToken; // Adiciona o token ao cabeçalho X-CSRFToken
+        }
     }
     return config;
-  },
-  (error) => {
+}, function (error) {
     return Promise.reject(error);
-  }
-);
-
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response && error.response.status === 401) {
-      console.warn("Erro 401: Token de acesso inválido ou expirado. Redirecionando para o login.");
-     
-      localStorage.removeItem('accessToken'); 
-    
-      window.location.href = "/login";
-      
-   
-      return Promise.reject(error);
-    } 
-
-
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Ocorreu um erro inesperado.";
-    
-    console.error(
-      `Erro da API: ${errorMessage}`,
-      error.response?.status,
-      error.response?.data
-    );
-
-    return Promise.reject(error);
-  }
-);
+});
 
 export default api;

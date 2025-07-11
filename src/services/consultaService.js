@@ -1,30 +1,108 @@
-import api from './api'; 
-
+// services/consultaService.js
+import api from "./api"; // Certifique-se de que este 'api' é a instância do Axios
 
 export const ConsultaService = {
   getConsultaHistory: async () => {
-    const response = await api.get('/consultas/historico/');
+    const response = await api.get("/consultas/historico/");
     return response.data;
   },
 
   realizarConsulta: async (payload) => {
-    // Este método é genérico e aceitará o payload com tipo_consulta: 'cpf'
-    // ou tipo_consulta: 'busca_cpf_alternativa'
-    const response = await api.post('/consultas/realizar/', payload);
+    // Este método é versátil e pode lidar com 'cpf', 'busca_cpf_alternativa',
+    // 'cnpj', 'busca_cnpj_alternativa' ou 'cep'
+    const response = await api.post("/consultas/realizar/", payload);
+    return response.data;
+  },
+
+  consultarCpf: async (cpf) => {
+    const payload = {
+      tipo_consulta: "cpf",
+      parametro_consulta: cpf,
+    };
+    const response = await api.post("/consultas/realizar/", payload);
+    return response.data;
+  },
+
+  // Consulta individual de CEP
+  consultarCep: async (cep) => {
+    const payload = {
+      tipo_consulta: "endereco", // Novo tipo de consulta
+      parametro_consulta: cep,
+    };
+    const response = await api.post("/consultas/realizar/", payload);
     return response.data;
   },
 
   /**
-   * Realiza uma consulta de CPF. No backend, esta chamada será direcionada para a BigDataCorp.
-   * @param {string} cpf - O número do CPF a ser consultado.
-   * @returns {Promise<object>} - Promessa com o resultado da consulta de CPF.
+   * Envia uma lista de CNPJs para processamento em massa e recebe um arquivo.
+   * @param {object} payload - Objeto contendo { cnpjs: Array<object>, origem: string }.
+   * @returns {Promise<Blob>} - Promessa com o Blob do arquivo XLSX de resultado.
    */
-  consultarCpf: async (cpf) => { // Renomeado de consultarCpfPadrao para apenas consultarCpf, se for a única.
-    const payload = {
-      tipo_consulta: 'cpf', // Continua enviando 'cpf'
-      parametro_consulta: cpf,
-    };
-    const response = await api.post('/consultas/realizar/', payload);
+  processarPlanilhaCNPJ: async (payload) => {
+    const response = await api.post("/processar-cnpj-planilha/", payload, {
+      responseType: "blob", // Indica ao Axios para tratar a resposta como um Blob
+    });
+    return response.data;
+  },
+
+  /**
+   * Baixa a planilha modelo de CNPJ.
+   * @returns {Promise<Blob>} - Promessa com o Blob do arquivo XLSX modelo.
+   */
+  baixarPlanilhaModeloCNPJ: async () => {
+    const response = await api.get("/planilha-modelo-cnpj/", {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
+  /**
+   * Envia uma lista de CPFs para processamento em massa e recebe um arquivo.
+   * @param {object} payload - Objeto contendo { cpfs: Array<object>, origem: string }.
+   * @returns {Promise<Blob>} - Promessa com o Blob do arquivo XLSX de resultado.
+   */
+  processarPlanilhaCPF: async (payload) => {
+    const response = await api.post("/processar-cpf-planilha/", payload, {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
+  /**
+   * Baixa a planilha modelo de CPF.
+   * @returns {Promise<Blob>} - Promessa com o Blob do arquivo XLSX modelo.
+   */
+  baixarPlanilhaModeloCPF: async () => {
+    const response = await api.get("/planilha-modelo-cpf/", {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
+  
+
+  /**
+   * NOVO: Envia uma lista de CEPs para processamento em massa e recebe um arquivo.
+   * @param {object} payload - Objeto contendo { ceps: Array<object>, origem: string }.
+   * @returns {Promise<Blob>} - Promessa com o Blob do arquivo XLSX de resultado.
+   */
+  processarPlanilhaCEP: async (payload) => {
+    // Endpoint para processar CEPs em massa. Ajuste conforme seu backend Django.
+    const response = await api.post("/processar-cep-planilha/", payload, {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
+  /**
+   * NOVO: Baixa a planilha modelo de CEP.
+   * @returns {Promise<Blob>} - Promessa com o Blob do arquivo XLSX modelo.
+   */
+  baixarPlanilhaModeloCEP: async () => {
+    // Endpoint para baixar o modelo de planilha de CEP. Ajuste conforme seu backend Django.
+    const response = await api.get("/planilha-modelo-cep/", {
+      responseType: "blob",
+    });
     return response.data;
   },
 };
