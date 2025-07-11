@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import * as XLSX from "xlsx"; // Importe a biblioteca XLSX
+// import * as XLSX from "xlsx"; // Importe a biblioteca XLSX
 import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FileSpreadsheet } from "lucide-react"; // Ícone para consulta em massa
