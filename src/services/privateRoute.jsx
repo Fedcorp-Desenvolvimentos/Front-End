@@ -1,45 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import api from '../services/api';
+import api from '../services/api'; // Certifique-se de que 'api' é a instância do Axios configurada com `withCredentials: true`
 
 const PrivateRoute = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const verifyToken = async () => {
-      const accessToken = localStorage.getItem('accessToken');
-
-      if (!accessToken) {
-        setIsAuthenticated(false);
-        setIsLoading(false);
-        return;
-      }
-
+    const verifyAuthentication = async () => {
       try {
         await api.get('users/me/');
-        setIsAuthenticated(true); 
+        setIsAuthenticated(true);
       } catch (error) {
-      
-        console.error("Erro na verificação do token na rota privada:", error);
+        console.error("Erro na verificação da autenticação na rota privada:", error);
         setIsAuthenticated(false);
       } finally {
-        setIsLoading(false); 
+        setIsLoading(false);
       }
     };
 
-    verifyToken();
+    verifyAuthentication();
   }, []);
 
-
   if (isLoading) {
-    return
+    return <div></div>;
   }
 
   if (isAuthenticated) {
     return <Outlet />;
   } else {
-    localStorage.removeItem('accessToken'); 
     return <Navigate to="/login" replace />;
   }
 };

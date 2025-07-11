@@ -1,19 +1,14 @@
-// ConsultaEnd.jsx
-
 import React, { useState } from "react";
 import * as XLSX from "xlsx"; // Importe a biblioteca XLSX para leitura no frontend
 import "../styles/Consulta.css"; // Verifique o caminho
-import { ConsultaService } from "../../services/consultaService"; // Verifique o caminho
-import { FileSpreadsheet } from "lucide-react";
-
-const DJANGO_BACKEND_BASE_URL = "http://127.0.0.1:8000"; // <--- VERIFIQUE AQUI SUA PORTA DJANGO
+import { ConsultaService } from "../../services/consultaService"; // Já usa o 'api' do Axios
+import { FileSpreadsheet } from "lucide-react"; // Ícone para consulta em massa
 
 const ConsultaEnd = () => {
   const [activeForm, setActiveForm] = useState("cep");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
-  const [resultado, setResultado] = useState(null);
+  const [resultado, setResultado] = useState(null); // Para resultados de consulta individual
   const [formData, setFormData] = useState({
     cep: "",
     rua: "",
@@ -21,7 +16,7 @@ const ConsultaEnd = () => {
     cidade: "",
     uf: "",
   });
-  const [massConsultaMessage, setMassConsultaMessage] = useState("");
+  const [massConsultaMessage, setMassConsultaMessage] = useState(""); // Para mensagens de consulta em massa
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -47,9 +42,8 @@ const ConsultaEnd = () => {
     event.preventDefault();
     setLoading(true);
     setError(null);
-    setMessage(null);
-    setResultado(null);
-    setMassConsultaMessage("");
+    setResultado(null); // Limpa resultado de consulta individual anterior
+    setMassConsultaMessage(""); // Limpa mensagem de massa
 
     let payload = {};
     let isFormValid = true;
@@ -62,7 +56,7 @@ const ConsultaEnd = () => {
         isFormValid = false;
       } else {
         payload = {
-          tipo_consulta: "endereco",
+          tipo_consulta: "endereco", // Endpoint de CEP individual
           parametro_consulta: formData.cep,
           origem: "manual",
         };
@@ -79,7 +73,7 @@ const ConsultaEnd = () => {
         isFormValid = false;
       } else {
         payload = {
-          tipo_consulta: "busca_endereco_alternativa",
+          tipo_consulta: "busca_endereco_alternativa", // Endpoint de chaves alternativas de endereço
           parametro_consulta: JSON.stringify({
             rua: formData.rua,
             bairro: formData.bairro,
@@ -101,16 +95,17 @@ const ConsultaEnd = () => {
     }
 
     try {
+      // ConsultaService já utiliza o 'api' do Axios, que gerencia os cookies HttpOnly
       const response = await ConsultaService.realizarConsulta(payload);
-      setResultado(response);
       
-      if (
-        response.mensagem === "Consulta realizada com sucesso." &&
-        response.resultado_api
-      ) {
-        setMessage("Consulta realizada com sucesso!");
+      // Assume que `resultado_api` é o objeto com os dados do endereço
+      // e que o backend envia uma `mensagem` de sucesso/falha
+      if (response.mensagem === "Consulta realizada com sucesso." && response.resultado_api) {
+        setResultado(response); // Armazena a resposta completa para exibição
+        console.log(response.resultado_api)
       } else {
-        setError(response.mensagem || "Resposta inesperada da API.");
+        setError(response.mensagem || "Resposta inesperada da API. Endereço não encontrado ou inválido.");
+        setResultado(null); // Limpa resultados anteriores em caso de erro
       }
     } catch (err) {
       const errorMessage =
@@ -128,22 +123,19 @@ const ConsultaEnd = () => {
     }
   };
 
- 
+  // --- LÓGICA DE CONSULTA EM MASSA PARA CEP ---
+
   const handleMassFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) {
       setMassConsultaMessage("Por favor, selecione um arquivo para upload.");
-      // Adicione um console.log para depuração
-      console.log("Nenhum arquivo selecionado.");
       return;
     }
 
     setLoading(true);
     setError(null);
-    setResultado(null);
-    setMessage(null);
+    setResultado(null); // Limpa resultados individuais
     setMassConsultaMessage("Lendo planilha e preparando para consulta...");
-    
 
     const reader = new FileReader();
 
@@ -155,90 +147,60 @@ const ConsultaEnd = () => {
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet); // Converte para array de objetos JSON
 
-        
-        // Certifique-se de que cada objeto tem a chave 'CEP'
+        // Mapeia os dados da planilha para o formato esperado pelo backend
+        // Assume que a coluna na planilha se chame 'CEP' (maiúsculas)
         const cepsParaConsulta = jsonData.map((row) => ({
-          // Supondo que a coluna na planilha se chame 'CEP' (maiúsculas)
           CEP: String(row.CEP || "").replace(/\D/g, ""), // Remove não-dígitos e garante string
         }));
 
-        // Filtra CEPs vazios ou inválidos se necessário
+        // Filtra CEPs vazios ou inválidos (aqueles que não têm 8 dígitos após a limpeza)
         const cepsValidos = cepsParaConsulta.filter(item => item.CEP && item.CEP.length === 8);
 
         if (cepsValidos.length === 0) {
-            setMassConsultaMessage("Nenhum CEP válido encontrado na planilha. Verifique a coluna 'CEP'.");
+            setMassConsultaMessage("Nenhum CEP válido encontrado na planilha. Verifique se a coluna de CEPs está preenchida corretamente e se o cabeçalho é 'CEP'.");
             setLoading(false);
             return;
         }
 
-      
-
-        // --- Obtém o token de autenticação do localStorage ---
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
-          setMassConsultaMessage(
-            "Erro: Token de autenticação não encontrado. Faça login novamente."
-          );
-          setLoading(false);
-          return;
-        }
-
         const requestBody = {
           ceps: cepsValidos, // Nome da chave que seu backend espera (ex: 'ceps')
-          origem_planilha: true, // Flag para indicar que a requisição veio da planilha
+          origem: "planilha", // Adiciona a origem para o registro no backend
         };
 
         setMassConsultaMessage("Enviando CEPs para processamento em massa...");
-      
-        const response = await fetch(
-          `${DJANGO_BACKEND_BASE_URL}/processar-cep-planilha/`, // Ajuste este endpoint no Django
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(requestBody),
-          }
-        );
 
-        if (response.ok) {
-          const blob = await response.blob(); // O backend retorna um Blob (arquivo XLSX)
-          const url = window.URL.createObjectURL(new Blob([blob]));
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", "planilha-resultado-ceps.xlsx"); // Nome do arquivo a ser baixado
-          document.body.appendChild(link);
-          link.click(); // Simula o clique para iniciar o download
-          link.parentNode.removeChild(link); // Remove o link após o download
-          setMassConsultaMessage(
-            "Processamento concluído! O download da planilha de resultados iniciou."
-          );
-          
-        } else {
-          let errorText = await response.text();
-          try {
-            const errorJson = JSON.parse(errorText);
-            errorText = errorJson.detail || errorJson.message || errorText;
-          } catch (e) {
-            // Se não for JSON, use o texto puro
-          }
-          console.error("Erro ao enviar planilha para o backend:", errorText);
-          setMassConsultaMessage(
-            `Erro ao processar a planilha: ${errorText || "Erro desconhecido."}`
-          );
-        }
+        // Usar o serviço de consulta para enviar a planilha de CEPs
+        // ConsultaService.processarPlanilhaCEP deve ser um novo método no seu serviço
+        const blobResponse = await ConsultaService.processarPlanilhaCEP(requestBody);
+
+        // O backend deve retornar um blob diretamente (o arquivo XLSX)
+        const url = window.URL.createObjectURL(new Blob([blobResponse]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "planilha-resultado-ceps.xlsx"); // Nome do arquivo a ser baixado
+        document.body.appendChild(link);
+        link.click(); // Simula o clique para iniciar o download
+        link.parentNode.removeChild(link); // Remove o link após o download
+        setMassConsultaMessage(
+          "Processamento concluído! O download da planilha de resultados iniciou."
+        );
       } catch (err) {
         console.error("Erro na comunicação ou processamento do arquivo:", err);
+        const errorMessage =
+          err.response?.data?.detail || 
+          err.response?.data?.message || 
+          (err.response?.data ? JSON.stringify(err.response.data) : null) || // Tenta stringify se for objeto genérico
+          err.message ||
+          "Erro inesperado: Verifique sua conexão e o formato do arquivo.";
         setMassConsultaMessage(
-          `Erro inesperado: ${
-            err.message || "Verifique sua conexão e o formato do arquivo."
-          }`
+          `Erro ao processar a planilha: ${errorMessage}`
         );
       } finally {
         setLoading(false);
         // Limpa o valor do input file para permitir o re-upload do mesmo arquivo
-        event.target.value = null;
+        if (event.target) {
+            event.target.value = null;
+        }
       }
     };
 
@@ -249,35 +211,26 @@ const ConsultaEnd = () => {
     setLoading(true);
     setMassConsultaMessage("Baixando planilha modelo...");
     try {
-      const response = await fetch(
-        `${DJANGO_BACKEND_BASE_URL}/planilha-modelo-cep/`,
-        {
-          method: "GET",
-        }
-      );
-
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(new Blob([blob]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "modelo-cep.xlsx");
-        document.body.appendChild(link);
-        link.click();
-        link.parentNode.removeChild(link);
-        setMassConsultaMessage("Download do modelo concluído.");
-      } else {
-        const errorText = await response.text();
-        console.error("Erro ao baixar modelo:", errorText);
-        setMassConsultaMessage(
-          `Erro ao baixar modelo: ${errorText || "Erro desconhecido."}`
-        );
-      }
+      // ConsultaService.baixarPlanilhaModeloCEP deve ser um novo método no seu serviço
+      const blobResponse = await ConsultaService.baixarPlanilhaModeloCEP();
+      
+      const url = window.URL.createObjectURL(new Blob([blobResponse]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "planilha-modelo-cep.xlsx"); // Nome do arquivo do modelo
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      setMassConsultaMessage("Download do modelo concluído.");
     } catch (err) {
-      console.error("Erro na comunicação:", err);
-      setMassConsultaMessage(
-        "Erro na comunicação com o servidor para baixar o modelo."
-      );
+      console.error("Erro ao baixar modelo:", err);
+      const errorMessage =
+        err.response?.data?.detail || 
+        err.response?.data?.message || 
+        (err.response?.data ? JSON.stringify(err.response.data) : null) ||
+        err.message ||
+        "Erro na comunicação com o servidor para baixar o modelo.";
+      setMassConsultaMessage(`Erro ao baixar modelo: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -286,17 +239,13 @@ const ConsultaEnd = () => {
   const resetFormState = () => {
     setFormData({ cep: "", rua: "", bairro: "", cidade: "", uf: "" });
     setError(null);
-    setMessage(null);
     setResultado(null);
     setMassConsultaMessage("");
   };
 
-
   // ==============================================================================
-  //                                   HTML
+  //                                    HTML
   // ==============================================================================
-
-
   return (
     <div className="consulta-container">
       <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
@@ -374,12 +323,12 @@ const ConsultaEnd = () => {
             onChange={handleFormChange}
             placeholder="Digite o CEP (apenas números)"
             required
+            disabled={loading}
           />
           <button type="submit" disabled={loading || formData.cep.length !== 8}>
             {loading ? "Consultando..." : "Consultar"}
           </button>
           {error && <p className="error-message">{error}</p>}
-          {message && <p className="success-message">{message}</p>}
         </form>
       )}
 
@@ -393,6 +342,7 @@ const ConsultaEnd = () => {
             value={formData.rua}
             onChange={handleFormChange}
             placeholder="Digite o nome da rua"
+            disabled={loading}
           />
           <label htmlFor="bairro">Bairro:</label>
           <input
@@ -402,6 +352,7 @@ const ConsultaEnd = () => {
             value={formData.bairro}
             onChange={handleFormChange}
             placeholder="Digite o nome do bairro"
+            disabled={loading}
           />
           <label htmlFor="cidade">Cidade:</label>
           <input
@@ -411,6 +362,7 @@ const ConsultaEnd = () => {
             value={formData.cidade}
             onChange={handleFormChange}
             placeholder="Digite a cidade"
+            disabled={loading}
           />
           <label htmlFor="uf">UF:</label>
           <input
@@ -421,6 +373,7 @@ const ConsultaEnd = () => {
             onChange={handleFormChange}
             placeholder="Digite o Estado (ex: RJ)"
             maxLength="2"
+            disabled={loading}
           />
           <button
             type="submit"
@@ -435,7 +388,6 @@ const ConsultaEnd = () => {
             {loading ? "Consultando..." : "Consultar"}
           </button>
           {error && <p className="error-message">{error}</p>}
-          {message && <p className="success-message">{message}</p>}
         </form>
       )}
 
@@ -462,18 +414,19 @@ const ConsultaEnd = () => {
             accept=".xlsx, .xls"
             style={{ display: "none" }}
             onChange={handleMassFileUpload}
+            disabled={loading}
           />
           {loading && <p>Processando planilha...</p>}
-          {error && <p className="error-message">{error}</p>}
           {massConsultaMessage && (
             <p
               className={`message ${
-                massConsultaMessage.includes("Erro") ? "error" : "success"
+                massConsultaMessage.includes("Erro") ? "error" : ""
               }`}
             >
               {massConsultaMessage}
             </p>
           )}
+          {error && <p className="error-message">{error}</p>}
         </div>
       )}
 

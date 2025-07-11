@@ -1,23 +1,35 @@
-import api from "./api";
+import api from "./api"; // Certifique-se de que este 'api' é a instância do Axios configurada com `withCredentials: true`
 
 export const UserService = {
   /**
    * Realiza o login do usuário.
+   * O token de acesso será definido como um cookie HttpOnly pelo backend.
    * @param {object} payload - Credenciais de login (email, password).
-   * @returns {Promise<object>} - Promessa com tokens de acesso e refresh e dados do usuário.
+   * @returns {Promise<object>} - Promessa com dados do usuário (se o backend retornar algo além do token).
    */
   login: async (payload) => {
-    const response = await api.post("/login/", payload);
+    // Certifique-se que a rota de login esteja correta.
+    // Você mencionou '/token/' anteriormente para simplejwt, mas aqui está '/login/'.
+    // Use a rota que está configurada em seu urls.py do Django para o CustomTokenObtainPairView.
+    // Ex: Se for a rota padrão de simplejwt, use '/token/'.
+    const response = await api.post("/login/", payload); 
+    
+    // IMPORTANTE: Se o backend estiver configurado para não retornar o token no corpo da resposta
+    // (apenas via cookie), `response.data` pode estar vazio ou conter outros dados.
+    // Você não precisa mais acessar `response.data.access` aqui.
     return response.data;
   },
 
   /**
    * Realiza o logout do usuário.
-   * @param {object} payload - Token de refresh para invalidar.
+   * Não precisa de payload, pois o backend apenas instruirá o navegador a deletar o cookie.
    * @returns {Promise<any>} - Promessa indicando sucesso.
    */
-  logout: async (payload) => {
-    const response = await api.post("/logout/", payload);
+  logout: async () => {
+    // Para logout com cookies HttpOnly, o backend pode simplesmente enviar uma resposta
+    // que instrui o navegador a deletar o cookie. O frontend apenas faz a requisição.
+    // Se você não está usando refresh token, o payload não é necessário.
+    const response = await api.post("/logout/");
     return response.data;
   },
 
@@ -42,6 +54,7 @@ export const UserService = {
 
   /**
    * Busca os detalhes do usuário atualmente autenticado.
+   * O navegador enviará o cookie 'access_token' automaticamente.
    * @returns {Promise<object>} - Promessa com os detalhes do usuário.
    */
   getMe: async () => {
