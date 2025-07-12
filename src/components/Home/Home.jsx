@@ -1,12 +1,12 @@
-// src/pages/Home.js
-import React from "react"; // 'useEffect' e 'useState' não são mais necessários aqui para o userType
+import React from "react";
 import { Link } from "react-router-dom";
 import "../styles/Home.css";
-import { useAuth } from "../../context/AuthContext"; // Importe o hook useAuth
+import { useAuth } from "../../context/AuthContext";
 
 const Home = () => {
   const { user, isAuthenticated, loading } = useAuth();
   const currentUserType = user?.nivel_acesso;
+
   if (loading) {
     return (
       <div className="home-container">
@@ -14,6 +14,7 @@ const Home = () => {
       </div>
     );
   }
+
   if (!isAuthenticated) {
     return (
       <div className="home-container">
@@ -28,7 +29,6 @@ const Home = () => {
         <div className="jumbotron">
           <div className="container">
             <h1>Bem-vindos à Plataforma Bigcorp!</h1>
-            {/* Exemplo de exibição do nome do usuário logado */}
             <p>
               Encontre dados para auxiliar em diversas ocasiões, oferecendo as
               melhores soluções.
@@ -109,8 +109,7 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Card 5 - Comercial (exibido para 'comercial' OU 'admin'/'master') */}
-            {/* ATENÇÃO: Verifique o nome exato do tipo de usuário 'admin' ou 'master' que vem do seu backend */}
+            {/* Card 5 - Comercial */}
             {(currentUserType === "comercial" ||
               currentUserType === "admin" ||
               currentUserType === "master") && (

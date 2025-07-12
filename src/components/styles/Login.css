@@ -130,7 +130,30 @@
   text-decoration: underline;
 }
 
+.senhaWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
 
+.senhaWrapper input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.togglePassword {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  font-size: 1rem;
+}
+
+.togglePassword:focus {
+  outline: none;
+}
 
 /* MOBILE FIRST */
 @media (min-width: 769px) {

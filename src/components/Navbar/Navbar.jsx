@@ -39,10 +39,21 @@ function Navbar() {
               <Link className="nav-link" to="/consulta-comercial">
                 <button type="button" className="btn">
                   <i className="bi bi-ui-checks-grid"></i>
-                 Comercial
+                  Comercial
                 </button>
               </Link>
             </li>
+
+            <li className="nav-item">
+              <Link className="nav-link" to="/home-adm">
+                <button type="button" className="btn">
+                <i className="bi bi-credit-card-2-front-fill"></i>
+                Administradora
+                </button>
+              </Link>
+            </li>
+
+
 
             {/* Dropdown Consultar Dados */}
             <li
