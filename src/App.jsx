@@ -14,9 +14,12 @@ import Cadastro from './components/Dropdown/dropItens/Cadastro';
 import DashboardLayout from './Layouts/DashboardLayout';
 import HistoricoPage from "./components/Dropdown/dropItens/HistoricoPage"; 
 import PrivateRoute from './services/privateRoute';
+import { AuthProvider } from './context/AuthContext';
+
 function App() {
   return (
     <Router>
+      <AuthProvider>
       <Routes>
         {/* Páginas públicas */}
         <Route path="/" element={<Login />} />
@@ -39,6 +42,7 @@ function App() {
         </Route>
         </Route>
       </Routes>
+      </AuthProvider>
     </Router>
   );
 }

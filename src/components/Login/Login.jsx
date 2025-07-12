@@ -1,91 +1,95 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
-import { UserService } from '../../services/userService';
+import { useAuth } from '../../context/AuthContext'
+
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState(null);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false); 
 
- const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    setError(null);
+    const { login } = useAuth(); 
+    const navigate = useNavigate();
 
-    const payload = { email, password };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setLoading(true);
+        setError(null);
+        try {
+            
+            const result = await login({ email, password }); 
 
-    try {
-      const response = await UserService.login(payload);
-      localStorage.setItem('accessToken', response.access);
-      setUserData(response); 
-      window.location.href = "/Home";
-    } catch (err) {
-      setError(err.response?.data?.message || 'Falha no login. Verifique suas credenciais.');
-      console.error('Erro de login:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+            if (result.success) {
+                navigate('/Home'); 
+            } else {
+                setError(result.error || 'Falha no login. Verifique suas credenciais.');
+            }
+        } catch (err) {
+            setError('Ocorreu um erro inesperado durante o login.');
+            console.error('Erro de login no componente:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    return (
+        <>
+            <div className="gradient-bg"></div>
 
-  return (
-    <>
-      <div className="gradient-bg"></div>
+            <div className="login-wrapper">
+                <div className="loginContainer">
+                    <div className="loginBox">
+                        <img
+                            src="../public/imagens/logo.png"
+                            alt="Fedcorp Logo"
+                            className="logoImg"
+                        />
 
-      <div className="login-wrapper">
-        <div className="loginContainer">
-          <div className="loginBox">
-            <img
-              src="../public/imagens/logo.png"
-              alt="Fedcorp Logo"
-              className="logoImg"
-            />
+                        <h2 className="titlePortal">BigCorp</h2>
+                        <p className="pPortal">Insira seus dados para acessar a plataforma</p>
 
-            <h2 className="titlePortal">BigCorp</h2>
-            <p className="pPortal">Insira seus dados para acessar a plataforma</p>
+                        {error && <p className="error">{error}</p>}
 
-            {error && <p className="error">{error}</p>}
+                        <form onSubmit={handleSubmit}>
+                            <div className="inputGroup">
+                                <label htmlFor="email">E-mail:</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    placeholder="Digite seu e-mail"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </div>
 
-            <form onSubmit={handleSubmit}>
-              <div className="inputGroup">
-                <label htmlFor="email">E-mail:</label>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="Digite seu e-mail"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
+                            <div className="inputGroup">
+                                <label htmlFor="senha">Senha:</label>
+                                <input
+                                    type="password"
+                                    id="senha"
+                                    placeholder="Digite sua senha"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
 
-              <div className="inputGroup">
-                <label htmlFor="senha">Senha:</label>
-                <input
-                  type="password"
-                  id="senha"
-                  placeholder="Digite sua senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
+                            <button type="submit" className="loginButton" disabled={loading}>
+                                {loading ? 'Entrando...' : 'Entrar'}
+                            </button>
 
-              <button type="submit" className="loginButton">
-                Entrar
-              </button>
-
-              <a href="/esqueci-senha" className="forgot-password">
-                Esqueceu sua senha?
-              </a>
-            </form>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+                            <a href="/esqueci-senha" className="forgot-password">
+                                Esqueceu sua senha?
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
 };
 
 export default Login;
