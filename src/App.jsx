@@ -17,6 +17,7 @@ import Cadastro from './components/Dropdown/dropItens/Cadastro';
 import HistoricoPage from './components/Dropdown/dropItens/HistoricoPage';
 
 import HomeAdm from './components/Adm/ImportacaoAdmPage';
+import Upload from './components/Adm/Upload';
 
 import DashboardLayout from './Layouts/DashboardLayout';
 import PrivateRoute from './services/privateRoute';
@@ -46,6 +47,7 @@ function App() {
               <Route path="/cadastro" element={<Cadastro />} />
               <Route path="/historico" element={<HistoricoPage />} />
               <Route path="/home-adm" element={<HomeAdm />} />
+              <Route path="/upload" element={<Upload />} />
             </Route>
           </Route>
         </Routes>
