@@ -51,9 +51,9 @@ const AdminHome = () => {
                 <Link to="/upload" className="btn-primary">
                     Importar em massa
                   </Link>
-                <button className="btn-primary" onClick={() => alert("Importar Vida")}>
-                  Importar individual
-                </button>
+                  <Link to="/importacao-vida" className="btn-primary">
+                    Importar individual
+                  </Link>
               </div>
             </div>
 
@@ -67,9 +67,9 @@ const AdminHome = () => {
                 <p>
                   Importe os dados referentes aos bens assegurados dentro de imóveis.
                 </p>
-                <button className="btn-primary" onClick={() => alert("Importar Conteúdo")}>
-                  Importar em massa
-                </button>
+                <Link to="/upload" className="btn-primary">
+                    Importar em massa
+                  </Link>
 
                 <button className="btn-primary" onClick={() => alert("Importar Conteúdo")}>
                   Importar individual
@@ -87,9 +87,9 @@ const AdminHome = () => {
                 <p>
                   Importe garantias financeiras com base em cotas de consórcio ou valores agregados.
                 </p>
-                <button className="btn-primary" onClick={() => alert("Importar Garantia Cota")}>
-                  Importar em massa
-                </button>
+                <Link to="/upload" className="btn-primary">
+                    Importar em massa
+                  </Link>
 
                 <button className="btn-primary" onClick={() => alert("Importar Garantia Cota")}>
                   Importar individual
@@ -107,12 +107,12 @@ const AdminHome = () => {
                 <p>
                   Importe informações relacionadas a seguros de locação e alug.
                 </p>
-                <button className="btn-primary" onClick={() => alert("Importar Aluguel")}>
-                  Importar em massa
-                </button>
-                <button className="btn-primary" onClick={() => alert("Importar Aluguel")}>
-                  Importar individual
-                </button>
+                <Link to="/upload" className="btn-primary">
+                    Importar em massa
+                  </Link>
+                  <Link to="/importacao-alug" className="btn-primary">
+                    Importar individual
+                  </Link>
               </div>
             </div>
 
@@ -126,9 +126,9 @@ const AdminHome = () => {
                 <p>
                   Importe as bases de dados de colaboradores para geração de benefícios VR/VA.
                 </p>
-                <button className="btn-primary" onClick={() => alert("Importar VR")}>
-                  Importar em massa
-                </button>
+                <Link to="/upload" className="btn-primary">
+                    Importar em massa
+                  </Link>
                 <button className="btn-primary" onClick={() => alert("Importar VR")}>
                   Importar individual
                 </button>
