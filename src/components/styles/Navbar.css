@@ -72,7 +72,7 @@
   line-height: 1;
 }
 
-/* Remove margem individual, usamos gap no container */
+/* Remove margem individual*/
 .navbar-nav .nav-item:first-child .btn {
   margin-left: 0;
 }

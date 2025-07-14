@@ -65,7 +65,7 @@ export default function UploadCard({ onDataParsed }) {
   return (
     <section className="upload-card">
       <div className="upload-container">
-      <img src="/imagens/logo3.png" alt="Logo" className="logo me-2" />
+      <img src="/imagens/logo3.png" alt="Logo" className="logo-perfil" />
 
         <h2 className="upload-title">
           <FaFileExcel className="icon-xl" />
@@ -95,9 +95,22 @@ export default function UploadCard({ onDataParsed }) {
         {success && <p className="success-alert">✅ Planilha enviada!</p>}
 
         <button
+          className="btn-baixar"
+          onClick={handleSendSpreadsheet}
+          
+        >
+          {isSending ? "⏳ Baixando..." : (
+            <>
+              <FaPaperPlane className="icon-sm" />
+             Baixar planilha modelo
+            </>
+          )}
+        </button>
+
+        <button
           className="btn-enviar"
           onClick={handleSendSpreadsheet}
-          disabled={dados.length === 0 || isSending || !produtorSelecionado}
+          disabled={dados.length === 0 || isSending}
         >
           {isSending ? "⏳ Enviando..." : (
             <>
@@ -106,6 +119,7 @@ export default function UploadCard({ onDataParsed }) {
             </>
           )}
         </button>
+       
       </div>
     </section>
   );

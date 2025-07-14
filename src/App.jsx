@@ -18,6 +18,9 @@ import HistoricoPage from './components/Dropdown/dropItens/HistoricoPage';
 
 import HomeAdm from './components/Adm/ImportacaoAdmPage';
 import Upload from './components/Adm/Upload';
+import ImportVida from './components/Adm/ImportVida';
+import ImportAlug from './components/Adm/ImportAlug';
+
 
 import DashboardLayout from './Layouts/DashboardLayout';
 import PrivateRoute from './services/privateRoute';
@@ -48,6 +51,9 @@ function App() {
               <Route path="/historico" element={<HistoricoPage />} />
               <Route path="/home-adm" element={<HomeAdm />} />
               <Route path="/upload" element={<Upload />} />
+              <Route path="/importacao-vida" element={<ImportVida />} />
+              <Route path="/importacao-alug" element={<ImportAlug />} />
+
             </Route>
           </Route>
         </Routes>
