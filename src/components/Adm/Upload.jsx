@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import "../styles/Upload.css";
-import { FaFileExcel, FaUpload, FaPaperPlane } from "react-icons/fa";
+import { FaFileExcel, FaUpload, FaPaperPlane, FaDownload } from "react-icons/fa";
 
 export default function UploadCard({ onDataParsed }) {
   const [fileName, setFileName] = useState("");
@@ -101,7 +101,7 @@ export default function UploadCard({ onDataParsed }) {
         >
           {isSending ? "⏳ Baixando..." : (
             <>
-              <FaPaperPlane className="icon-sm" />
+            <FaDownload className="icon-sm" />
              Baixar planilha modelo
             </>
           )}
