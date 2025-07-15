@@ -7,6 +7,16 @@ export const ConsultaService = {
     return response.data;
   },
 
+  getHistoryByID: async (payload) => {
+    const response = await api.get(`/consultas/historico/${payload}`);
+    return response.data;
+  },
+
+  getUserHistory: async (payload) => {
+    const response = await api.get(`/consultas/historico/usuario/5/`);
+    return response.data;
+  },
+
   realizarConsulta: async (payload) => {
     // Este método é versátil e pode lidar com 'cpf', 'busca_cpf_alternativa',
     // 'cnpj', 'busca_cnpj_alternativa' ou 'cep'

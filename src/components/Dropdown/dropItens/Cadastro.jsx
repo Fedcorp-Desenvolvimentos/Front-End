@@ -1,52 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+// Importe a instância do api do seu serviço, se ela for diferente do axios global
+// import api from '../services/api'; // Se o seu 'api' estiver em services/api.js
+import { UserService } from '../../../services/userService'; // Importe o UserService
 import '../../styles/Cadastro.css';
 import { Link } from 'react-router-dom';
 
 function Cadastro() {
-  const [activeTab, setActiveTab] = useState('cadastro');
-  const [usuarios, setUsuarios] = useState([]);
+  const [activeTab, setActiveTab] = useState('cadastro'); // Mantido, mas só uma aba
   const [novoUsuario, setNovoUsuario] = useState({
-    nome: '',
+    nome_completo: '', // Alterado de 'nome' para 'nome_completo'
     email: '',
     nivelAcesso: '',
-    senha: ''
+    senha: '',
+    empresa: 'Fedcorp' // Novo campo 'empresa' com valor inicial 'Fedcorp'
   });
   const [erroCadastro, setErroCadastro] = useState('');
+  const [sucessoCadastro, setSucessoCadastro] = useState(''); // Novo estado para mensagem de sucesso
 
-  useEffect(() => {
-    const usuariosMock = [
-      { nome: 'João da Silva', email: 'joao@email.com', nivelAcesso: 'admin' },
-      { nome: 'Maria Oliveira', email: 'maria@email.com', nivelAcesso: 'usuario' }
-    ];
-
-    axios.get('/api/usuarios')
-      .then(response => {
-        const data = Array.isArray(response.data) ? response.data : [];
-        setUsuarios(data.length > 0 ? data : usuariosMock);
-      })
-      .catch(() => {
-        setUsuarios(usuariosMock);
-      });
-  }, []);
+  // O useEffect original que carregava mocks e fazia um GET inicial foi removido
+  // porque não é relevante para a funcionalidade de cadastro.
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNovoUsuario(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => { // Tornada assíncrona
     e.preventDefault();
     setErroCadastro('');
+    setSucessoCadastro(''); // Limpa mensagens anteriores
 
-    axios.post('/api/usuarios', novoUsuario)
-      .then(response => {
-        setUsuarios(prev => [...prev, response.data]);
-        setNovoUsuario({ nome: '', email: '', nivelAcesso: '', senha: '' });
-      })
-      .catch(() => {
-        setErroCadastro('Erro ao cadastrar usuário. Verifique os dados e tente novamente.');
+    try {
+      // Mapeia o nome do campo para o que o backend espera (nome_completo)
+      const payload = {
+        nome_completo: novoUsuario.nome_completo,
+        email: novoUsuario.email,
+        nivel_acesso: novoUsuario.nivelAcesso, // Backend espera 'nivel_acesso'
+        password: novoUsuario.senha, // Backend espera 'password'
+        empresa: novoUsuario.empresa, // Inclui o campo empresa
+        is_fed: true // Assumindo que todos os usuários cadastrados aqui são is_fed
+      };
+
+      const response = await UserService.registerUser(payload);
+      console.log('Usuário cadastrado com sucesso:', response);
+      setSucessoCadastro(`Usuário "${response.nome_completo || response.email}" cadastrado com sucesso!`);
+      
+      // Limpa o formulário após o sucesso
+      setNovoUsuario({
+        nome_completo: '',
+        email: '',
+        nivelAcesso: '',
+        senha: '',
+        empresa: 'Fedcorp' // Mantém o valor padrão ou você pode resetar para ''
       });
+
+      // Limpa a mensagem de sucesso após alguns segundos
+      setTimeout(() => setSucessoCadastro(''), 5000);
+
+    } catch (error) {
+      console.error('Erro ao cadastrar usuário:', error);
+      // Pega a mensagem de erro da resposta do backend, se disponível
+      const errorData = error.response?.data;
+      let mensagem = 'Erro ao cadastrar usuário. Verifique os dados e tente novamente.';
+
+      if (errorData) {
+        if (errorData.email) {
+          mensagem = `Erro no E-mail: ${Array.isArray(errorData.email) ? errorData.email.join(', ') : errorData.email}`;
+        } else if (errorData.password) {
+          mensagem = `Erro na Senha: ${Array.isArray(errorData.password) ? errorData.password.join(', ') : errorData.password}`;
+        } else if (errorData.detail) { // Erros de permissão, por exemplo
+          mensagem = `Erro: ${errorData.detail}`;
+        } else {
+          mensagem = JSON.stringify(errorData); // Para erros genéricos
+        }
+      }
+      setErroCadastro(mensagem);
+      // Limpa a mensagem de erro após alguns segundos
+      setTimeout(() => setErroCadastro(''), 7000);
+    }
   };
 
   return (
@@ -63,7 +94,6 @@ function Cadastro() {
           </Link>
         </aside>
 
-
         <section className="cadastro-card">
           <h2 className="section-title">
             <i className="bi bi-person-circle"></i> Cadastrar Usuário
@@ -71,12 +101,12 @@ function Cadastro() {
 
           <form className="cadastro-form" onSubmit={handleSubmit} style={{ gap: '1rem' }}>
             <div className="form-group">
-              <label htmlFor="nome">Nome</label>
+              <label htmlFor="nome_completo">Nome Completo</label> {/* Alterado id e name */}
               <input
                 type="text"
-                id="nome"
-                name="nome"
-                value={novoUsuario.nome}
+                id="nome_completo"
+                name="nome_completo" // Alterado id e name
+                value={novoUsuario.nome_completo}
                 onChange={handleChange}
                 required
               />
@@ -119,12 +149,32 @@ function Cadastro() {
                 <option value="admin">Administrador</option>
                 <option value="usuario">Usuário</option>
                 <option value="comercial">Comercial</option>
+                <option value="moderador">Moderador</option> {/* Adicionei 'moderador' conforme suas models */}
+              </select>
+            </div>
+
+            <div className="form-group"> {/* Novo campo para Empresa */}
+              <label htmlFor="empresa">Empresa</label>
+              <select
+                id="empresa"
+                name="empresa"
+                value={novoUsuario.empresa}
+                onChange={handleChange}
+                required
+              >
+                {/* Por enquanto, apenas uma opção fixa. Se tiver mais, adicione aqui. */}
+                <option value="Fedcorp">Fedcorp</option>
               </select>
             </div>
 
             {erroCadastro && (
               <div className="mensagem-erro">
                 <i className="bi bi-exclamation-circle-fill"></i> {erroCadastro}
+              </div>
+            )}
+            {sucessoCadastro && (
+              <div className="mensagem-sucesso">
+                <i className="bi bi-check-circle-fill"></i> {sucessoCadastro}
               </div>
             )}
 

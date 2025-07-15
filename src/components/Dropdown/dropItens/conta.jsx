@@ -126,6 +126,7 @@ const ConfigConta = () => {
                       >
                         <i className="bi bi-pencil-square text-primary"></i>
                       </button>
+                      {usuario.id !== usuarios[0].id &&
                       <button
                         className="btn-icon"
                         onClick={() => abrirModalExclusao(usuario)}
@@ -133,7 +134,8 @@ const ConfigConta = () => {
                       >
                         <i className="bi bi-trash text-danger"></i>
                       </button>
-                    </td>
+                      }
+                   </td>
                   </tr>
                 ))}
               </tbody>
@@ -147,7 +149,7 @@ const ConfigConta = () => {
             <div className="modal-content">
               <h3>Confirmar Exclusão</h3>
               <p>
-                Tem certeza que deseja excluir{' '}
+                Tem certeza que deseja excluir
                 <strong>{usuarioSelecionado?.nome_completo}</strong>?
               </p>
               <div className="modal-actions">
