@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import * as XLSX from "xlsx"; // Importe a biblioteca XLSX para leitura no frontend
-import "../styles/Consulta.css"; // Verifique o caminho
-import { ConsultaService } from "../../services/consultaService"; // Já usa o 'api' do Axios
-import { FileSpreadsheet } from "lucide-react"; // Ícone para consulta em massa
+import * as XLSX from "xlsx";
+import "../styles/Consulta.css";
+import { ConsultaService } from "../../services/consultaService"; 
+import { FileSpreadsheet } from "lucide-react";
 
 const ConsultaEnd = () => {
   const [activeForm, setActiveForm] = useState("cep");
@@ -16,7 +16,7 @@ const ConsultaEnd = () => {
     cidade: "",
     uf: "",
   });
-  const [massConsultaMessage, setMassConsultaMessage] = useState(""); // Para mensagens de consulta em massa
+  const [massConsultaMessage, setMassConsultaMessage] = useState("");
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -95,11 +95,8 @@ const ConsultaEnd = () => {
     }
 
     try {
-      // ConsultaService já utiliza o 'api' do Axios, que gerencia os cookies HttpOnly
       const response = await ConsultaService.realizarConsulta(payload);
       
-      // Assume que `resultado_api` é o objeto com os dados do endereço
-      // e que o backend envia uma `mensagem` de sucesso/falha
       if (response.mensagem === "Consulta realizada com sucesso." && response.resultado_api) {
         setResultado(response); // Armazena a resposta completa para exibição
         console.log(response.resultado_api)
@@ -123,8 +120,6 @@ const ConsultaEnd = () => {
     }
   };
 
-  // --- LÓGICA DE CONSULTA EM MASSA PARA CEP ---
-
   const handleMassFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) {
@@ -145,15 +140,12 @@ const ConsultaEnd = () => {
         const workbook = XLSX.read(data, { type: "array" });
         const sheetName = workbook.SheetNames[0]; // Pega a primeira aba da planilha
         const worksheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet); // Converte para array de objetos JSON
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-        // Mapeia os dados da planilha para o formato esperado pelo backend
-        // Assume que a coluna na planilha se chame 'CEP' (maiúsculas)
         const cepsParaConsulta = jsonData.map((row) => ({
-          CEP: String(row.CEP || "").replace(/\D/g, ""), // Remove não-dígitos e garante string
+          CEP: String(row.CEP || "").replace(/\D/g, ""),
         }));
 
-        // Filtra CEPs vazios ou inválidos (aqueles que não têm 8 dígitos após a limpeza)
         const cepsValidos = cepsParaConsulta.filter(item => item.CEP && item.CEP.length === 8);
 
         if (cepsValidos.length === 0) {
@@ -163,24 +155,19 @@ const ConsultaEnd = () => {
         }
 
         const requestBody = {
-          ceps: cepsValidos, // Nome da chave que seu backend espera (ex: 'ceps')
+          ceps: cepsValidos, // Nome da chave que seu backend espera 
           origem: "planilha", // Adiciona a origem para o registro no backend
         };
 
         setMassConsultaMessage("Enviando CEPs para processamento em massa...");
-
-        // Usar o serviço de consulta para enviar a planilha de CEPs
-        // ConsultaService.processarPlanilhaCEP deve ser um novo método no seu serviço
         const blobResponse = await ConsultaService.processarPlanilhaCEP(requestBody);
-
-        // O backend deve retornar um blob diretamente (o arquivo XLSX)
         const url = window.URL.createObjectURL(new Blob([blobResponse]));
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", "planilha-resultado-ceps.xlsx"); // Nome do arquivo a ser baixado
+        link.setAttribute("download", "planilha-resultado-ceps.xlsx"); 
         document.body.appendChild(link);
-        link.click(); // Simula o clique para iniciar o download
-        link.parentNode.removeChild(link); // Remove o link após o download
+        link.click();
+        link.parentNode.removeChild(link); 
         setMassConsultaMessage(
           "Processamento concluído! O download da planilha de resultados iniciou."
         );
@@ -189,7 +176,7 @@ const ConsultaEnd = () => {
         const errorMessage =
           err.response?.data?.detail || 
           err.response?.data?.message || 
-          (err.response?.data ? JSON.stringify(err.response.data) : null) || // Tenta stringify se for objeto genérico
+          (err.response?.data ? JSON.stringify(err.response.data) : null) ||
           err.message ||
           "Erro inesperado: Verifique sua conexão e o formato do arquivo.";
         setMassConsultaMessage(
@@ -211,7 +198,7 @@ const ConsultaEnd = () => {
     setLoading(true);
     setMassConsultaMessage("Baixando planilha modelo...");
     try {
-      // ConsultaService.baixarPlanilhaModeloCEP deve ser um novo método no seu serviço
+
       const blobResponse = await ConsultaService.baixarPlanilhaModeloCEP();
       
       const url = window.URL.createObjectURL(new Blob([blobResponse]));
@@ -243,9 +230,6 @@ const ConsultaEnd = () => {
     setMassConsultaMessage("");
   };
 
-  // ==============================================================================
-  //                                    HTML
-  // ==============================================================================
   return (
     <div className="consulta-container">
       <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
