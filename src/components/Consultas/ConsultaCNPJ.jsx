@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import "../styles/Consulta.css";
-import { ConsultaService } from "../../services/consultaService"; // Já usa o 'api' do Axios
-import { FileSpreadsheet } from "lucide-react"; // Ícone para consulta em massa
+import { ConsultaService } from "../../services/consultaService"; 
+import { FileSpreadsheet } from "lucide-react"; 
 
 
 const ConsultaCNPJ = () => {
@@ -80,7 +80,6 @@ const ConsultaCNPJ = () => {
     }
 
     try {
-      // ConsultaService já usa o 'api' do Axios, que lida com cookies HttpOnly
       const response = await ConsultaService.realizarConsulta(payload);
       setResultado(response);
       console.log("Resultado da consulta:", response);
@@ -96,8 +95,6 @@ const ConsultaCNPJ = () => {
       setLoading(false);
     }
   };
-
-  // --- LÓGICA ATUALIZADA PARA CONSULTA EM MASSA ---
 
   // Função para lidar com o upload do arquivo Excel
   const handleMassFileUpload = async (event) => {
@@ -133,13 +130,8 @@ const ConsultaCNPJ = () => {
 
         setMassConsultaMessage("Enviando CNPJs para processamento em massa...");
 
-        // --- MUDANÇA CRUCIAL AQUI: Usar 'api' do Axios ---
-        // O Axios com 'withCredentials: true' enviará o cookie HttpOnly automaticamente.
-        // Não precisamos mais pegar o token do localStorage ou montar o cabeçalho 'Authorization'.
         const response = await ConsultaService.processarPlanilhaCNPJ(requestBody);
-
-        // Se o backend retorna um blob diretamente (o arquivo XLSX), a resposta do Axios pode ser o blob
-        const blob = response; // ConsultaService já deve retornar o blob
+        const blob = response; 
         const url = window.URL.createObjectURL(new Blob([blob]));
         const link = document.createElement("a");
         link.href = url;
@@ -159,7 +151,7 @@ const ConsultaCNPJ = () => {
         setMassConsultaMessage(`Erro ao processar a planilha: ${errorMessage}`);
       } finally {
         setLoading(false);
-        if (event.target) { // Garantir que event.target existe antes de limpar
+        if (event.target) { 
           event.target.value = null;
         }
       }
@@ -173,13 +165,9 @@ const ConsultaCNPJ = () => {
     setLoading(true);
     setMassConsultaMessage("Baixando planilha modelo...");
     try {
-      // --- MUDANÇA CRUCIAL AQUI: Usar 'api' do Axios ---
-      // O Axios com 'withCredentials: true' enviará o cookie HttpOnly automaticamente.
-      // O ConsultaService agora deve ter um método para isso.
       const response = await ConsultaService.baixarPlanilhaModeloCNPJ();
       
-      // Se o backend retorna um blob diretamente, a resposta do Axios pode ser o blob
-      const blob = response; // ConsultaService já deve retornar o blob
+      const blob = response; 
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement("a");
       link.href = url;
@@ -200,9 +188,6 @@ const ConsultaCNPJ = () => {
     }
   };
 
-  // ==============================================================================
-  //                                   HTML
-  // ==============================================================================
   return (
     <div className="consulta-container">
       <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
