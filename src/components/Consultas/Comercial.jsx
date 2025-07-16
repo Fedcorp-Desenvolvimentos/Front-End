@@ -39,6 +39,7 @@ const ConsultaComercial = () => {
 
       <div className="form-card">
         <div className="card-body">
+        <label className="text-title">Nome:</label>
           <input
             type="text"
             className="form-control"
@@ -47,6 +48,7 @@ const ConsultaComercial = () => {
             value={form.nome}
             onChange={handleChange}
           />
+          <label className="text-title">CNPJ:</label>
           <input
             type="text"
             className="form-control"
@@ -55,6 +57,7 @@ const ConsultaComercial = () => {
             value={form.cnpj}
             onChange={handleChange}
           />
+          <label className="text-title">E-mail:</label>
           <input
             type="email"
             className="form-control"
@@ -63,6 +66,7 @@ const ConsultaComercial = () => {
             value={form.email}
             onChange={handleChange}
           />
+          <label className="text-title">Telefone:</label>
           <input
             type="tel"
             className="form-control"
