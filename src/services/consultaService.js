@@ -13,13 +13,11 @@ export const ConsultaService = {
   },
 
   getUserHistory: async (payload) => {
-    const response = await api.get(`/consultas/historico/usuario/5/`);
+    const response = await api.get(`/consultas/historico/usuario/`);
     return response.data;
   },
 
   realizarConsulta: async (payload) => {
-    // Este método é versátil e pode lidar com 'cpf', 'busca_cpf_alternativa',
-    // 'cnpj', 'busca_cnpj_alternativa' ou 'cep'
     const response = await api.post("/consultas/realizar/", payload);
     return response.data;
   },

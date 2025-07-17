@@ -14,9 +14,8 @@ const ConsultaPF = () => {
     cpf: "",
     nome: "",
     dataNascimento: "",
-    uf: "",
-    email: "",
-    telefone: "",
+    motherName: "",
+    fatherName: "", 
   });
 
   // Estado para mensagens de feedback específicas da consulta em massa
@@ -29,11 +28,6 @@ const ConsultaPF = () => {
     if (name === "cpf") {
       // Remove tudo que não for dígito e limita a 11 caracteres
       formattedValue = value.replace(/\D/g, "").substring(0, 11);
-    }
-
-    if (name === "uf") {
-      // Converte para maiúsculas e limita a 2 caracteres
-      formattedValue = value.toUpperCase().substring(0, 2);
     }
 
     setFormData((prev) => ({
@@ -65,27 +59,22 @@ const ConsultaPF = () => {
         };
       }
     } else if (activeForm === "chaves") {
-      // Verifica se pelo menos UM campo das chaves alternativas foi preenchido
-      if (
-        !formData.nome.trim() &&
-        !formData.dataNascimento.trim() &&
-        !formData.uf.trim() &&
-        !formData.email.trim() &&
-        !formData.telefone.trim()
-      ) {
-        validationErrorMessage =
-          "Por favor, preencha pelo menos um campo para busca de CPF por chaves alternativas.";
+      // Verifica se pelo menos o campo nome foi preenchido para a consulta por chaves
+      if (!formData.nome.trim()) {
+        validationErrorMessage = "Por favor, preencha o campo Nome.";
         isFormValid = false;
       } else {
+        // Formata a data de nascimento para dd/MM/yyyy
+        const formattedBirthDate = formData.dataNascimento
+          ? new Date(formData.dataNascimento).toLocaleDateString("pt-BR")
+          : "";
+
         payload = {
-          tipo_consulta: "busca_cpf_alternativa",
-          // É crucial que o backend saiba como desserializar esta string JSON
+          tipo_consulta: "cpf_alternativa",
           parametro_consulta: JSON.stringify({
-            nome: formData.nome,
-            dataNascimento: formData.dataNascimento,
-            uf: formData.uf,
-            email: formData.email,
-            telefone: formData.telefone,
+            Datasets: "basic_data",
+            q: `name{${formData.nome}}, birthdate{${formattedBirthDate}},dateformat{dd/MM/yyyy}, mothername{${formData.motherName}}, fathername{${formData.fatherName}}`,
+            Limit: 5,
           }),
         };
       }
@@ -155,7 +144,7 @@ const ConsultaPF = () => {
           );
           setLoading(false);
           // Limpa o input file para que o mesmo arquivo possa ser selecionado novamente
-          if (event.target) event.target.value = null; 
+          if (event.target) event.target.value = null;
           return;
         }
 
@@ -169,7 +158,9 @@ const ConsultaPF = () => {
         );
 
         // Usar o serviço ConsultaService para processar a planilha de CPF
-        const response = await ConsultaService.processarPlanilhaCPF(requestBody);
+        const response = await ConsultaService.processarPlanilhaCPF(
+          requestBody
+        );
 
         const blob = response; // ConsultaService já deve retornar o blob
         const url = window.URL.createObjectURL(new Blob([blob]));
@@ -242,7 +233,9 @@ const ConsultaPF = () => {
       <div className="card-options-wrapper">
         {/* Card Consulta por CPF */}
         <div
-          className={`card card-option ${activeForm === "cpf" ? "active" : ""}`}
+          className={`card card-option ${
+            activeForm === "cpf" ? "active" : ""
+          }`}
           onClick={() => {
             setActiveForm("cpf");
             setFormData({ ...formData, cpf: "" }); // Limpa o CPF ao trocar
@@ -280,9 +273,8 @@ const ConsultaPF = () => {
               cpf: "", // Limpa o CPF
               nome: "",
               dataNascimento: "",
-              uf: "",
-              email: "",
-              telefone: "",
+              motherName: "",
+              fatherName: "",
             });
             setError(null);
             setResultado(null);
@@ -354,6 +346,7 @@ const ConsultaPF = () => {
             value={formData.nome}
             onChange={handleFormChange}
             placeholder="Digite o nome"
+            required // Nome agora é obrigatório
             disabled={loading}
           />
           <label htmlFor="dataNascimento">Data de Nascimento</label>
@@ -366,48 +359,27 @@ const ConsultaPF = () => {
             placeholder="DD/MM/AAAA"
             disabled={loading}
           />
-          <label htmlFor="uf">UF</label>
+          <label htmlFor="motherName">Nome da Mãe</label>
           <input
             type="text"
-            id="uf"
-            name="uf"
-            value={formData.uf}
+            id="motherName"
+            name="motherName"
+            value={formData.motherName}
             onChange={handleFormChange}
-            placeholder="Digite a UF (ex: RJ)"
-            maxLength="2"
+            placeholder="Digite o nome da mãe"
             disabled={loading}
           />
-          <label htmlFor="email">E-mail</label>
+          <label htmlFor="fatherName">Nome do Pai</label>
           <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
+            type="text"
+            id="fatherName"
+            name="fatherName"
+            value={formData.fatherName}
             onChange={handleFormChange}
-            placeholder="Digite o e-mail"
+            placeholder="Digite o nome do pai"
             disabled={loading}
           />
-          <label htmlFor="telefone">Telefone</label>
-          <input
-            type="tel"
-            id="telefone"
-            name="telefone"
-            value={formData.telefone}
-            onChange={handleFormChange}
-            placeholder="Digite o telefone"
-            disabled={loading}
-          />
-          <button
-            type="submit"
-            disabled={
-              loading ||
-              (!formData.nome.trim() &&
-                !formData.dataNascimento.trim() &&
-                !formData.uf.trim() &&
-                !formData.email.trim() &&
-                !formData.telefone.trim())
-            }
-          >
+          <button type="submit" disabled={loading || !formData.nome.trim()}>
             Consultar
           </button>
           {error && <p className="error-message">{error}</p>}
@@ -468,8 +440,8 @@ const ConsultaPF = () => {
               // Acesse o CommonName de forma segura
               const commonName = basicData.Aliases?.CommonName || "N/A";
 
-
-              if (!Object.keys(basicData).length && !commonName) { // Verifica se basicData está vazio e commonName é N/A
+              if (!Object.keys(basicData).length && !commonName) {
+                // Verifica se basicData está vazio e commonName é N/A
                 return <p>Dados básicos do CPF não disponíveis na resposta.</p>;
               }
 
@@ -496,7 +468,11 @@ const ConsultaPF = () => {
                   <input
                     type="text"
                     // Formata a data se existir
-                    value={basicData.BirthDate ? new Date(basicData.BirthDate).toLocaleDateString() : "N/A"}
+                    value={
+                      basicData.BirthDate
+                        ? new Date(basicData.BirthDate).toLocaleDateString()
+                        : "N/A"
+                    }
                     disabled
                   />
 
@@ -523,11 +499,7 @@ const ConsultaPF = () => {
                   />
 
                   <label>Nome Comum (Alias):</label>
-                  <input
-                    type="text"
-                    value={commonName}
-                    disabled
-                  />
+                  <input type="text" value={commonName} disabled />
 
                   <label>Indicação de Óbito:</label>
                   <input
