@@ -8,14 +8,14 @@ function Navbar() {
   const timeoutRef = useRef(null);
 
   const handleMouseEnter = () => {
-    clearTimeout(timeoutRef.current); // Evita que feche imediatamente
+    clearTimeout(timeoutRef.current); 
     setDropdownOpen(true);
   };
 
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setDropdownOpen(false);
-    }, 300); // Tempo que o dropdown permanece aberto após sair com o mouse
+    }, 300);
   };
 
   return (
@@ -65,7 +65,6 @@ function Navbar() {
               </Link>
             </li>
 
-            {/* Dropdown com delay */}
             <li
               className={`nav-item dropdown ${dropdownOpen ? "show" : ""}`}
               onMouseEnter={handleMouseEnter}
