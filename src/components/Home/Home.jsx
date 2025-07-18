@@ -38,81 +38,88 @@ const Home = () => {
 
         <div className="container">
           <div className="cards-container">
-            {/* Card 1 - Pessoa Física */}
-            <div className="card">
-              <div className="card-body">
-                <div className="feature-icon">
-                  <i className="bi bi-person-fill"></i>
+            {/* Moderador vê somente a parte da Administradora */}
+            {currentUserType === "moderador" && (
+              <div className="card">
+                <div className="card-body">
+                  <div className="feature-icon">
+                    <i className="bi bi-credit-card-2-front-fill"></i>
+                  </div>
+                  <h2>Administradora</h2>
+                  <p>
+                    Acesse o painel da administradora para acompanhar e importar informações administrativas.
+                  </p>
+                  <Link to="/home-adm" className="btn-primary">Acessar</Link>
                 </div>
-                <h2>Dados Pessoais</h2>
-                <p>
-                  A pesquisa por dados pessoais fornece informações sobre
-                  pessoas registradas, incluindo CPF, nome, filiação e data de
-                  nascimento.
-                </p>
-                <Link to="/consulta-pf" className="btn-primary">
-                  Pesquisar
-                </Link>
               </div>
-            </div>
+            )}
 
-            {/* Card 2 - Empresa */}
-            <div className="card">
-              <div className="card-body">
-                <div className="feature-icon">
-                  <i className="bi bi-building-fill"></i>
+            {/* Pessoa Física */}
+            {["admin", "usuario", "comercial"].includes(currentUserType) && (
+              <div className="card">
+                <div className="card-body">
+                  <div className="feature-icon">
+                    <i className="bi bi-person-fill"></i>
+                  </div>
+                  <h2>Dados Pessoais</h2>
+                  <p>
+                    Informações sobre pessoas registradas, incluindo CPF, nome, filiação e data de nascimento.
+                  </p>
+                  <Link to="/consulta-pf" className="btn-primary">Pesquisar</Link>
                 </div>
-                <h2>Dados Empresariais</h2>
-                <p>
-                  A busca por dados empresariais fornece informações sobre
-                  empresas registradas, incluindo CNPJ, razão social, quadro
-                  societário e situação cadastral.
-                </p>
-                <Link to="/consulta-cnpj" className="btn-primary">
-                  Pesquisar
-                </Link>
               </div>
-            </div>
+            )}
 
-            {/* Card 3 - Endereços */}
-            <div className="card">
-              <div className="card-body">
-                <div className="feature-icon">
-                  <i className="bi bi-geo-alt-fill"></i>
+            {/* CNPJ */}
+            {["admin", "usuario", "comercial"].includes(currentUserType) && (
+              <div className="card">
+                <div className="card-body">
+                  <div className="feature-icon">
+                    <i className="bi bi-building-fill"></i>
+                  </div>
+                  <h2>Dados Empresariais</h2>
+                  <p>
+                    Informações sobre empresas registradas, como razão social, CNPJ, e situação cadastral.
+                  </p>
+                  <Link to="/consulta-cnpj" className="btn-primary">Pesquisar</Link>
                 </div>
-                <h2>Endereços</h2>
-                <p>
-                  A consulta de endereços permite localizar informações
-                  detalhadas sobre logradouros, incluindo CEP, bairro, cidade e
-                  estado.
-                </p>
-                <Link to="/consulta-end" className="btn-primary">
-                  Pesquisar
-                </Link>
               </div>
-            </div>
+            )}
 
-            {/* Card 4 - Consulta Segurados */}
-            <div className="card">
-              <div className="card-body">
-                <div className="feature-icon">
-                  <i className="bi bi-shield-check"></i>
+            {/* Endereço */}
+            {["admin", "usuario", "comercial"].includes(currentUserType) && (
+              <div className="card">
+                <div className="card-body">
+                  <div className="feature-icon">
+                    <i className="bi bi-geo-alt-fill"></i>
+                  </div>
+                  <h2>Endereços</h2>
+                  <p>
+                    Informações detalhadas sobre logradouros, CEPs, cidades e estados.
+                  </p>
+                  <Link to="/consulta-end" className="btn-primary">Pesquisar</Link>
                 </div>
-                <h2>Consulta Segurados</h2>
-                <p>
-                  A consulta de segurado permite localizar informações
-                  detalhadas em nossa base.
-                </p>
-                <Link to="/consulta-segurados" className="btn-primary">
-                  Pesquisar
-                </Link>
               </div>
-            </div>
+            )}
 
-            {/* Card 5 - Comercial */}
-            {(currentUserType === "comercial" ||
-              currentUserType === "admin" ||
-              currentUserType === "master") && (
+            {/* Segurados */}
+            {["admin", "usuario", "comercial"].includes(currentUserType) && (
+              <div className="card">
+                <div className="card-body">
+                  <div className="feature-icon">
+                    <i className="bi bi-shield-check"></i>
+                  </div>
+                  <h2>Consulta Segurados</h2>
+                  <p>
+                    Localize informações sobre segurados com base nos registros disponíveis.
+                  </p>
+                  <Link to="/consulta-segurados" className="btn-primary">Pesquisar</Link>
+                </div>
+              </div>
+            )}
+
+            {/* Comercial */}
+            {["admin", "comercial"].includes(currentUserType) && (
               <div className="card">
                 <div className="card-body">
                   <div className="feature-icon">
@@ -120,12 +127,9 @@ const Home = () => {
                   </div>
                   <h2>Comercial</h2>
                   <p>
-                    Busque dados de clientes em potencial tendo informações
-                    detalhadas para auxiliar em vendas.
+                    Acesso a informações de leads e potenciais clientes para suporte ao time comercial.
                   </p>
-                  <Link to="/consulta-comercial" className="btn-primary">
-                    Pesquisar
-                  </Link>
+                  <Link to="/consulta-comercial" className="btn-primary">Pesquisar</Link>
                 </div>
               </div>
             )}
