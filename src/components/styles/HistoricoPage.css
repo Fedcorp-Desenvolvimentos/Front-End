@@ -1,4 +1,3 @@
-/* Seu CSS existente */
 .historico-container {
     padding: 2rem;
     background-color: #fdfdfd;
@@ -32,14 +31,14 @@
     color: white;
 }
 
-/* Estilo para a linha ativa (clicada) */
+
 .historico-table tr.active-row {
-    background-color: #e6f0ff; /* Um azul mais claro para indicar seleção */
+    background-color: #e6f0ff;
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0, 123, 255, 0.1);
 }
 
-.historico-table tr:not(.active-row):hover { /* Aplicar hover apenas em linhas não ativas */
+.historico-table tr:not(.active-row):hover {
     background-color: #f1f1f1;
 }
 
@@ -59,15 +58,14 @@
     font-size: 1rem;
 }
 
-/* --- Novas Classes para o Painel de Detalhes e Botão Voltar --- */
 
 .btn-voltar {
-    display: inline-flex; /* Para alinhar o ícone e o texto */
+    display: inline-flex;
     align-items: center;
-    gap: 8px; /* Espaço entre ícone e texto */
+    gap: 8px; 
     margin-bottom: 1.5rem;
     padding: 0.6rem 1rem;
-    background-color: #6c757d; /* Um cinza neutro */
+    background-color: #6c757d; 
     color: white;
     text-decoration: none;
     border-radius: 0.375rem;
@@ -87,37 +85,36 @@
 }
 
 .error-message {
-    color: #dc3545; /* Vermelho padrão para erros */
+    color: #dc3545;
     font-weight: bold;
 }
 
-/* Estilo para o ícone de expansão */
+
 .expand-icon {
-    width: 30px; /* Garante que a coluna do ícone tenha uma largura definida */
+    width: 30px; 
     text-align: center;
 }
 
 .expand-icon i {
     cursor: pointer;
     font-size: 1.2rem;
-    color: #0d6efd; /* Cor do seu tema */
+    color: #0d6efd; 
     transition: transform 0.2s ease;
 }
 
 .active-row .expand-icon i {
-    transform: rotate(180deg); /* Gira o ícone para cima quando a linha está ativa */
+    transform: rotate(180deg); 
 }
 
-/* Painel de Detalhes da Consulta */
 .detalhes-historico-panel {
-    background-color: #f8fcff; /* Um fundo azul bem claro */
-    border-top: 2px solid #0d6efd; /* Borda superior para separar */
+    background-color: #f8fcff; 
+    border-top: 2px solid #0d6efd; 
     padding: 1.5rem;
-    margin-top: 0.5rem; /* Um pequeno espaçamento da linha da tabela */
-    border-radius: 0 0 8px 8px; /* Cantos arredondados na parte inferior */
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.03); /* Sutil sombra interna */
-    overflow: hidden; /* Garante que o conteúdo não vaze */
-    animation: fadeIn 0.3s ease-out; /* Animação simples de fade in */
+    margin-top: 0.5rem; 
+    border-radius: 0 0 8px 8px; 
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.03);
+
+    animation: fadeIn 0.3s ease-out; 
 }
 
 @keyframes fadeIn {
@@ -126,11 +123,11 @@
 }
 
 .detalhes-historico-panel h4 {
-    color: #0d6efd; /* Cor do tema para o título dos detalhes */
+    color: #0d6efd;
     margin-top: 0;
     margin-bottom: 1rem;
     font-size: 1.3rem;
-    border-bottom: 1px solid #cceeff; /* Linha sutil abaixo do título */
+    border-bottom: 1px solid #cceeff; 
     padding-bottom: 0.5rem;
 }
 
@@ -145,8 +142,8 @@
 }
 
 .resultado-box {
-    background-color: #e9ecef; /* Um cinza mais claro para o box de resultado */
-    border: 1px solid #dee2e6; /* Borda levemente escura */
+    background-color: #e9ecef; 
+    border: 1px solid #dee2e6; 
     border-radius: 0.375rem;
     padding: 1rem;
     margin-top: 1.5rem;
@@ -155,21 +152,21 @@
 .resultado-box h5 {
     margin-top: 0;
     margin-bottom: 0.8rem;
-    color: #495057; /* Um cinza escuro para o título */
+    color: #495057; 
     font-size: 1.1rem;
 }
 
 .resultado-box .resultado-json {
-    background-color: #f1f3f5; /* Um cinza bem claro para o código */
+    background-color: #f1f3f5;
     padding: 0.8rem;
     border-radius: 0.25rem;
     font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
     font-size: 0.85rem;
-    white-space: pre-wrap; /* Quebra linhas longas */
-    word-break: break-all; /* Quebra palavras muito longas */
-    max-height: 250px; /* Altura máxima para o JSON */
-    overflow-y: auto; /* Adiciona scroll se necessário */
-    color: #343a40; /* Cor do texto do JSON */
+    white-space: pre-wrap; 
+    word-break: break-all; 
+    max-height: 250px; 
+    overflow-y: auto;
+    color: #343a40; 
 }
 
 .detalhes-loading, .detalhes-error {
@@ -182,3 +179,38 @@
 .detalhes-error {
     color: #dc3545;
 }
+
+.paginacao {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .paginacao button {
+    padding: 0.5rem 1rem;
+    background-color: #004aad;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .paginacao button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .input-pesquisa {
+    margin: 1rem 0;
+    margin-left: 1rem;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    max-width: 1300px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  

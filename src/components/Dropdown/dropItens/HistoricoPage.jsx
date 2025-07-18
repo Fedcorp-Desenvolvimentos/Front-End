@@ -3,11 +3,12 @@ import '../../styles/HistoricoPage.css';
 import { Link } from 'react-router-dom';
 import { ConsultaService } from '../../../services/consultaService';
 import { useAuth } from '../../../context/AuthContext';
-import { FileType } from 'lucide-react';
 
 const HistoricoConsulta = () => {
   const [consultas, setConsultas] = useState([]);
   const [filtro, setFiltro] = useState('');
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const intensPorPagina = 10;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedConsultaId, setSelectedConsultaId] = useState(null);
@@ -22,18 +23,15 @@ const HistoricoConsulta = () => {
       setError('');
       try {
         let data;
-       console.log(user)
         if (user && (user.nivel_acesso === "admin" || user.nivel_acesso === "moderador")) {
           data = await ConsultaService.getConsultaHistory();
-        } else if (user && user.id && (user.nivel_acesso === "usuario"|| user.nivel_acesso === "comercial")) {
+        } else if (user && user.id && (user.nivel_acesso === "usuario" || user.nivel_acesso === "comercial")) {
           data = await ConsultaService.getUserHistory(user.id);
-         console.log(data)
         } else {
           setError('Usuário não autenticado ou sem permissão para ver o histórico.');
           setLoading(false);
           return;
         }
-        
         setConsultas(data.results || data);
       } catch (err) {
         console.error('Erro ao buscar histórico de consultas:', err);
@@ -46,7 +44,11 @@ const HistoricoConsulta = () => {
     if (user) {
       fetchHistorico();
     }
-  }, [user]); 
+  }, [user]);
+
+  useEffect(() => {
+    setPaginaAtual(1); // Resetar para página 1 quando filtro mudar
+  }, [filtro]);
 
   const handleItemClick = async (consultaId) => {
     if (selectedConsultaId === consultaId) {
@@ -72,12 +74,17 @@ const HistoricoConsulta = () => {
 
   const consultasFiltradas = consultas.filter((consulta) => {
     const termo = filtro.toLowerCase();
-    return(
+    return (
       (consulta.tipo_consulta_display || consulta.tipo_consulta || '').toLowerCase().includes(termo) ||
       (consulta.parametro_consulta || '').toLowerCase().includes(termo) ||
       (consulta.usuario_email || '').toLowerCase().includes(termo)
     );
   });
+
+  const totalPaginas = Math.ceil(consultasFiltradas.length / intensPorPagina);
+  const inicio = (paginaAtual - 1) * intensPorPagina;
+  const fim = inicio + intensPorPagina;
+  const consultasFiltradasPaginadas = consultasFiltradas.slice(inicio, fim);
 
   return (
     <div className="historico-container">
@@ -87,11 +94,11 @@ const HistoricoConsulta = () => {
       </Link>
 
       <input 
-      type="text"
-      placeholder='Buscar por tipo, parâmetro ou email...' 
-      value={filtro}
-      onChange={(e) => setFiltro(e.target.value)}
-      className='input-pesquisa'
+        type="text"
+        placeholder='Buscar por tipo, parâmetro ou email...' 
+        value={filtro}
+        onChange={(e) => setFiltro(e.target.value)}
+        className='input-pesquisa'
       />
 
       {loading && <p className="loading-message">Carregando histórico...</p>}
@@ -102,74 +109,89 @@ const HistoricoConsulta = () => {
       )}
 
       {!loading && !error && consultas.length > 0 && (
-        <table className="historico-table">
-          <thead>
-            <tr>
-              <th>Tipo de Consulta</th>
-              <th>Parâmetro</th>
-              <th>Realizada por</th>
-              <th>Data</th>
+        <>
+          <table className="historico-table">
+            <thead>
+              <tr>
+                <th>Tipo de Consulta</th>
+                <th>Parâmetro</th>
+                <th>Realizada por</th>
+                <th>Data</th>
+                <th></th>
               </tr>
-          </thead>
-          <tbody>
-            {consultasFiltradas.map((consulta) => (
-              <React.Fragment key={consulta.id}>
-                <tr
-                  className={selectedConsultaId === consulta.id ? 'active-row' : ''}
-                  onClick={() => handleItemClick(consulta.id)}
-                >
-                  <td>{consulta.tipo_consulta_display || consulta.tipo_consulta}</td>
-                  <td>{consulta.parametro_consulta}</td>
-                  <td>{consulta.usuario_email || 'N/A'}</td>
-                  <td>{new Date(consulta.data_consulta).toLocaleDateString()}</td>
-                  <td className="expand-icon">
-                    <i className={`bi ${selectedConsultaId === consulta.id ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
-                  </td>
-                </tr>
-
-                {selectedConsultaId === consulta.id && (
-                  <tr>
-                    <td colSpan="5">
-                      <div className="detalhes-historico-panel">
-                        {detalhesLoading && <p className="detalhes-loading">Carregando detalhes...</p>}
-                        {detalhesError && <p className="detalhes-error">{detalhesError}</p>}
-                        
-                        {detalhesConsulta && detalhesConsulta.resultado && detalhesConsulta.resultado.Result && detalhesConsulta.resultado.Result.length > 0 ? (
-                          <div className="detalhes-content">
-                            <h4>Detalhes da Consulta #{detalhesConsulta.id}</h4>
-                            <p><strong>Tipo:</strong> {detalhesConsulta.tipo_consulta_display || detalhesConsulta.tipo_consulta}</p>
-                            <p><strong>Parâmetro:</strong> {detalhesConsulta.parametro_consulta}</p>
-                            <p><strong>Data/Hora Completa:</strong> {new Date(detalhesConsulta.data_consulta).toLocaleString()}</p>
-                            <p><strong>Realizada por:</strong> {detalhesConsulta.usuario_email || 'N/A'}</p>
-                            <p><strong>Origem:</strong> {detalhesConsulta.origem}</p>
-                            <p><strong>Tempo de Resposta:</strong> {detalhesConsulta.resultado.ElapsedMilliseconds || 'N/A'} ms</p>
-
-                            <div className="resultado-box">
-                                <h5>Resultado da Consulta:</h5>
-                                {detalhesConsulta.resultado.Result[0].BasicData && (
-                                    <>{console.log(detalhesConsulta.resultado.Result[0].BasicData)}
-                                        <p><strong>Nome:</strong> {detalhesConsulta.resultado.Result[0].BasicData.Name || 'N/A'}</p>
-                                        <p><strong>Situação Cadastral:</strong> {detalhesConsulta.resultado.Result[0].BasicData.TaxIdStatus || 'N/A'}</p>
-                                        <p><strong>Data de Nascimento:</strong> {detalhesConsulta.resultado.Result[0].BasicData.CapturedBirthDateFromRFSource || 'N/A'}</p>
-                                        <p><strong>Nome da Mãe:</strong> {detalhesConsulta.resultado.Result[0].BasicData.MotherName || 'N/A'}</p>
-                                    </>
-                                )}
-                                {detalhesConsulta.resultado.Result[0].MatchKeys && (
-                                    <p><strong>Chave de Correspondência:</strong> {detalhesConsulta.resultado.Result[0].MatchKeys}</p>
-                                )}
-                            </div>
-                          </div>
-                        ) : (
-                          <p className="no-data-message">Nenhum resultado detalhado disponível para esta consulta.</p>
-                        )}
-                      </div>
+            </thead>
+            <tbody>
+              {consultasFiltradasPaginadas.map((consulta) => (
+                <React.Fragment key={consulta.id}>
+                  <tr
+                    className={selectedConsultaId === consulta.id ? 'active-row' : ''}
+                    onClick={() => handleItemClick(consulta.id)}
+                  >
+                    <td>{consulta.tipo_consulta_display || consulta.tipo_consulta}</td>
+                    <td>{consulta.parametro_consulta}</td>
+                    <td>{consulta.usuario_email || 'N/A'}</td>
+                    <td>{new Date(consulta.data_consulta).toLocaleDateString()}</td>
+                    <td className="expand-icon">
+                      <i className={`bi ${selectedConsultaId === consulta.id ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
                     </td>
                   </tr>
-                )}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
+
+                  {selectedConsultaId === consulta.id && (
+                    <tr>
+                      <td colSpan="5">
+                        <div className="detalhes-historico-panel">
+                          {detalhesLoading && <p className="detalhes-loading">Carregando detalhes...</p>}
+                          {detalhesError && <p className="detalhes-error">{detalhesError}</p>}
+                          
+                          {detalhesConsulta && detalhesConsulta.resultado && detalhesConsulta.resultado.Result && detalhesConsulta.resultado.Result.length > 0 ? (
+                            <div className="detalhes-content">
+                              <h4>Detalhes da Consulta #{detalhesConsulta.id}</h4>
+                              <p><strong>Tipo:</strong> {detalhesConsulta.tipo_consulta_display || detalhesConsulta.tipo_consulta}</p>
+                              <p><strong>Parâmetro:</strong> {detalhesConsulta.parametro_consulta}</p>
+                              <p><strong>Data/Hora Completa:</strong> {new Date(detalhesConsulta.data_consulta).toLocaleString()}</p>
+                              <p><strong>Realizada por:</strong> {detalhesConsulta.usuario_email || 'N/A'}</p>
+                              <p><strong>Origem:</strong> {detalhesConsulta.origem}</p>
+                              <p><strong>Tempo de Resposta:</strong> {detalhesConsulta.resultado.ElapsedMilliseconds || 'N/A'} ms</p>
+
+                              <div className="resultado-box">
+                                <h5>Resultado da Consulta:</h5>
+                                {detalhesConsulta.resultado.Result[0].BasicData && (
+                                  <>
+                                    <p><strong>Nome:</strong> {detalhesConsulta.resultado.Result[0].BasicData.Name || 'N/A'}</p>
+                                    <p><strong>Situação Cadastral:</strong> {detalhesConsulta.resultado.Result[0].BasicData.TaxIdStatus || 'N/A'}</p>
+                                    <p><strong>Data de Nascimento:</strong> {detalhesConsulta.resultado.Result[0].BasicData.CapturedBirthDateFromRFSource || 'N/A'}</p>
+                                    <p><strong>Nome da Mãe:</strong> {detalhesConsulta.resultado.Result[0].BasicData.MotherName || 'N/A'}</p>
+                                  </>
+                                )}
+                                {detalhesConsulta.resultado.Result[0].MatchKeys && (
+                                  <p><strong>Chave de Correspondência:</strong> {detalhesConsulta.resultado.Result[0].MatchKeys}</p>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="no-data-message">Nenhum resultado detalhado disponível para esta consulta.</p>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+          
+          {consultasFiltradas.length > intensPorPagina && (
+            <div className="paginacao">
+              <button onClick={() => setPaginaAtual(p => Math.max(p - 1, 1))} disabled={paginaAtual === 1}>
+                Anterior
+              </button>
+              <span>Página {paginaAtual} de {totalPaginas}</span>
+              <button onClick={() => setPaginaAtual(p => Math.min(p + 1, totalPaginas))} disabled={paginaAtual === totalPaginas}>
+                Próxima
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
