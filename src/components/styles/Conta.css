@@ -144,9 +144,9 @@
   display: flex;
   justify-content: space-around;
   margin-top: 1.5rem;
+  gap: 1rem ;
 }
 
-/* Botão ícone */
 .btn-icon {
   background: none;
   border: none;
@@ -154,7 +154,6 @@
   font-size: 1.2rem;
 }
 
-/* Alerta de sucesso */
 .alert-sucesso {
   background-color: #d4edda;
   color: #155724;
@@ -171,8 +170,6 @@
   flex-direction: column;
 }
 
-
-/* Botões padrão */
 .btn-primary {
   color: white !important;
   padding: 0.6rem 1.2rem;
@@ -184,8 +181,6 @@
 .btn-primary:hover {
   background-color: #0056d2;
 }
-
-
 
 .user-table td .btn-icon + .btn-icon {
   margin-left: 0.5rem;

@@ -18,7 +18,7 @@ const ConfigConta = () => {
     const [empresaEditada, setEmpresaEditada] = useState('');
     const [isFedEditado, setIsFedEditado] = useState(false);
 
-    // Função para carregar usuários do backend
+    
     const fetchUsuarios = async () => {
         try {
             const response = await UserService.getAllUsers();
@@ -58,7 +58,7 @@ const ConfigConta = () => {
             await UserService.deleteUser(usuarioSelecionado.id);
             exibirMensagem('sucesso', `Usuário ${usuarioSelecionado.nome_completo} excluído com sucesso!`);
             setMostrarModalExclusao(false);
-            fetchUsuarios(); // Recarrega a lista após exclusão
+            fetchUsuarios(); 
         } catch (error) {
             console.error("Erro ao excluir usuário:", error);
             exibirMensagem('erro', `Erro ao excluir usuário ${usuarioSelecionado.nome_completo}.`);
@@ -71,8 +71,8 @@ const ConfigConta = () => {
         setNomeEditado(usuario.nome_completo);
         setEmailEditado(usuario.email);
         setNivelAcessoEditado(usuario.nivel_acesso);
-        setEmpresaEditada(usuario.empresa?.id || ''); // Assume que 'empresa' pode ser um objeto com 'id'
-        setIsFedEditado(usuario.is_fed); // Define o estado inicial de is_fed
+        setEmpresaEditada(usuario.empresa?.id || '');
+        setIsFedEditado(usuario.is_fed); 
         setMostrarModalEdicao(true);
     };
 
@@ -84,26 +84,24 @@ const ConfigConta = () => {
                 nome_completo: nomeEditado,
                 email: emailEditado,
                 nivel_acesso: nivelAcessoEditado,
-                empresa: empresaEditada, // Envia o ID da empresa
-                is_fed: isFedEditado, // Inclui o campo is_fed
+                empresa: empresaEditada,
+                is_fed: isFedEditado, 
             };
-            // Note: Não estamos enviando a senha aqui. Se você quiser permitir
-            // a mudança de senha, precisaria de um campo e lógica separada.
             await UserService.updateUser(usuarioSelecionado.id, dadosAtualizados);
             exibirMensagem('sucesso', `Usuário ${nomeEditado} atualizado com sucesso!`);
             setMostrarModalEdicao(false);
-            fetchUsuarios(); // Recarrega a lista após edição
+            fetchUsuarios(); 
         } catch (error) {
             console.error("Erro ao atualizar usuário:", error.response?.data || error);
             const errorData = error.response?.data;
             let errorMessage = "Erro ao atualizar usuário. Verifique os dados.";
             if (errorData) {
-                // Tenta pegar mensagens de erro específicas do backend
+               
                 if (errorData.email) errorMessage = `Erro no E-mail: ${errorData.email.join(', ')}`;
                 else if (errorData.nome_completo) errorMessage = `Erro no Nome: ${errorData.nome_completo.join(', ')}`;
                 else if (errorData.nivel_acesso) errorMessage = `Erro na Função: ${errorData.nivel_acesso.join(', ')}`;
                 else if (errorData.empresa) errorMessage = `Erro na Empresa: ${errorData.empresa.join(', ')}`;
-                else if (errorData.detail) errorMessage = errorData.detail; // Erros genéricos de DRF
+                else if (errorData.detail) errorMessage = errorData.detail; 
                 else if (typeof errorData === 'object') errorMessage = JSON.stringify(errorData);
                 else errorMessage = errorData;
             }
@@ -120,7 +118,7 @@ const ConfigConta = () => {
         );
     });
 
-    const niveisAcesso = ["admin", "usuario", "comercial", "moderador"]; // Adicione "moderador" aqui
+    const niveisAcesso = ["admin", "usuario", "comercial", "moderador"]; 
 
     return (
         <div className="conta-container">
@@ -185,8 +183,8 @@ const ConfigConta = () => {
                                             >
                                                 <i className="bi bi-pencil-square text-primary"></i>
                                             </button>
-                                            {/* Impedir exclusão do primeiro usuário ou de usuários com ID específico, se necessário */}
-                                            {usuario.id !== usuarios[0]?.id && ( // Adicionado safe navigation para evitar erro se 'usuarios' estiver vazio
+                                           
+                                            {usuario.id !== usuarios[0]?.id && (
                                                 <button
                                                     className="btn-icon"
                                                     onClick={() => abrirModalExclusao(usuario)}
@@ -203,7 +201,6 @@ const ConfigConta = () => {
                     </div>
                 </div>
 
-                {/* Modal de Exclusão */}
                 {mostrarModalExclusao && (
                     <div className="modal-overlay">
                         <div className="modal-content">
@@ -223,8 +220,7 @@ const ConfigConta = () => {
                         </div>
                     </div>
                 )}
-
-                {/* Modal de Edição */}
+                
                 {mostrarModalEdicao && (
                     <div className="modal-overlay">
                         <div className="modal-content">
@@ -246,16 +242,14 @@ const ConfigConta = () => {
                                 value={nivelAcessoEditado}
                                 onChange={(e) => setNivelAcessoEditado(e.target.value)}
                             >
-                                {/* Mapeia os níveis de acesso disponíveis */}
                                 {niveisAcesso.map(nivel => (
                                     <option key={nivel} value={nivel}>
-                                        {nivel.charAt(0).toUpperCase() + nivel.slice(1)} {/* Capitaliza o primeiro caractere */}
+                                        {nivel.charAt(0).toUpperCase() + nivel.slice(1)} 
+                                        
                                     </option>
                                 ))}
                             </select>
                         
-                          
-
                             <div className="modal-actions">
                                 <button className="btn btn-primary" onClick={() => setMostrarModalEdicao(false)}>
                                     Cancelar
