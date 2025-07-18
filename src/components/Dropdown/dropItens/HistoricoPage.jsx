@@ -2,19 +2,18 @@ import React, { useState, useEffect } from 'react';
 import '../../styles/HistoricoPage.css';
 import { Link } from 'react-router-dom';
 import { ConsultaService } from '../../../services/consultaService';
-import { useAuth } from '../../../context/AuthContext'; // Assumindo que você tem um AuthContext para pegar o usuário/papel
+import { useAuth } from '../../../context/AuthContext';
+import { FileType } from 'lucide-react';
 
 const HistoricoConsulta = () => {
   const [consultas, setConsultas] = useState([]);
+  const [filtro, setFiltro] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedConsultaId, setSelectedConsultaId] = useState(null);
   const [detalhesConsulta, setDetalhesConsulta] = useState(null);
   const [detalhesLoading, setDetalhesLoading] = useState(false);
   const [detalhesError, setDetalhesError] = useState('');
-
-  // Assumindo que useAuth() provê o usuário logado e suas permissões/ID
-  // Por exemplo: { user: { id: 1, role: 'comum', email: 'user@example.com' } }
   const { user } = useAuth(); 
 
   useEffect(() => {
@@ -24,7 +23,6 @@ const HistoricoConsulta = () => {
       try {
         let data;
        console.log(user)
-        // Verifica se o usuário existe e se ele tem o papel de 'admin' ou 'moderador'
         if (user && (user.nivel_acesso === "admin" || user.nivel_acesso === "moderador")) {
           data = await ConsultaService.getConsultaHistory();
         } else if (user && user.id && (user.nivel_acesso === "usuario"|| user.nivel_acesso === "comercial")) {
@@ -45,10 +43,10 @@ const HistoricoConsulta = () => {
       }
     };
 
-    if (user) { // Garante que a busca só ocorra se houver um usuário logado
+    if (user) {
       fetchHistorico();
     }
-  }, [user]); // Adiciona 'user' como dependência para re-executar se o usuário mudar
+  }, [user]); 
 
   const handleItemClick = async (consultaId) => {
     if (selectedConsultaId === consultaId) {
@@ -72,12 +70,29 @@ const HistoricoConsulta = () => {
     }
   };
 
+  const consultasFiltradas = consultas.filter((consulta) => {
+    const termo = filtro.toLowerCase();
+    return(
+      (consulta.tipo_consulta_display || consulta.tipo_consulta || '').toLowerCase().includes(termo) ||
+      (consulta.parametro_consulta || '').toLowerCase().includes(termo) ||
+      (consulta.usuario_email || '').toLowerCase().includes(termo)
+    );
+  });
+
   return (
     <div className="historico-container">
       <h2>Histórico de Consultas</h2>
       <Link to="/home" className="btn-voltar">
         <i className="bi bi-arrow-left-circle"></i> Voltar
       </Link>
+
+      <input 
+      type="text"
+      placeholder='Buscar por tipo, parâmetro ou email...' 
+      value={filtro}
+      onChange={(e) => setFiltro(e.target.value)}
+      className='input-pesquisa'
+      />
 
       {loading && <p className="loading-message">Carregando histórico...</p>}
       {error && <p className="error-message">{error}</p>}
@@ -89,10 +104,15 @@ const HistoricoConsulta = () => {
       {!loading && !error && consultas.length > 0 && (
         <table className="historico-table">
           <thead>
-            <tr><th>Tipo de Consulta</th><th>Parâmetro</th><th>Realizada por</th><th>Data</th><th></th></tr>
+            <tr>
+              <th>Tipo de Consulta</th>
+              <th>Parâmetro</th>
+              <th>Realizada por</th>
+              <th>Data</th>
+              </tr>
           </thead>
           <tbody>
-            {consultas.map((consulta) => (
+            {consultasFiltradas.map((consulta) => (
               <React.Fragment key={consulta.id}>
                 <tr
                   className={selectedConsultaId === consulta.id ? 'active-row' : ''}

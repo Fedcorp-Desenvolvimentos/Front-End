@@ -53,7 +53,7 @@
 }
 
 .form-container {
-  width: 450px; /* Reduzi o tamanho do card */
+  width: 450px; 
   padding: 20px;
   border-radius: 10px;
   background-color: #fff;
@@ -61,10 +61,10 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease-in-out, background-color 0.3s ease-in-out;
   text-align: start;
-  margin: 20px auto; /* Centraliza o card na tela */
+  margin: 20px auto; 
 }
 
-/* Ajustando os campos de entrada */
+
 .form-container input {
   width: 100%;
   padding: 8px;
@@ -73,7 +73,7 @@
   border: 1px solid #ddd;
 }
 
-/* Botão de pesquisa dentro do card */
+
 .form-container button {
   width: 100%;
   padding: 10px;
@@ -120,11 +120,11 @@
   margin-top: 4px;
 }
 
-/* ==== ESTILIZAÇÃO PARA CONSULTA EM MASSA ==== */
+
 .form-massa-container {
   width: 450px;
   padding: 20px;
-  margin: 20px auto;         /* Centraliza o container */
+  margin: 20px auto;        
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -154,4 +154,15 @@
 
 .form-massa-container input[type="file"] {
   display: none;
+}
+
+.input-pesquisa {
+  margin: 1rem 0;
+  margin-left: 1rem;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  max-width: 1300px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
 }
