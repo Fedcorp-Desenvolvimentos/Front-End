@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import * as XLSX from "xlsx"; // Importe a biblioteca XLSX
+import * as XLSX from "xlsx"; 
 import "../styles/Consulta.css";
-import { ConsultaService } from "../../services/consultaService"; // Assumindo que este serviço será atualizado para PF
-import { FileSpreadsheet } from "lucide-react"; // Ícone para consulta em massa
+import { ConsultaService } from "../../services/consultaService"; 
+import { FileSpreadsheet } from "lucide-react"; 
 
 const ConsultaPF = () => {
-  const [activeForm, setActiveForm] = useState("cpf"); // Inicia com 'cpf'
+  const [activeForm, setActiveForm] = useState(""); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resultado, setResultado] = useState(null);
@@ -18,15 +18,12 @@ const ConsultaPF = () => {
     fatherName: "", 
   });
 
-  // Estado para mensagens de feedback específicas da consulta em massa
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
-
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     let formattedValue = value;
 
     if (name === "cpf") {
-      // Remove tudo que não for dígito e limita a 11 caracteres
       formattedValue = value.replace(/\D/g, "").substring(0, 11);
     }
 
@@ -41,7 +38,7 @@ const ConsultaPF = () => {
     setLoading(true);
     setError(null);
     setResultado(null);
-    setMassConsultaMessage(""); // Limpa mensagens de consulta em massa
+    setMassConsultaMessage(""); 
 
     let payload = {};
     let isFormValid = true;
@@ -59,12 +56,10 @@ const ConsultaPF = () => {
         };
       }
     } else if (activeForm === "chaves") {
-      // Verifica se pelo menos o campo nome foi preenchido para a consulta por chaves
       if (!formData.nome.trim()) {
         validationErrorMessage = "Por favor, preencha o campo Nome.";
         isFormValid = false;
       } else {
-        // Formata a data de nascimento para dd/MM/yyyy
         const formattedBirthDate = formData.dataNascimento
           ? new Date(formData.dataNascimento).toLocaleDateString("pt-BR")
           : "";
@@ -87,7 +82,6 @@ const ConsultaPF = () => {
     }
 
     try {
-      // ConsultaService já deve lidar com a autenticação via cookie HttpOnly
       const response = await ConsultaService.realizarConsulta(payload);
       setResultado(response);
       console.log("Resultado da consulta PF:", response);
@@ -103,10 +97,6 @@ const ConsultaPF = () => {
       setLoading(false);
     }
   };
-
-  // --- LÓGICA ATUALIZADA PARA CONSULTA EM MASSA ---
-
-  // Função para lidar com o upload do arquivo Excel
   const handleMassFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) {
@@ -116,7 +106,7 @@ const ConsultaPF = () => {
 
     setLoading(true);
     setError(null);
-    setResultado(null); // Limpa resultados de consultas individuais
+    setResultado(null); 
     setMassConsultaMessage("Lendo planilha e preparando para consulta...");
 
     const reader = new FileReader();
@@ -130,7 +120,6 @@ const ConsultaPF = () => {
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
         const cpfsParaConsulta = jsonData.map((row) => ({
-          // Garante que 'CPF' é uma string e remove caracteres não numéricos
           CPF: String(row.CPF || "").replace(/\D/g, ""),
         }));
 
@@ -143,33 +132,29 @@ const ConsultaPF = () => {
             "Nenhum CPF válido encontrado na planilha. Verifique a coluna 'CPF'."
           );
           setLoading(false);
-          // Limpa o input file para que o mesmo arquivo possa ser selecionado novamente
           if (event.target) event.target.value = null;
           return;
         }
 
         const requestBody = {
           cpfs: cpfsValidos,
-          origem: "planilha", // Ajuste para consistência com o backend (underscore)
+          origem: "planilha",
         };
 
         setMassConsultaMessage(
           `Enviando ${cpfsValidos.length} CPFs para processamento em massa...`
         );
-
-        // Usar o serviço ConsultaService para processar a planilha de CPF
         const response = await ConsultaService.processarPlanilhaCPF(
           requestBody
         );
-
-        const blob = response; // ConsultaService já deve retornar o blob
+        const blob = response; 
         const url = window.URL.createObjectURL(new Blob([blob]));
         const link = document.createElement("a");
         link.href = url;
         link.setAttribute("download", "planilha-resultado-cpf.xlsx");
         document.body.appendChild(link);
         link.click();
-        link.parentNode.removeChild(link); // Limpa o elemento <a> após o download
+        link.parentNode.removeChild(link); 
         setMassConsultaMessage(
           "Processamento concluído! O download da planilha de resultados iniciou."
         );
@@ -179,29 +164,24 @@ const ConsultaPF = () => {
           err.response?.data?.message ||
           err.message ||
           "Erro inesperado: Verifique sua conexão e o formato do arquivo.";
-        setError(`Erro ao processar a planilha: ${errorMessage}`); // Usa setError para exibir na UI
-        setMassConsultaMessage(""); // Limpa a mensagem de processamento se der erro
+        setError(`Erro ao processar a planilha: ${errorMessage}`);
+        setMassConsultaMessage(""); 
       } finally {
         setLoading(false);
-        // Limpa o input file para permitir novo upload
         if (event.target) {
           event.target.value = null;
         }
       }
     };
-    reader.readAsArrayBuffer(file); // Inicia a leitura do arquivo
+    reader.readAsArrayBuffer(file); 
   };
-
-  // Função para baixar a planilha modelo de CPF
   const handleDownloadModel = async () => {
     setLoading(true);
-    setError(null); // Limpa erros anteriores
+    setError(null); 
     setMassConsultaMessage("Baixando planilha modelo de CPF...");
     try {
-      // Usar o serviço ConsultaService para baixar a planilha modelo de CPF
       const response = await ConsultaService.baixarPlanilhaModeloCPF();
-
-      const blob = response; // ConsultaService já deve retornar o blob
+      const blob = response; 
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement("a");
       link.href = url;
@@ -216,32 +196,28 @@ const ConsultaPF = () => {
         err.response?.data?.message ||
         err.message ||
         "Erro na comunicação com o servidor para baixar o modelo.";
-      setError(`Erro ao baixar modelo: ${errorMessage}`); // Usa setError para exibir na UI
-      setMassConsultaMessage(""); // Limpa a mensagem de processamento se der erro
+      setError(`Erro ao baixar modelo: ${errorMessage}`); 
+      setMassConsultaMessage("");
     } finally {
       setLoading(false);
     }
   };
 
-  // ==============================================================================
-  //                                    HTML
-  // ==============================================================================
   return (
     <div className="consulta-container">
       <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
 
       <div className="card-options-wrapper">
-        {/* Card Consulta por CPF */}
         <div
           className={`card card-option ${
             activeForm === "cpf" ? "active" : ""
           }`}
           onClick={() => {
             setActiveForm("cpf");
-            setFormData({ ...formData, cpf: "" }); // Limpa o CPF ao trocar
+            setFormData({ ...formData, cpf: "" }); 
             setError(null);
             setResultado(null);
-            setMassConsultaMessage(""); // Limpa mensagens ao trocar de aba
+            setMassConsultaMessage(""); 
           }}
         >
           <div className="icon-container">
@@ -262,7 +238,6 @@ const ConsultaPF = () => {
           <h5>Consulta por CPF</h5>
         </div>
 
-        {/* Card Chaves Alternativas */}
         <div
           className={`card card-option ${
             activeForm === "chaves" ? "active" : ""
@@ -270,7 +245,7 @@ const ConsultaPF = () => {
           onClick={() => {
             setActiveForm("chaves");
             setFormData({
-              cpf: "", // Limpa o CPF
+              cpf: "", 
               nome: "",
               dataNascimento: "",
               motherName: "",
@@ -278,7 +253,7 @@ const ConsultaPF = () => {
             });
             setError(null);
             setResultado(null);
-            setMassConsultaMessage(""); // Limpa mensagens ao trocar de aba
+            setMassConsultaMessage("");
           }}
         >
           <div className="icon-container">
@@ -294,7 +269,6 @@ const ConsultaPF = () => {
           <h5>Chaves Alternativas</h5>
         </div>
 
-        {/* Card Consulta em Massa */}
         <div
           className={`card card-option ${
             activeForm === "massa" ? "active" : ""
@@ -303,7 +277,7 @@ const ConsultaPF = () => {
             setActiveForm("massa");
             setError(null);
             setResultado(null);
-            setMassConsultaMessage(""); // Limpa mensagens ao trocar de aba
+            setMassConsultaMessage(""); 
           }}
         >
           <div className="icon-container">
@@ -346,7 +320,7 @@ const ConsultaPF = () => {
             value={formData.nome}
             onChange={handleFormChange}
             placeholder="Digite o nome"
-            required // Nome agora é obrigatório
+            required 
             disabled={loading}
           />
           <label htmlFor="dataNascimento">Data de Nascimento</label>
@@ -385,8 +359,6 @@ const ConsultaPF = () => {
           {error && <p className="error-message">{error}</p>}
         </form>
       )}
-
-      {/* Conteúdo Consulta em Massa (ADAPTADO PARA CPF) */}
       {activeForm === "massa" && (
         <div className="form-massa-container">
           <input
@@ -422,26 +394,21 @@ const ConsultaPF = () => {
           {!loading && massConsultaMessage && (
             <p className="message">{massConsultaMessage}</p>
           )}
-          {/* Mostra erros da consulta em massa aqui também */}
           {error && <p className="error-message">{error}</p>}
         </div>
       )}
 
-      {/* Resultado da Consulta (para consultas individuais de CPF) */}
       {activeForm !== "massa" &&
         resultado?.resultado_api?.Result &&
         resultado.resultado_api.Result.length > 0 && (
           <div className="card-resultado">
             <h4>Resultado da busca realizada</h4>
             {(() => {
-              // Acesse BasicData de forma mais segura
               const resultItem = resultado.resultado_api.Result[0];
               const basicData = resultItem?.BasicData || {};
-              // Acesse o CommonName de forma segura
               const commonName = basicData.Aliases?.CommonName || "N/A";
 
               if (!Object.keys(basicData).length && !commonName) {
-                // Verifica se basicData está vazio e commonName é N/A
                 return <p>Dados básicos do CPF não disponíveis na resposta.</p>;
               }
 
@@ -467,7 +434,6 @@ const ConsultaPF = () => {
                   <label>Data de Nascimento:</label>
                   <input
                     type="text"
-                    // Formata a data se existir
                     value={
                       basicData.BirthDate
                         ? new Date(basicData.BirthDate).toLocaleDateString()

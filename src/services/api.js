@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/', // Mantenha sua URL do backend
+  baseURL: 'https://bigcorp-backend.onrender.com/', // Mantenha sua URL do backend
   withCredentials: true, // Importante para enviar e receber cookies
 });
 

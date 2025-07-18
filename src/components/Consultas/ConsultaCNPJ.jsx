@@ -6,7 +6,7 @@ import { FileSpreadsheet } from "lucide-react";
 
 const ConsultaCNPJ = () => {
   const [cnpj, setCnpj] = useState("");
-  const [activeForm, setActiveForm] = useState("cnpj");
+  const [activeForm, setActiveForm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resultado, setResultado] = useState(null);
@@ -50,7 +50,7 @@ const ConsultaCNPJ = () => {
         isFormValid = false;
       } else {
         payload = {
-          tipo_consulta: "cnpj", // Tipo para consulta direta de CNPJ
+          tipo_consulta: "cnpj", 
           parametro_consulta: cnpj,
         };
       }
@@ -132,11 +132,9 @@ const ConsultaCNPJ = () => {
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
         const cnpjsParaConsulta = jsonData.map((row) => ({
           CNPJ: String(row.CNPJ),
         }));
-
         const requestBody = {
           cnpjs: cnpjsParaConsulta,
           origem: "planilha",
@@ -201,25 +199,21 @@ const ConsultaCNPJ = () => {
     }
   };
 
-  // Função auxiliar para obter os dados da BigDataCorp ou BrasilAPI
   const getCnpjData = () => {
     if (!resultado || !resultado.resultado_api) return null;
-
-    // Se o tipo de consulta for CNPJ direto (BrasilAPI)
     if (resultado.historico_salvo?.tipo_consulta === "cnpj") {
       return resultado.resultado_api;
     } 
-    // Se o tipo de consulta for CNPJ por Razão Social (BigDataCorp)
     else if (resultado.historico_salvo?.tipo_consulta === "cnpj_razao_social") {
       
       if (resultado.resultado_api.Result && resultado.resultado_api.Result.length > 0) {
-        return resultado.resultado_api.Result[0].BasicData; // Pega os dados básicos do primeiro resultado
+        return resultado.resultado_api.Result[0].BasicData;
       }
     }
-    return null; // Retorna nulo se não encontrar dados em nenhum dos formatos
+    return null; 
   };
 
-  const cnpjData = getCnpjData(); // Obtém os dados de CNPJ formatados para exibição
+  const cnpjData = getCnpjData(); 
 
   return (
     <div className="consulta-container">
@@ -375,8 +369,6 @@ const ConsultaCNPJ = () => {
           {error && <p className="error-message">{error}</p>}
         </div>
       )}
-
-      {/* Condição de exibição do resultado: só mostra se não for consulta em massa E tiver dados para exibir */}
       {activeForm !== "massa" && cnpjData && (
         <div className="card-resultado">
           <h4>Resultado da busca realizada</h4>

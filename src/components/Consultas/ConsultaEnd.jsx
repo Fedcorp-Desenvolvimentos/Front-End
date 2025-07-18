@@ -8,11 +8,11 @@ const ConsultaEnd = () => {
     const [activeForm, setActiveForm] = useState("cep");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [resultado, setResultado] = useState(null); // Para resultados de consulta individual
+    const [resultado, setResultado] = useState(null); 
     const [formData, setFormData] = useState({
         cep: "",
         rua: "",
-        bairro: "", // Bairro não é um campo esperado pela ViaCEP, mas pode ser útil para o usuário.
+        bairro: "", 
         cidade: "",
         uf: "",
     });
@@ -42,42 +42,35 @@ const ConsultaEnd = () => {
         event.preventDefault();
         setLoading(true);
         setError(null);
-        setResultado(null); // Limpa resultado de consulta individual anterior
-        setMassConsultaMessage(""); // Limpa mensagem de massa
+        setResultado(null); 
+        setMassConsultaMessage(""); 
 
         let payload = {};
         let isFormValid = true;
         let validationErrorMessage = "";
 
         if (activeForm === "cep") {
-            // Consulta de CEP simples (BrasilAPI)
             if (formData.cep.length !== 8) {
                 validationErrorMessage = "Por favor, insira um CEP válido com 8 dígitos.";
                 isFormValid = false;
             } else {
                 payload = {
-                    tipo_consulta: "endereco", // Este é para a consulta de CEP da BrasilAPI (pelo número do CEP)
+                    tipo_consulta: "endereco",
                     parametro_consulta: formData.cep,
                     origem: "manual",
                 };
             }
         } else if (activeForm === "chaves") {
-            // Consulta de CEP por Rua e Cidade (ViaCEP)
-            // Validar se 'uf', 'cidade' e 'logradouro' (rua) foram preenchidos,
-            // pois são os campos mínimos exigidos pelo ViaCEP.
             if (!formData.uf.trim() || !formData.cidade.trim() || !formData.rua.trim()) {
                 validationErrorMessage = "Para busca por chaves alternativas, os campos UF, Cidade e Rua são obrigatórios.";
                 isFormValid = false;
             } else {
                 payload = {
-                    tipo_consulta: "cep_rua_cidade", // <-- O nome do tipo de consulta no backend
+                    tipo_consulta: "cep_rua_cidade", 
                     parametro_consulta: JSON.stringify({
-                        estado: formData.uf, // O backend espera 'estado'
+                        estado: formData.uf,
                         cidade: formData.cidade,
-                        logradouro: formData.rua, // O backend espera 'logradouro'
-                        // O campo 'bairro' não é usado pela ViaCEP para a consulta,
-                        // então não precisa ser incluído no JSON para o backend.
-                        // Se o backend precisar para algum propósito interno, pode manter.
+                        logradouro: formData.rua, 
                     }),
                     origem: "manual",
                 };
@@ -101,7 +94,7 @@ const ConsultaEnd = () => {
                 console.log(response); 
             } else {
                 setError(response.mensagem || "Resposta inesperada da API. Endereço não encontrado ou inválido.");
-                setResultado(null); // Limpa resultados anteriores em caso de erro
+                setResultado(null); 
             }
         } catch (err) {
             const errorMessage =
@@ -118,8 +111,6 @@ const ConsultaEnd = () => {
             setLoading(false);
         }
     };
-
-    // ... (Seu código handleMassFileUpload e handleDownloadModel) ...
 
     const resetFormState = () => {
         setFormData({ cep: "", rua: "", bairro: "", cidade: "", uf: "" });
@@ -177,7 +168,6 @@ const ConsultaEnd = () => {
                     <h5>Chaves Alternativas</h5>
                 </div>
 
-                {/* Card Consulta em Massa */}
                 <div
                     className={`card card-option ${
                         activeForm === "massa" ? "active" : ""
@@ -217,7 +207,6 @@ const ConsultaEnd = () => {
             {activeForm === "chaves" && (
                 <form className="form-container" onSubmit={handleSubmit}>
                     <p className="form-description">
-                        {/* Se houver alguma descrição para este formulário, coloque aqui */}
                     </p>
                     <label htmlFor="uf">UF:</label>
                     <input
@@ -253,7 +242,6 @@ const ConsultaEnd = () => {
                         required
                         disabled={loading}
                     />
-                    {/* Bairro não é um campo obrigatório para a ViaCEP, pode ser opcional ou removido se não for útil */}
                     <label htmlFor="bairro">Bairro (Opcional):</label>
                     <input
                         type="text"
@@ -278,8 +266,6 @@ const ConsultaEnd = () => {
                     {error && <p className="error-message">{error}</p>}
                 </form>
             )}
-
-            {/* Conteúdo Consulta em Massa (CEP) */}
             {activeForm === "massa" && (
                 <div className="form-massa-container">
                     <button
@@ -317,12 +303,9 @@ const ConsultaEnd = () => {
                     {error && <p className="error-message">{error}</p>}
                 </div>
             )}
-
-            {/* Exibição do resultado da consulta individual */}
             {activeForm !== "massa" && resultado?.resultado_api && (
                 <div className="card-resultado">
                     <h4>Resultado da busca realizada</h4>
-                    {/* Exibe o resultado de CEP simples (BrasilAPI) */}
                     {resultado.tipo_consulta === "endereco" && (
                         <>
                             <label>CEP:</label>
@@ -403,7 +386,6 @@ const ConsultaEnd = () => {
                                         value={item.complemento || "N/A"}
                                         disabled
                                     />
-                                    {/* Adiciona uma linha divisória entre múltiplos resultados, exceto no último */}
                                     {index < resultado.resultado_api.resultados_viacep.length - 1 && (
                                         <hr className="result-separator" />
                                     )}
@@ -411,9 +393,9 @@ const ConsultaEnd = () => {
                             ))}
                         </>
                     ) : (
-                        // Esta é a mensagem de "nenhum resultado" quando o array está vazio
+                     
                         resultado.tipo_consulta === "cep_rua_cidade" &&
-                        resultado.resultado_api && // Certifica que resultado_api existe para evitar erros
+                        resultado.resultado_api &&
                         (!Array.isArray(resultado.resultado_api.resultados_viacep) ||
                          resultado.resultado_api.resultados_viacep.length === 0) && (
                             <p className="no-results-message">
