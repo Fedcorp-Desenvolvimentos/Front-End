@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import "../styles/Consulta.css";
-import { ConsultaService } from "../../services/consultaService"; 
-import { FileSpreadsheet } from "lucide-react"; 
+import { ConsultaService } from "../../services/consultaService";
+import { FileSpreadsheet } from "lucide-react";
 
 const ConsultaCNPJ = () => {
   const [cnpj, setCnpj] = useState("");
@@ -50,7 +50,7 @@ const ConsultaCNPJ = () => {
         isFormValid = false;
       } else {
         payload = {
-          tipo_consulta: "cnpj", 
+          tipo_consulta: "cnpj",
           parametro_consulta: cnpj,
         };
       }
@@ -71,17 +71,18 @@ const ConsultaCNPJ = () => {
         }
 
         if (qParams.length === 0) {
-          validationErrorMessage = "Nenhum parâmetro de busca válido para chaves alternativas.";
+          validationErrorMessage =
+            "Nenhum parâmetro de busca válido para chaves alternativas.";
           isFormValid = false;
         } else {
           const bigDataCorpPayload = {
-            "Datasets": "basic_data", 
-            "q": qParams.join(", "), 
-            "Limit": 5 
+            Datasets: "basic_data",
+            q: qParams.join(", "),
+            Limit: 5,
           };
 
           payload = {
-            tipo_consulta: "cnpj_razao_social", 
+            tipo_consulta: "cnpj_razao_social",
             parametro_consulta: JSON.stringify(bigDataCorpPayload),
           };
         }
@@ -142,8 +143,10 @@ const ConsultaCNPJ = () => {
 
         setMassConsultaMessage("Enviando CNPJs para processamento em massa...");
 
-        const response = await ConsultaService.processarPlanilhaCNPJ(requestBody);
-        const blob = response; 
+        const response = await ConsultaService.processarPlanilhaCNPJ(
+          requestBody
+        );
+        const blob = response;
         const url = window.URL.createObjectURL(new Blob([blob]));
         const link = document.createElement("a");
         link.href = url;
@@ -163,7 +166,7 @@ const ConsultaCNPJ = () => {
         setMassConsultaMessage(`Erro ao processar a planilha: ${errorMessage}`);
       } finally {
         setLoading(false);
-        if (event.target) { 
+        if (event.target) {
           event.target.value = null;
         }
       }
@@ -177,8 +180,8 @@ const ConsultaCNPJ = () => {
     setMassConsultaMessage("Baixando planilha modelo...");
     try {
       const response = await ConsultaService.baixarPlanilhaModeloCNPJ();
-      
-      const blob = response; 
+
+      const blob = response;
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement("a");
       link.href = url;
@@ -203,18 +206,21 @@ const ConsultaCNPJ = () => {
     if (!resultado || !resultado.resultado_api) return null;
     if (resultado.historico_salvo?.tipo_consulta === "cnpj") {
       return resultado.resultado_api;
-    } 
-    else if (resultado.historico_salvo?.tipo_consulta === "cnpj_razao_social") {
-      
-      if (resultado.resultado_api.Result && resultado.resultado_api.Result.length > 0) {
+    } else if (
+      resultado.historico_salvo?.tipo_consulta === "cnpj_razao_social"
+    ) {
+      if (
+        resultado.resultado_api.Result &&
+        resultado.resultado_api.Result.length > 0
+      ) {
         return resultado.resultado_api.Result[0].BasicData;
       }
     }
-    return null; 
+    return null;
   };
 
-  const cnpjData = getCnpjData(); 
-
+  const cnpjData = getCnpjData();
+  console.log(cnpjData);
   return (
     <div className="consulta-container">
       <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
@@ -326,7 +332,7 @@ const ConsultaCNPJ = () => {
             disabled={
               loading ||
               (!formData.razaoSocial.trim() &&
-                !formData.uf.trim() && 
+                !formData.uf.trim() &&
                 !formData.email.trim() &&
                 !formData.telefone.trim())
             }
@@ -372,67 +378,49 @@ const ConsultaCNPJ = () => {
       {activeForm !== "massa" && cnpjData && (
         <div className="card-resultado">
           <h4>Resultado da busca realizada</h4>
-          
+
           <label>Razão Social:</label>
-          <input
-            type="text"
-            value={cnpjData.OfficialName || ""}
-            disabled
-          />
+          <input type="text" value={cnpjData.razao_social || "N/A"} disabled />
 
           <label>Nome Fantasia:</label>
-          <input
-            type="text"
-            value={cnpjData.TradeName || ""}
-            disabled
-          />
+          <input type="text" value={cnpjData.nome_fantasia || "N/A"} disabled />
 
           <label>CNPJ:</label>
-          <input
-            type="text"
-            value={cnpjData.TaxIdNumber || ""}
-            disabled
-          />
+          <input type="text" value={cnpjData.cnpj || "N/A"} disabled />
 
           <label>Atividade Principal:</label>
           <input
             type="text"
-            value={cnpjData.Activities?.[0]?.Activity || ""}
+            value={cnpjData.cnae_fiscal_descricao || "N/A"}
             disabled
           />
 
           <label>Natureza Jurídica:</label>
           <input
             type="text"
-            value={cnpjData.LegalNature?.Activity || ""}
+            value={cnpjData.natureza_juridica || "N/A"}
             disabled
           />
 
           <label>UF (Sede):</label>
-          <input type="text" value={cnpjData.HeadquarterState || ""} disabled />
+          <input type="text" value={cnpjData.uf || "N/A"} disabled />
 
           <label>Situação Cadastral:</label>
           <input
             type="text"
-            value={cnpjData.TaxIdStatus || "Não informada"}
+            value={cnpjData.situacao_cadastral || "Não informada"}
             disabled
           />
 
           <label>Data de Fundação:</label>
           <input
             type="text"
-            value={cnpjData.FoundedDate ? new Date(cnpjData.FoundedDate).toLocaleDateString() : ""}
+            value={cnpjData.data_inicio_atividade || "N/A"}
             disabled
           />
 
           <label>Capital Social:</label>
-          <input
-            type="text"
-            value={cnpjData.AdditionalOutputData?.CapitalRS || cnpjData.AdditionalOutputData?.Capital || ""}
-            disabled
-          />
-
-
+          <input type="text" value={cnpjData.capital_social || "N/A"} disabled />
         </div>
       )}
     </div>
