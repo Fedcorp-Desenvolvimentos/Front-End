@@ -30,8 +30,6 @@ export const ConsultaService = {
     const response = await api.post("/consultas/realizar/", payload);
     return response.data;
   },
-
-  // Consulta individual de CEP
   consultarCep: async (cep) => {
     const payload = {
       tipo_consulta: "endereco", // Novo tipo de consulta
@@ -39,6 +37,24 @@ export const ConsultaService = {
     };
     const response = await api.post("/consultas/realizar/", payload);
     return response.data;
+  },
+
+  consultarComercial: async(cnpj)=>{
+    const payload = {
+      tipo_consulta: "cnpj_comercial",
+      parametro_consulta: cnpj,
+    };
+    const response = await api.post("consultas/comercial/", payload);
+    return response.data
+  },
+
+   consultarContatoComercial: async(cpf)=>{
+    const payload = {
+      tipo_consulta: "comercial",
+      parametro_consulta: cpf,
+    };
+    const response = await api.post("consultas/cont-comercial/", payload);
+    return response.data
   },
 
   /**
@@ -113,4 +129,5 @@ export const ConsultaService = {
     });
     return response.data;
   },
+
 };
