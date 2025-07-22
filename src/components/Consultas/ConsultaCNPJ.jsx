@@ -220,7 +220,7 @@ const ConsultaCNPJ = () => {
   };
 
   const cnpjData = getCnpjData();
-  console.log(cnpjData);
+ 
   return (
     <div className="consulta-container">
       <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
@@ -375,7 +375,7 @@ const ConsultaCNPJ = () => {
           {error && <p className="error-message">{error}</p>}
         </div>
       )}
-      {activeForm !== "massa" && cnpjData && (
+      {activeForm == "cnpj" && cnpjData && (
         <div className="card-resultado">
           <h4>Resultado da busca realizada</h4>
 
@@ -423,7 +423,53 @@ const ConsultaCNPJ = () => {
           <input type="text" value={cnpjData.capital_social || "N/A"} disabled />
         </div>
       )}
+      {activeForm == "chaves" && cnpjData && (
+        <div className="card-resultado">
+          <h4>Resultado da busca realizada</h4>
+
+          <label>Razão Social:</label>
+          <input type="text" value={cnpjData.OfficialName || "N/A"} disabled />
+
+          <label>Nome Fantasia:</label>
+          <input type="text" value={cnpjData.TradeName || "N/A"} disabled />
+
+          <label>CNPJ:</label>
+          <input type="text" value={cnpjData.TaxIdNumber || "N/A"} disabled />
+
+          <label>Atividade Principal:</label>
+          <input
+            type="text"
+            value={cnpjData.Activities[0].Activity || "N/A"}
+            disabled
+          />
+
+          <label>Natureza Jurídica:</label>
+          <input
+            type="text"
+            value={cnpjData.LegalNature.Activity || "N/A"}
+            disabled
+          />
+
+          <label>UF (Sede):</label>
+          <input type="text" value={cnpjData.HeadquarterState || "N/A"} disabled />
+
+          <label>Situação Cadastral:</label>
+          <input
+            type="text"
+            value={cnpjData.TaxIdStatus || "Não informada"}
+            disabled
+          />
+
+          <label>Data de Fundação:</label>
+          <input
+            type="text"
+            value={cnpjData.FoundedDate || "N/A"}
+            disabled
+          />
+        </div>
+      )}
     </div>
+    
   );
 };
 
