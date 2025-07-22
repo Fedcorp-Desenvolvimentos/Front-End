@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../styles/Comercial.css";
 import "../styles/Conta.css"; // Para reutilizar estilos de modal customizado
 import { ConsultaService } from "../../services/consultaService";
+import { FaBuilding, FaSearch } from "react-icons/fa";
 
 const ConsultaComercial = () => {
   const [form, setForm] = useState({ cnpj: "" });
@@ -124,7 +125,7 @@ const ConsultaComercial = () => {
     <div className="comercial-page">
       <div className="card-opcoes">
         <div className="icon-container">
-          <span className="icon-opcao">🏢</span>
+        <FaBuilding className="icon-opcao" />
         </div>
         <h2 className="titulo-principal">Consulta Comercial</h2>
         <p className="opcao-texto">
@@ -148,7 +149,7 @@ const ConsultaComercial = () => {
             onClick={handleSearch}
             disabled={loading}
           >
-            {loading ? "Consultando..." : "Consultar"}
+          {loading ? "Consultando..." : <><FaSearch className="btn-icon" /> Consultar</>}
           </button>
           {error && <div className="alert-erro mt-3">{error}</div>}
         </div>
