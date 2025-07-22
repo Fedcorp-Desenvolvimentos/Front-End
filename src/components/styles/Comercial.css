@@ -123,3 +123,118 @@
 .text-title {
   margin-bottom: 0.50rem;
 }
+
+/* Lista de relacionamentos */
+.rel-title {
+  color: #0056b3;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.rel-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rel-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+
+.rel-info {
+  flex-grow: 1;
+  padding-right: 10px;
+  color: #333;
+}
+
+.rel-type, .rel-cpf {
+  font-size: 0.95em;
+  color: #666;
+}
+
+.btn-rel-details {
+  background: #0d6efd;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 14px;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-rel-details:hover {
+  background: #084cdf;
+}
+
+.no-rel-msg {
+  margin-top: 2rem;
+  color: #888;
+  text-align: center;
+  font-size: 1rem;
+}
+
+/* Mensagem de erro customizada */
+.alert-erro {
+  background-color: #f8d7da;
+  color: #842029;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  border: 1px solid #f5c2c7;
+  font-size: 1rem;
+}
+
+/* Modal customizado (reutiliza parte de Conta.css) */
+.modal-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #0d6efd;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  z-index: 2;
+}
+.modal-close:hover {
+  color: #0d6efd;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+.mt-4 {
+  margin-top: 2rem;
+}
