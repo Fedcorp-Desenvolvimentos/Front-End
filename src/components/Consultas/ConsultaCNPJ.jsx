@@ -220,16 +220,15 @@ const ConsultaCNPJ = () => {
   };
 
   const cnpjData = getCnpjData();
- 
+
   return (
     <div className="consulta-container">
       <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
 
       <div className="card-options-wrapper">
         <div
-          className={`card card-option ${
-            activeForm === "cnpj" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "cnpj" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("cnpj");
             setError(null);
@@ -254,9 +253,8 @@ const ConsultaCNPJ = () => {
         </div>
 
         <div
-          className={`card card-option ${
-            activeForm === "chaves" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "chaves" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("chaves");
             setError(null);
@@ -278,9 +276,8 @@ const ConsultaCNPJ = () => {
         </div>
 
         <div
-          className={`card card-option ${
-            activeForm === "massa" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "massa" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("massa");
             setError(null);
@@ -382,9 +379,6 @@ const ConsultaCNPJ = () => {
           <label>Razão Social:</label>
           <input type="text" value={cnpjData.razao_social || "N/A"} disabled />
 
-          <label>Nome Fantasia:</label>
-          <input type="text" value={cnpjData.nome_fantasia || "N/A"} disabled />
-
           <label>CNPJ:</label>
           <input type="text" value={cnpjData.cnpj || "N/A"} disabled />
 
@@ -395,32 +389,47 @@ const ConsultaCNPJ = () => {
             disabled
           />
 
-          <label>Natureza Jurídica:</label>
-          <input
-            type="text"
-            value={cnpjData.natureza_juridica || "N/A"}
-            disabled
-          />
+          <label>Telefone:</label>
+          <input type="text" value={cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"} disabled />
 
           <label>UF (Sede):</label>
           <input type="text" value={cnpjData.uf || "N/A"} disabled />
 
-          <label>Situação Cadastral:</label>
+          <label>Bairro</label>
           <input
             type="text"
-            value={cnpjData.situacao_cadastral || "Não informada"}
+            value={cnpjData.bairro || "Não informada"}
             disabled
           />
 
-          <label>Data de Fundação:</label>
+          <label>Rua</label>
           <input
             type="text"
-            value={cnpjData.data_inicio_atividade || "N/A"}
+            value={
+              cnpjData.descricao_tipo_de_logradouro && cnpjData.logradouro
+                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro}${cnpjData.numero ? `, ${cnpjData.numero}` : ""
+                }`
+                : cnpjData.descricao_tipo_de_logradouro ||
+                cnpjData.logradouro ||
+                "Não informada"
+            }
             disabled
           />
 
-          <label>Capital Social:</label>
-          <input type="text" value={cnpjData.capital_social || "N/A"} disabled />
+          <label>Complemento</label>
+          <input
+            type="text"
+            value={cnpjData.municipio || "Não informada"}
+            disabled
+          />
+
+          <label>Município</label>
+          <input
+            type="text"
+            value={cnpjData.complemento || "Não informada"}
+            disabled
+          />
+
         </div>
       )}
       {activeForm == "chaves" && cnpjData && (
@@ -469,7 +478,7 @@ const ConsultaCNPJ = () => {
         </div>
       )}
     </div>
-    
+
   );
 };
 
