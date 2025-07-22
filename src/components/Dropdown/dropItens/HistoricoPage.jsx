@@ -15,6 +15,8 @@ const HistoricoConsulta = () => {
   const [detalhesConsulta, setDetalhesConsulta] = useState(null);
   const [detalhesLoading, setDetalhesLoading] = useState(false);
   const [detalhesError, setDetalhesError] = useState('');
+  const [totalPaginas, setTotalPaginas] = useState(1);
+  const [totalItens, setTotalItens] = useState(0);
   const { user } = useAuth(); 
 
   useEffect(() => {
@@ -24,15 +26,17 @@ const HistoricoConsulta = () => {
       try {
         let data;
         if (user && (user.nivel_acesso === "admin" || user.nivel_acesso === "moderador")) {
-          data = await ConsultaService.getConsultaHistory();
+          data = await ConsultaService.getConsultaHistory(paginaAtual, intensPorPagina);
         } else if (user && user.id && (user.nivel_acesso === "usuario" || user.nivel_acesso === "comercial")) {
-          data = await ConsultaService.getUserHistory(user.id);
+          data = await ConsultaService.getUserHistory(user.id, paginaAtual, intensPorPagina);
         } else {
           setError('Usuário não autenticado ou sem permissão para ver o histórico.');
           setLoading(false);
           return;
         }
         setConsultas(data.results || data);
+        setTotalItens(data.count || (data.results ? data.results.length : data.length));
+        setTotalPaginas(Math.ceil((data.count || (data.results ? data.results.length : data.length)) / intensPorPagina));
       } catch (err) {
         console.error('Erro ao buscar histórico de consultas:', err);
         setError('Não foi possível carregar o histórico de consultas.');
@@ -44,7 +48,7 @@ const HistoricoConsulta = () => {
     if (user) {
       fetchHistorico();
     }
-  }, [user]);
+  }, [user, paginaAtual]);
 
   useEffect(() => {
     setPaginaAtual(1); // Resetar para página 1 quando filtro mudar
@@ -81,10 +85,12 @@ const HistoricoConsulta = () => {
     );
   });
 
-  const totalPaginas = Math.ceil(consultasFiltradas.length / intensPorPagina);
-  const inicio = (paginaAtual - 1) * intensPorPagina;
-  const fim = inicio + intensPorPagina;
-  const consultasFiltradasPaginadas = consultasFiltradas.slice(inicio, fim);
+  // Não faz mais sentido paginar no front, pois o backend já faz isso
+  // const totalPaginas = Math.ceil(consultasFiltradas.length / intensPorPagina);
+  // const inicio = (paginaAtual - 1) * intensPorPagina;
+  // const fim = inicio + intensPorPagina;
+  // const consultasFiltradasPaginadas = consultasFiltradas.slice(inicio, fim);
+  const consultasFiltradasPaginadas = consultasFiltradas; // Já está paginado do backend
 
   return (
     <div className="historico-container">
@@ -180,7 +186,7 @@ const HistoricoConsulta = () => {
             </tbody>
           </table>
           
-          {consultasFiltradas.length > intensPorPagina && (
+          {totalPaginas > 1 && (
             <div className="paginacao">
               <button onClick={() => setPaginaAtual(p => Math.max(p - 1, 1))} disabled={paginaAtual === 1}>
                 Anterior

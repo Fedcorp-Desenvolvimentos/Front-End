@@ -2,8 +2,8 @@
 import api from "./api"; // Certifique-se de que este 'api' é a instância do Axios
 
 export const ConsultaService = {
-  getConsultaHistory: async () => {
-    const response = await api.get("/consultas/historico/");
+  getConsultaHistory: async (page = 1, page_size = 10) => {
+    const response = await api.get(`/consultas/historico/?page=${page}&page_size=${page_size}`);
     return response.data;
   },
 
@@ -12,8 +12,9 @@ export const ConsultaService = {
     return response.data;
   },
 
-  getUserHistory: async (payload) => {
-    const response = await api.get(`/consultas/historico/usuario/`);
+  getUserHistory: async (userId, page = 1, page_size = 10) => {
+    // Supondo que o endpoint aceite paginação também
+    const response = await api.get(`/consultas/historico/usuario/?page=${page}&page_size=${page_size}`);
     return response.data;
   },
 
