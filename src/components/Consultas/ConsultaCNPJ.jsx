@@ -220,7 +220,7 @@ const ConsultaCNPJ = () => {
   };
 
   const cnpjData = getCnpjData();
-  console.log(cnpjData);
+ 
   return (
     <div className="consulta-container">
       <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
