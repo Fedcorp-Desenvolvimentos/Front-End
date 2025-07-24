@@ -5,21 +5,28 @@ import { ConsultaService } from "../../services/consultaService";
 import { FaBuilding, FaSearch } from "react-icons/fa";
 
 const ConsultaComercial = () => {
+  // Estados individuais
   const [form, setForm] = useState({ cnpj: "" });
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Modal de detalhes
   const [showModal, setShowModal] = useState(false);
   const [modalPersonData, setModalPersonData] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState(null);
+
+  // Consulta em massa
   const [file, setFile] = useState(null);
   const [bulkResults, setBulkResults] = useState([]);
+  const [massConsultaMessage, setMassConsultaMessage] = useState("");
+  const [massLoading, setMassLoading] = useState(false);
 
+  // Manipuladores individuais
   const handleCnpjChange = (e) => {
-    const value = e.target.value;
-    const onlyDigits = value.replace(/\D/g, "");
-    setForm({ ...form, cnpj: onlyDigits.slice(0, 14) });
+    const onlyDigits = e.target.value.replace(/\D/g, "");
+    setForm({ cnpj: onlyDigits.slice(0, 14) });
   };
 
   const handleSearch = async () => {
@@ -35,10 +42,10 @@ const ConsultaComercial = () => {
     }
     setLoading(true);
     try {
-      const responseData = await ConsultaService.consultarComercial(form.cnpj);
-      const found = responseData.resultado_api?.Result?.[0] || null;
-      if (found) {
-        setResult(found);
+      const { resultado_api } = await ConsultaService.consultarComercial(form.cnpj);
+      const empresa = resultado_api?.Result?.[0] || null;
+      if (empresa) {
+        setResult(empresa);
       } else {
         setError("Nenhum resultado de empresa encontrado para o CNPJ fornecido.");
       }
@@ -49,10 +56,11 @@ const ConsultaComercial = () => {
     }
   };
 
-  const handlePersonClick = async (personData) => {
-    const cpf = personData.RelatedEntityTaxIdNumber;
-    if (!cpf || personData.RelatedEntityTaxIdType !== "CPF") {
-      setModalError("CPF não disponível ou tipo de documento inválido para consulta de contato.");
+  // Detalhes de pessoa no modal
+  const handlePersonClick = async (person) => {
+    const cpf = person.RelatedEntityTaxIdNumber;
+    if (!cpf || person.RelatedEntityTaxIdType !== "CPF") {
+      setModalError("CPF não disponível ou tipo de documento inválido.");
       setShowModal(true);
       return;
     }
@@ -60,45 +68,43 @@ const ConsultaComercial = () => {
     setModalError(null);
     setModalPersonData(null);
     try {
-      const responseData = await ConsultaService.consultarContatoComercial(cpf);
-      const regData = responseData.resultado_api?.Result?.[0]?.RegistrationData || null;
-      if (regData) {
-        setModalPersonData(regData);
-      } else {
-        setModalError("Nenhum dado de contato encontrado para esta pessoa.");
-      }
+      const { resultado_api } = await ConsultaService.consultarContatoComercial(cnpj);
+      const regData = resultado_api?.Result?.[0]?.RegistrationData || null;
+      if (regData) setModalPersonData(regData);
+      else setModalError("Nenhum dado de contato encontrado para esta pessoa.");
     } catch (err) {
-      setModalError(err.message || "Ocorreu um erro ao consultar os detalhes de contato.");
+      setModalError(err.message || "Erro ao consultar detalhes de contato.");
     } finally {
       setModalLoading(false);
       setShowModal(true);
     }
   };
 
-  const renderFilteredRelationships = (relationships, title) => {
-    if (!relationships?.length) return null;
-    const filtered = relationships.filter(
-      (rel) =>
-        rel.RelationshipType === "QSA" ||
-        rel.RelationshipType === "Ownership" ||
-        rel.RelationshipType === "REPRESENTANTELEGAL"
+  // Renderizar relacionamentos filtrados
+  const renderFilteredRelationships = (rels, title) => {
+    if (!rels?.length) return null;
+    const filtered = rels.filter(
+      (r) =>
+        r.RelationshipType === "QSA" ||
+        r.RelationshipType === "Ownership" ||
+        r.RelationshipType === "REPRESENTANTELEGAL"
     );
     if (!filtered.length) return null;
     return (
       <>
         <h6 className="rel-title">{title}:</h6>
         <ul className="rel-list">
-          {filtered.map((person, idx) => (
-            <li key={`${person.RelatedEntityTaxIdNumber}-${idx}`} className="rel-list-item">
+          {filtered.map((p, i) => (
+            <li key={`${p.RelatedEntityTaxIdNumber}-${i}`} className="rel-list-item">
               <div className="rel-info">
-                <strong>{person.RelatedEntityName || "Nome N/A"}</strong><br/>
-                <span className="rel-type">Tipo: {person.RelationshipType}</span><br/>
-                <span className="rel-cpf">CPF: {person.RelatedEntityTaxIdNumber}</span>
+                <strong>{p.RelatedEntityName || "Nome N/A"}</strong><br />
+                <span className="rel-type">Tipo: {p.RelationshipType}</span><br />
+                <span className="rel-cpf">CPF: {p.RelatedEntityTaxIdNumber}</span>
               </div>
               <button
                 className="btn-rel-details"
-                onClick={() => handlePersonClick(person)}
-                title="Consultar detalhes desta pessoa"
+                onClick={() => handlePersonClick(p)}
+                title="Ver Detalhes"
               >
                 Ver Detalhes
               </button>
@@ -109,34 +115,65 @@ const ConsultaComercial = () => {
     );
   };
 
-  const handleFileChange = (e) => setFile(e.target.files[0] || null);
+  // Manipuladores de upload CSV
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0] || null);
+    setBulkResults([]);
+    setMassConsultaMessage("");
+  };
 
   const handleBulkSearch = () => {
     if (!file) {
       alert("Selecione um arquivo CSV com CNPJs.");
       return;
     }
+    setMassLoading(true);
+    setMassConsultaMessage("");
     const reader = new FileReader();
     reader.onload = async (e) => {
       const lines = e.target.result.split("\n").map((l) => l.trim()).filter(Boolean);
       const results = [];
       for (const cnpj of lines) {
         try {
-          const res = await ConsultaService.consultarComercial(cnpj);
-          const emp = res.resultado_api?.Result?.[0] || null;
+          const { resultado_api } = await ConsultaService.consultarComercial(cnpj);
+          const emp = resultado_api?.Result?.[0] || null;
           results.push({ cnpj, empresa: emp, erro: !emp });
         } catch {
           results.push({ cnpj, empresa: null, erro: true });
         }
       }
       setBulkResults(results);
+      setMassLoading(false);
+      setMassConsultaMessage("Consulta em massa concluída.");
     };
     reader.readAsText(file);
   };
 
+  // Download de planilha modelo
+  const handleDownloadModel = async () => {
+    setMassLoading(true);
+    setMassConsultaMessage("Baixando modelo...");
+    try {
+      const response = await ConsultaService.baixarPlanilhaModeloCNPJ();
+      const blob = new Blob([response], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "modelo-cnpj.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setMassConsultaMessage("Download do modelo concluído.");
+    } catch {
+      setMassConsultaMessage("Erro ao baixar modelo.");
+    } finally {
+      setMassLoading(false);
+    }
+  };
+
   return (
     <div className="comercial-page">
-      {/* Header */}
+      {/* Cabeçalho */}
       <div className="card-opcoes">
         <div className="icon-container">
           <FaBuilding className="icon-opcao" />
@@ -147,7 +184,7 @@ const ConsultaComercial = () => {
         </p>
       </div>
 
-      {/* Flex Container com dois cards idênticos */}
+      {/* Container Flex com dois cards */}
       <div className="form-card-container">
         {/* Card Individual */}
         <div className="form-card">
@@ -157,7 +194,6 @@ const ConsultaComercial = () => {
               type="text"
               className="form-control"
               placeholder="Digite apenas os 14 dígitos do CNPJ"
-              name="cnpj"
               value={form.cnpj}
               onChange={handleCnpjChange}
               maxLength="14"
@@ -167,7 +203,7 @@ const ConsultaComercial = () => {
               onClick={handleSearch}
               disabled={loading}
             >
-              {loading ? "Consultando..." : <><FaSearch className="btn-icon" /> Consultar</>}
+              {loading ? "Consultando..." : <> <FaSearch className="btn-icon" /> Consultar </>}
             </button>
             {error && <div className="alert-erro mt-3">{error}</div>}
           </div>
@@ -179,17 +215,34 @@ const ConsultaComercial = () => {
             <label className="form-label">Consulta em massa:</label>
             <input
               type="file"
-              className="form-control"
-              accept=".csv"
+              id="input-massa-cnpj"
+              accept=".xlsx, .xls"
+              style={{ display: "none" }}
               onChange={handleFileChange}
+              disabled={massLoading}
             />
             <button
-              className="btn-primary"
-              onClick={handleBulkSearch}
-              disabled={loading}
-            >
-              {loading ? "Processando..." : <><FaSearch className="btn-icon" /> Consultar</>}
-            </button>
+             className="btn-primary"
+            type="button"
+            onClick={() => document.getElementById("input-massa").click()}
+            disabled={loading}
+          >
+            Importar Planilha de CNPJs
+          </button>
+          <button
+           className="btn-primary mt-2"
+            type="button"
+            onClick={handleDownloadModel}
+            disabled={loading}
+          >
+            Baixar Planilha Modelo
+          </button>
+            {massLoading && <p>Processando planilha...</p>}
+            {massConsultaMessage && (
+              <p className={massConsultaMessage.includes("Erro") ? "error-message" : "message"}>
+                {massConsultaMessage}
+              </p>
+            )}
             {bulkResults.length > 0 && (
               <div className="bulk-results mt-3">
                 <h5>Resultados:</h5>
@@ -209,7 +262,7 @@ const ConsultaComercial = () => {
         </div>
       </div>
 
-      {/* Resultado Único renderizado abaixo */}
+      {/* Resultado Individual */}
       {result && (
         <div className="form-card mt-4">
           <div className="card-body">
@@ -217,7 +270,7 @@ const ConsultaComercial = () => {
               result.Relationships.CurrentRelationships,
               "Sócios, Administradores e Representantes Legais"
             )}
-            {(!result.Relationships.CurrentRelationships?.length) && (
+            {!result.Relationships.CurrentRelationships?.length && (
               <p className="no-rel-msg">
                 Nenhum sócio, administrador ou representante legal encontrado para este CNPJ.
               </p>
@@ -252,8 +305,7 @@ const ConsultaComercial = () => {
                   <p><strong>Nome:</strong> {modalPersonData.BasicData?.Name || "N/A"}</p>
                   <p><strong>CPF:</strong> {modalPersonData.BasicData?.TaxIdNumber || "N/A"}</p>
                   <p><strong>Gênero:</strong> {modalPersonData.BasicData?.Gender || "N/A"}</p>
-                  <p>
-                    <strong>Data de Nascimento:</strong>{" "}
+                  <p><strong>Data de Nascimento:</strong>{" "}
                     {modalPersonData.BasicData?.BirthDate
                       ? new Date(modalPersonData.BasicData.BirthDate).toLocaleDateString()
                       : "N/A"}
@@ -284,38 +336,12 @@ const ConsultaComercial = () => {
                       <h6 className="mt-3">Endereços:</h6>
                       {modalPersonData.Addresses.Primary && (
                         <p>
-                          <strong>Principal:</strong>{" "}
-                          {`${modalPersonData.Addresses.Primary.AddressMain || ""}, ${
-                            modalPersonData.Addresses.Primary.Number || ""
-                          } ${
-                            modalPersonData.Addresses.Primary.Complement
-                              ? "- " + modalPersonData.Addresses.Primary.Complement
-                              : ""
-                          }`}
-                          <br />
-                          {`${modalPersonData.Addresses.Primary.Neighborhood || ""}, ${
-                            modalPersonData.Addresses.Primary.City || ""
-                          }/${modalPersonData.Addresses.Primary.State || ""} - CEP: ${
-                            modalPersonData.Addresses.Primary.ZipCode || ""
-                          }`}
+                          <strong>Principal:</strong> {modalPersonData.Addresses.Primary.AddressMain}, {modalPersonData.Addresses.Primary.Number}
                         </p>
                       )}
                       {modalPersonData.Addresses.Secondary && (
                         <p>
-                          <strong>Secundário:</strong>{" "}
-                          {`${modalPersonData.Addresses.Secondary.AddressMain || ""}, ${
-                            modalPersonData.Addresses.Secondary.Number || ""
-                          } ${
-                            modalPersonData.Addresses.Secondary.Complement
-                              ? "- " + modalPersonData.Addresses.Secondary.Complement
-                              : ""
-                          }`}
-                          <br />
-                          {`${modalPersonData.Addresses.Secondary.Neighborhood || ""}, ${
-                            modalPersonData.Addresses.Secondary.City || ""
-                          }/${modalPersonData.Addresses.Secondary.State || ""} - CEP: ${
-                            modalPersonData.Addresses.Secondary.ZipCode || ""
-                          }`}
+                          <strong>Secundário:</strong> {modalPersonData.Addresses.Secondary.AddressMain}, {modalPersonData.Addresses.Secondary.Number}
                         </p>
                       )}
                       {!modalPersonData.Addresses.Primary &&
