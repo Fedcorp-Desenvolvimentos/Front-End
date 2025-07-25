@@ -18,6 +18,7 @@ const ConsultaCNPJ = () => {
   });
 
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
+  const [selectedResultIndex, setSelectedResultIndex] = useState(null);
 
   const handleCnpjChange = (e) => {
     const rawCnpj = e.target.value.replace(/\D/g, "");
@@ -220,6 +221,10 @@ const ConsultaCNPJ = () => {
   };
 
   const cnpjData = getCnpjData();
+
+  const handleExpandResult = (idx) => {
+    setSelectedResultIndex(selectedResultIndex === idx ? null : idx);
+  };
 
   return (
     <div className="consulta-container">
@@ -432,49 +437,53 @@ const ConsultaCNPJ = () => {
 
         </div>
       )}
-      {activeForm == "chaves" && cnpjData && (
+      {activeForm == "chaves" && resultado?.resultado_api?.Result && resultado.resultado_api.Result.length > 0 && (
         <div className="card-resultado">
-          <h4>Resultado da busca realizada</h4>
-
-          <label>Razão Social:</label>
-          <input type="text" value={cnpjData.OfficialName || "N/A"} disabled />
-
-          <label>Nome Fantasia:</label>
-          <input type="text" value={cnpjData.TradeName || "N/A"} disabled />
-
-          <label>CNPJ:</label>
-          <input type="text" value={cnpjData.TaxIdNumber || "N/A"} disabled />
-
-          <label>Atividade Principal:</label>
-          <input
-            type="text"
-            value={cnpjData.Activities[0].Activity || "N/A"}
-            disabled
-          />
-
-          <label>Natureza Jurídica:</label>
-          <input
-            type="text"
-            value={cnpjData.LegalNature.Activity || "N/A"}
-            disabled
-          />
-
-          <label>UF (Sede):</label>
-          <input type="text" value={cnpjData.HeadquarterState || "N/A"} disabled />
-
-          <label>Situação Cadastral:</label>
-          <input
-            type="text"
-            value={cnpjData.TaxIdStatus || "Não informada"}
-            disabled
-          />
-
-          <label>Data de Fundação:</label>
-          <input
-            type="text"
-            value={cnpjData.FoundedDate || "N/A"}
-            disabled
-          />
+          <h4>Resultados encontrados</h4>
+          <table className="historico-table">
+            <thead>
+              <tr>
+                <th>Razão Social</th>
+                <th>CNPJ</th>
+                <th>UF</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {resultado.resultado_api.Result.map((item, idx) => (
+                <React.Fragment key={idx}>
+                  <tr
+                    className={selectedResultIndex === idx ? 'active-row' : ''}
+                    onClick={() => handleExpandResult(idx)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>{item.BasicData?.OfficialName || 'N/A'}</td>
+                    <td>{item.BasicData?.TaxIdNumber || 'N/A'}</td>
+                    <td>{item.BasicData?.HeadquarterState || 'N/A'}</td>
+                    <td className="expand-icon">
+                      <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
+                    </td>
+                  </tr>
+                  {selectedResultIndex === idx && (
+                    <tr>
+                      <td colSpan="4">
+                        <div className="detalhes-historico-panel">
+                          <p><strong>Razão Social:</strong> {item.BasicData?.OfficialName || 'N/A'}</p>
+                          <p><strong>Nome Fantasia:</strong> {item.BasicData?.TradeName || 'N/A'}</p>
+                          <p><strong>CNPJ:</strong> {item.BasicData?.TaxIdNumber || 'N/A'}</p>
+                          <p><strong>Atividade Principal:</strong> {item.BasicData?.Activities?.[0]?.Activity || 'N/A'}</p>
+                          <p><strong>Natureza Jurídica:</strong> {item.BasicData?.LegalNature?.Activity || 'N/A'}</p>
+                          <p><strong>UF (Sede):</strong> {item.BasicData?.HeadquarterState || 'N/A'}</p>
+                          <p><strong>Situação Cadastral:</strong> {item.BasicData?.TaxIdStatus || 'N/A'}</p>
+                          <p><strong>Data de Fundação:</strong> {item.BasicData?.FoundedDate || 'N/A'}</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

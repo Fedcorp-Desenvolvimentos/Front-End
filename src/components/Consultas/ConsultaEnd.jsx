@@ -17,6 +17,7 @@ const ConsultaEnd = () => {
     uf: "",
   });
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
+  const [selectedResultIndex, setSelectedResultIndex] = useState(null);
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -228,6 +229,10 @@ const ConsultaEnd = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleExpandResult = (idx) => {
+    setSelectedResultIndex(selectedResultIndex === idx ? null : idx);
   };
 
   const resetFormState = () => {
@@ -514,6 +519,55 @@ const ConsultaEnd = () => {
           )}
         </div>
       )}
+      {activeForm === "chaves" && resultado?.resultado_api?.resultados_viacep && resultado.resultado_api.resultados_viacep.length > 0 && (
+  <div className="card-resultado">
+    <h4>Resultados encontrados</h4>
+    <table className="historico-table">
+      <thead>
+        <tr>
+          <th>CEP</th>
+          <th>Logradouro</th>
+          <th>Cidade</th>
+          <th>UF</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {resultado.resultado_api.resultados_viacep.map((item, idx) => (
+          <React.Fragment key={idx}>
+            <tr
+              className={selectedResultIndex === idx ? 'active-row' : ''}
+              onClick={() => handleExpandResult(idx)}
+              style={{ cursor: 'pointer' }}
+            >
+              <td>{item.cep || 'N/A'}</td>
+              <td>{item.logradouro || 'N/A'}</td>
+              <td>{item.localidade || 'N/A'}</td>
+              <td>{item.uf || 'N/A'}</td>
+              <td className="expand-icon">
+                <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
+              </td>
+            </tr>
+            {selectedResultIndex === idx && (
+              <tr>
+                <td colSpan="5">
+                  <div className="detalhes-historico-panel">
+                    <p><strong>CEP:</strong> {item.cep || 'N/A'}</p>
+                    <p><strong>Logradouro:</strong> {item.logradouro || 'N/A'}</p>
+                    <p><strong>Bairro:</strong> {item.bairro || 'N/A'}</p>
+                    <p><strong>Cidade:</strong> {item.localidade || 'N/A'}</p>
+                    <p><strong>UF:</strong> {item.uf || 'N/A'}</p>
+                    <p><strong>Complemento:</strong> {item.complemento || 'N/A'}</p>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </React.Fragment>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
     </div>
   );
 };
