@@ -92,6 +92,47 @@ const HistoricoConsulta = () => {
   // const consultasFiltradasPaginadas = consultasFiltradas.slice(inicio, fim);
   const consultasFiltradasPaginadas = consultasFiltradas; // Já está paginado do backend
 
+  function getParametroDisplay(consulta, detalhes = null) {
+    // Tipos de consulta por chaves alternativas
+    const tiposChave = [
+      'cpf_alternativa',
+      'cnpj_razao_social',
+      'cep_rua_cidade'
+    ];
+    if (tiposChave.includes(consulta.tipo_consulta)) {
+      // Se já temos detalhes (linha expandida)
+      if (detalhes && detalhes.resultado && detalhes.resultado.Result && detalhes.resultado.Result.length > 0) {
+        // CPF/CNPJ: pega o nome do primeiro resultado
+        if (detalhes.resultado.Result[0].BasicData && detalhes.resultado.Result[0].BasicData.Name) {
+          return detalhes.resultado.Result[0].BasicData.Name;
+        }
+        // CNPJ pode ser OfficialName
+        if (detalhes.resultado.Result[0].BasicData && detalhes.resultado.Result[0].BasicData.OfficialName) {
+          return detalhes.resultado.Result[0].BasicData.OfficialName;
+        }
+      }
+      // Endereço: pega o logradouro do primeiro resultado
+      if (detalhes && detalhes.resultado && detalhes.resultado.resultados_viacep && detalhes.resultado.resultados_viacep.length > 0) {
+        return detalhes.resultado.resultados_viacep[0].logradouro || detalhes.resultado.resultados_viacep[0].cep || 'Endereço encontrado';
+      }
+      // Se não encontrou nada
+      if (detalhes && ((detalhes.resultado && ((detalhes.resultado.Result && detalhes.resultado.Result.length === 0) || (detalhes.resultado.resultados_viacep && detalhes.resultado.resultados_viacep.length === 0))) || !detalhes.resultado)) {
+        return 'Pesquisa falhou';
+      }
+      // Se não tem detalhes ainda, mostra um resumo do parâmetro
+      try {
+        const param = typeof consulta.parametro_consulta === 'string' ? JSON.parse(consulta.parametro_consulta) : consulta.parametro_consulta;
+        if (param && param.q) return param.q;
+        if (param && param.name) return param.name;
+        return 'Chaves alternativas';
+      } catch {
+        return 'Chaves alternativas';
+      }
+    }
+    // Para outros tipos, exibe normalmente
+    return consulta.parametro_consulta;
+  }
+
   return (
     <div className="historico-container">
       <h2>Histórico de Consultas</h2>
@@ -134,7 +175,7 @@ const HistoricoConsulta = () => {
                     onClick={() => handleItemClick(consulta.id)}
                   >
                     <td>{consulta.tipo_consulta_display || consulta.tipo_consulta}</td>
-                    <td>{consulta.parametro_consulta}</td>
+                    <td>{getParametroDisplay(consulta)}</td>
                     <td>{consulta.usuario_email || 'N/A'}</td>
                     <td>{new Date(consulta.data_consulta).toLocaleDateString()}</td>
                     <td className="expand-icon">
@@ -153,7 +194,7 @@ const HistoricoConsulta = () => {
                             <div className="detalhes-content">
                               <h4>Detalhes da Consulta #{detalhesConsulta.id}</h4>
                               <p><strong>Tipo:</strong> {detalhesConsulta.tipo_consulta_display || detalhesConsulta.tipo_consulta}</p>
-                              <p><strong>Parâmetro:</strong> {detalhesConsulta.parametro_consulta}</p>
+                              <p><strong>Parâmetro:</strong> {getParametroDisplay(consultasFiltradasPaginadas.find(c => c.id === detalhesConsulta.id) || detalhesConsulta, detalhesConsulta)}</p>
                               <p><strong>Data/Hora Completa:</strong> {new Date(detalhesConsulta.data_consulta).toLocaleString()}</p>
                               <p><strong>Realizada por:</strong> {detalhesConsulta.usuario_email || 'N/A'}</p>
                               <p><strong>Origem:</strong> {detalhesConsulta.origem}</p>
