@@ -203,6 +203,12 @@ const ConsultaPF = () => {
     }
   };
 
+  const [selectedResultIndex, setSelectedResultIndex] = useState(null);
+
+  const handleExpandResult = (idx) => {
+    setSelectedResultIndex(selectedResultIndex === idx ? null : idx);
+  };
+
   return (
     <div className="consulta-container">
       <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
@@ -398,92 +404,56 @@ const ConsultaPF = () => {
         </div>
       )}
 
-      {activeForm !== "massa" &&
-        resultado?.resultado_api?.Result &&
-        resultado.resultado_api.Result.length > 0 && (
-          <div className="card-resultado">
-            <h4>Resultado da busca realizada</h4>
-            {(() => {
-              const resultItem = resultado.resultado_api.Result[0];
-              const basicData = resultItem?.BasicData || {};
-              const commonName = basicData.Aliases?.CommonName || "N/A";
-
-              if (!Object.keys(basicData).length && !commonName) {
-                return <p>Dados básicos do CPF não disponíveis na resposta.</p>;
-              }
-
-              return (
-                <>
-                  <label>Nome Completo:</label>
-                  <input type="text" value={basicData.Name || "N/A"} disabled />
-
-                  <label>CPF:</label>
-                  <input
-                    type="text"
-                    value={basicData.TaxIdNumber || "N/A"}
-                    disabled
-                  />
-
-                  <label>Situação Cadastral:</label>
-                  <input
-                    type="text"
-                    value={basicData.TaxIdStatus || "N/A"}
-                    disabled
-                  />
-
-                  <label>Data de Nascimento:</label>
-                  <input
-                    type="text"
-                    value={
-                      basicData.BirthDate
-                        ? new Date(basicData.BirthDate).toLocaleDateString()
-                        : "N/A"
-                    }
-                    disabled
-                  />
-
-                  <label>Idade:</label>
-                  <input type="text" value={basicData.Age || "N/A"} disabled />
-
-                  <label>Nome da Mãe:</label>
-                  <input
-                    type="text"
-                    value={basicData.MotherName || "N/A"}
-                    disabled
-                  />
-                  <label>Nome do Pai:</label>
-                  <input
-                    type="text"
-                    value={basicData.FatherName || "N/A"}
-                    disabled
-                  />
-                  <label>Gênero:</label>
-                  <input
-                    type="text"
-                    value={basicData.Gender || "N/A"}
-                    disabled
-                  />
-
-                  <label>Nome Comum (Alias):</label>
-                  <input type="text" value={commonName} disabled />
-
-                  <label>Indicação de Óbito:</label>
-                  <input
-                    type="text"
-                    value={
-                      basicData.HasObitIndication !== undefined
-                        ? basicData.HasObitIndication
-                          ? "Sim"
-                          : "Não"
-                        : "N/A"
-                    }
-                    disabled
-                  />
-                </>
-              );
-            })()}
-          </div>
-        )}
+      {activeForm === "chaves" && resultado?.resultado_api?.Result && resultado.resultado_api.Result.length > 0 && (
+  <div className="card-resultado">
+    <h4>Resultados encontrados</h4>
+    <table className="historico-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Data de Nascimento</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {resultado.resultado_api.Result.map((item, idx) => (
+          <React.Fragment key={idx}>
+            <tr
+              className={selectedResultIndex === idx ? 'active-row' : ''}
+              onClick={() => handleExpandResult(idx)}
+              style={{ cursor: 'pointer' }}
+            >
+              <td>{item.BasicData?.Name || 'N/A'}</td>
+              <td>{item.BasicData?.TaxIdNumber || 'N/A'}</td>
+              <td>{item.BasicData?.BirthDate ? new Date(item.BasicData.BirthDate).toLocaleDateString() : 'N/A'}</td>
+              <td className="expand-icon">
+                <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
+              </td>
+            </tr>
+            {selectedResultIndex === idx && (
+              <tr>
+                <td colSpan="4">
+                  <div className="detalhes-historico-panel">
+                    <p><strong>Nome:</strong> {item.BasicData?.Name || 'N/A'}</p>
+                    <p><strong>CPF:</strong> {item.BasicData?.TaxIdNumber || 'N/A'}</p>
+                    <p><strong>Situação Cadastral:</strong> {item.BasicData?.TaxIdStatus || 'N/A'}</p>
+                    <p><strong>Data de Nascimento:</strong> {item.BasicData?.BirthDate ? new Date(item.BasicData.BirthDate).toLocaleDateString() : 'N/A'}</p>
+                    <p><strong>Nome da Mãe:</strong> {item.BasicData?.MotherName || 'N/A'}</p>
+                    <p><strong>Nome do Pai:</strong> {item.BasicData?.FatherName || 'N/A'}</p>
+                    <p><strong>Gênero:</strong> {item.BasicData?.Gender || 'N/A'}</p>
+                    <p><strong>Alias:</strong> {item.BasicData?.Aliases?.CommonName || 'N/A'}</p>
+                    <p><strong>Indicação de Óbito:</strong> {item.BasicData?.HasObitIndication !== undefined ? (item.BasicData.HasObitIndication ? 'Sim' : 'Não') : 'N/A'}</p>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </React.Fragment>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
     </div>
   );
 };
