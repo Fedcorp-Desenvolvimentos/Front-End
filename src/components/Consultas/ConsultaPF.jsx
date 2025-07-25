@@ -4,6 +4,15 @@ import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService"; 
 import { FileSpreadsheet } from "lucide-react"; 
 
+function formatDateBR(dateStr) {
+  if (!dateStr) return 'N/A';
+  // Extrai só a parte da data se vier com T ou espaço
+  const onlyDate = dateStr.split('T')[0].split(' ')[0];
+  const [yyyy, mm, dd] = onlyDate.split('-');
+  if (yyyy && mm && dd) return `${dd}/${mm}/${yyyy}`;
+  return dateStr; // fallback
+}
+
 const ConsultaPF = () => {
   const [activeForm, setActiveForm] = useState(""); 
   const [loading, setLoading] = useState(false);
@@ -316,6 +325,56 @@ const ConsultaPF = () => {
         </form>
       )}
 
+      {activeForm === "cpf" && resultado?.resultado_api?.Result && resultado.resultado_api.Result.length > 0 && (
+        <div className="card-resultado">
+          <h4>Resultado da busca realizada</h4>
+          {(() => {
+            const resultItem = resultado.resultado_api.Result[0];
+            const basicData = resultItem?.BasicData || {};
+            return (
+              <>
+                <label>Nome Completo:</label>
+                <input type="text" value={basicData.Name || "N/A"} disabled />
+                <label>CPF:</label>
+                <input type="text" value={basicData.TaxIdNumber || "N/A"} disabled />
+                <label>Situação Cadastral:</label>
+                <input type="text" value={basicData.TaxIdStatus || "N/A"} disabled />
+                <label>Data de Nascimento:</label>
+                <input
+                  type="text"
+                  value={
+                    formatDateBR(basicData.BirthDate)
+                  }
+                  disabled
+                />
+                <label>Idade:</label>
+                <input type="text" value={basicData.Age || "N/A"} disabled />
+                <label>Nome da Mãe:</label>
+                <input type="text" value={basicData.MotherName || "N/A"} disabled />
+                <label>Nome do Pai:</label>
+                <input type="text" value={basicData.FatherName || "N/A"} disabled />
+                <label>Gênero:</label>
+                <input type="text" value={basicData.Gender || "N/A"} disabled />
+                <label>Nome Comum (Alias):</label>
+                <input type="text" value={basicData.Aliases?.CommonName || "N/A"} disabled />
+                <label>Indicação de Óbito:</label>
+                <input
+                  type="text"
+                  value={
+                    basicData.HasObitIndication !== undefined
+                      ? basicData.HasObitIndication
+                        ? "Sim"
+                        : "Não"
+                      : "N/A"
+                  }
+                  disabled
+                />
+              </>
+            );
+          })()}
+        </div>
+      )}
+
       {activeForm === "chaves" && (
         <form className="form-container" onSubmit={handleSubmit}>
           <label htmlFor="nome">Nome</label>
@@ -426,7 +485,7 @@ const ConsultaPF = () => {
             >
               <td>{item.BasicData?.Name || 'N/A'}</td>
               <td>{item.BasicData?.TaxIdNumber || 'N/A'}</td>
-              <td>{item.BasicData?.BirthDate ? new Date(item.BasicData.BirthDate).toLocaleDateString() : 'N/A'}</td>
+              <td>{formatDateBR(item.BasicData?.BirthDate)}</td>
               <td className="expand-icon">
                 <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
               </td>
@@ -438,7 +497,7 @@ const ConsultaPF = () => {
                     <p><strong>Nome:</strong> {item.BasicData?.Name || 'N/A'}</p>
                     <p><strong>CPF:</strong> {item.BasicData?.TaxIdNumber || 'N/A'}</p>
                     <p><strong>Situação Cadastral:</strong> {item.BasicData?.TaxIdStatus || 'N/A'}</p>
-                    <p><strong>Data de Nascimento:</strong> {item.BasicData?.BirthDate ? new Date(item.BasicData.BirthDate).toLocaleDateString() : 'N/A'}</p>
+                    <p><strong>Data de Nascimento:</strong> {formatDateBR(item.BasicData?.BirthDate)}</p>
                     <p><strong>Nome da Mãe:</strong> {item.BasicData?.MotherName || 'N/A'}</p>
                     <p><strong>Nome do Pai:</strong> {item.BasicData?.FatherName || 'N/A'}</p>
                     <p><strong>Gênero:</strong> {item.BasicData?.Gender || 'N/A'}</p>
