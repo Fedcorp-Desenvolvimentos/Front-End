@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../../styles/conta.css';
+import '../../styles/Conta.css';
 import { Link } from 'react-router-dom';
 import { UserService } from '../../../services/userService'; // Certifique-se de que este caminho está correto
 
