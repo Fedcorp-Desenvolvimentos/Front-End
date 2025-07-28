@@ -30,9 +30,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; /* Garante que ocupa toda a altura da tela */
+  min-height: 100vh;
   padding: 2rem;
-  overflow: hidden; /* Evita scroll indesejado */
+  overflow: hidden;
 }
 
 .loginBox {
@@ -93,12 +93,6 @@
   transform: scale(0.98);
 }
 
-.error {
-  color: red;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  text-align: center;
-}
 
 .titlePortal {
   font-size: 1.6rem;
@@ -155,7 +149,17 @@
   outline: none;
 }
 
-/* MOBILE FIRST */
+.error {
+  color: #c53030;
+  background-color: #ffe0e0;
+  border: 1px solid #ff9b9b;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
 @media (min-width: 769px) {
   .login-wrapper {
     

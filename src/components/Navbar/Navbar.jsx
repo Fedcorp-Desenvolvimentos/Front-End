@@ -27,7 +27,7 @@ function Navbar() {
       <div className="container">
         {/* Logo */}
         <a className="navbar-brand d-flex align-items-center" href="../Home">
-          <img src="../public/imagens/logo.png" alt="Logo" className="logo me-2" />
+          <img src="https://i.postimg.cc/Gh597vbr/LOGO.png" alt="Logo" className="logo me-2" />
         </a>
 
         <div className="navbar-collapse">
