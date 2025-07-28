@@ -88,10 +88,6 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
     }), [user, isAuthenticated, loading, login, logout]);
-    
-    if (loading) {
-        return <div>Carregando autenticação...</div>;
-    }
 
     return (
         <AuthContext.Provider value={authContextValue}>
