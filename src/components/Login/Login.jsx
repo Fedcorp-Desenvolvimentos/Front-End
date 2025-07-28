@@ -52,8 +52,6 @@ const Login = () => {
                         <h2 className="titlePortal">BigCorp</h2>
                         <p className="pPortal">Insira seus dados para acessar a plataforma</p>
 
-                        {error && <p className="error">{error}</p>}
-
                         <form onSubmit={handleSubmit}>
                             <div className="inputGroup">
                                 <label htmlFor="email">E-mail:</label>
@@ -89,6 +87,11 @@ const Login = () => {
 
                             </div>
 
+                            {error && (
+                                <p className="error-message">
+                                    {error}
+                                </p>
+                            )}
 
                             <button type="submit" className="loginButton" disabled={loading}>
                                 {loading ? 'Entrando...' : 'Entrar'}
