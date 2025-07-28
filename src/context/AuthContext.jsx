@@ -1,7 +1,6 @@
-// src/contexts/AuthContext.js
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api.js'; // Certifique-se que o caminho está correto
+import api from '../services/api.js'; 
 
 const AuthContext = createContext(null);
 
@@ -28,7 +27,13 @@ export const AuthProvider = ({ children }) => {
             console.error("Login failed:", error.response?.data || error.message);
             setIsAuthenticated(false);
             setUser(null);
-            return { success: false, error: error.response?.data?.detail || "Login failed" };
+            return {
+                success: false,
+                error:
+                  typeof error.response?.data?.detail === 'string'
+                    ? error.response.data.detail
+                    : JSON.stringify(error.response?.data?.detail) || "Falha ao tentar fazer login."
+              };
         } finally {
             setLoading(false); 
         }
@@ -83,8 +88,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
     }), [user, isAuthenticated, loading, login, logout]);
-
-    // Renderiza o conteúdo do aplicativo apenas quando a verificação inicial de autenticação for concluída
+    
     if (loading) {
         return <div>Carregando autenticação...</div>;
     }

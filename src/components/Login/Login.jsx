@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
-import { useAuth } from '../../context/AuthContext'
-import { FaEye, FaEyeSlash } from 'react-icons/fa'
-
+import { useAuth } from '../../context/AuthContext';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false)
+    const [showPassword, setShowPassword] = useState(false);
 
     const { login } = useAuth();
     const navigate = useNavigate();
@@ -18,15 +17,17 @@ const Login = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         setLoading(true);
-        setError(null);
-        try {
+        setError('');
 
-            const result = await login({ email, password });
+        try {
+            console.log("Credenciais enviadas:", { email, password });
+           const result = await login({ username: email, password });
 
             if (result.success) {
                 navigate('/Home');
             } else {
                 setError(result.error || 'Falha no login. Verifique suas credenciais.');
+                console.log("Mensagem de erro definida:", result.error);
             }
         } catch (err) {
             setError('Ocorreu um erro inesperado durante o login.');
@@ -36,6 +37,10 @@ const Login = () => {
         }
     };
 
+    useEffect(() => {
+        console.log("Erro atual:", error);
+      }, [error]);
+
     return (
         <>
             <div className="gradient-bg"></div>
@@ -44,15 +49,13 @@ const Login = () => {
                 <div className="loginContainer">
                     <div className="loginBox">
                         <img
-                            src="../public/imagens/logo.png"
+                            src="https://i.postimg.cc/Gh597vbr/LOGO.png"
                             alt="Fedcorp Logo"
                             className="logoImg"
                         />
 
                         <h2 className="titlePortal">BigCorp</h2>
                         <p className="pPortal">Insira seus dados para acessar a plataforma</p>
-
-                        {error && <p className="error">{error}</p>}
 
                         <form onSubmit={handleSubmit}>
                             <div className="inputGroup">
@@ -70,25 +73,25 @@ const Login = () => {
                             <div className="inputGroup senhaGroup">
                                 <label htmlFor="senha">Senha:</label>
                                 <div className="senhaWrapper">
-                                    <input type={showPassword ? "text" : "password"}
-                                        id='senha'
-                                        placeholder='Digite sua senha'
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        id="senha"
+                                        placeholder="Digite sua senha"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
                                     />
-
                                     <button
-                                        type='button'
-                                        className='togglePassword'
+                                        type="button"
+                                        className="togglePassword"
                                         onClick={() => setShowPassword(!showPassword)}
                                     >
                                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                                     </button>
                                 </div>
-
                             </div>
 
+                            {error && <p className="error">{error}</p>}
 
                             <button type="submit" className="loginButton" disabled={loading}>
                                 {loading ? 'Entrando...' : 'Entrar'}
