@@ -166,3 +166,66 @@ input.editando {
   background-color: #0d6efd;
   color: #fff;
 }
+ 
+@media (max-width: 768px) {
+  .config-wrapper {
+    flex-direction: column;
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .config-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: none;
+    border-bottom: 1px solid #dee2e6;
+    justify-content: center;
+  }
+
+  .tab-button {
+    flex: 1 1 auto;
+    font-size: 0.9rem;
+    padding: 0.75rem;
+    justify-content: center;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .tab-button.voltar {
+    width: 100%;
+    margin-top: 1rem;
+    justify-content: center;
+  }
+
+  .config-form {
+    padding: 1rem;
+  }
+
+  .config-form h3 {
+    font-size: 1.2rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .success-message {
+    font-size: 0.85rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .input-with-icon i {
+    right: 0.5rem;
+  }
+}
