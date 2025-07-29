@@ -1,29 +1,26 @@
 import React, { useState } from "react";
 import "../styles/Comercial.css";
-import "../styles/Conta.css"; // Para reutilizar estilos de modal customizado
+import "../styles/Conta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FaBuilding, FaSearch } from "react-icons/fa";
 
 const ConsultaComercial = () => {
-  // Estados individuais
+
   const [form, setForm] = useState({ cnpj: "" });
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Modal de detalhes
   const [showModal, setShowModal] = useState(false);
   const [modalPersonData, setModalPersonData] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState(null);
 
-  // Consulta em massa
   const [file, setFile] = useState(null);
   const [bulkResults, setBulkResults] = useState([]);
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
   const [massLoading, setMassLoading] = useState(false);
 
-  // Manipuladores individuais
   const handleCnpjChange = (e) => {
     const onlyDigits = e.target.value.replace(/\D/g, "");
     setForm({ cnpj: onlyDigits.slice(0, 14) });
@@ -56,7 +53,6 @@ const ConsultaComercial = () => {
     }
   };
 
-  // Detalhes de pessoa no modal
   const handlePersonClick = async (person) => {
     const cpf = person.RelatedEntityTaxIdNumber;
     if (!cpf || person.RelatedEntityTaxIdType !== "CPF") {
@@ -80,7 +76,6 @@ const ConsultaComercial = () => {
     }
   };
 
-  // Renderizar relacionamentos filtrados
   const renderFilteredRelationships = (rels, title) => {
     if (!rels?.length) return null;
     const filtered = rels.filter(
@@ -115,7 +110,6 @@ const ConsultaComercial = () => {
     );
   };
 
-  // Manipuladores de upload CSV
   const handleFileChange = (e) => {
     setFile(e.target.files[0] || null);
     setBulkResults([]);
@@ -149,7 +143,6 @@ const ConsultaComercial = () => {
     reader.readAsText(file);
   };
 
-  // Download de planilha modelo
   const handleDownloadModel = async () => {
     setMassLoading(true);
     setMassConsultaMessage("Baixando modelo...");
@@ -173,7 +166,6 @@ const ConsultaComercial = () => {
 
   return (
     <div className="comercial-page">
-      {/* Cabeçalho */}
       <div className="card-opcoes">
         <div className="icon-container">
           <FaBuilding className="icon-opcao" />
@@ -183,10 +175,7 @@ const ConsultaComercial = () => {
           Preencha o CNPJ da empresa para consultar os dados dos sócios e representantes.
         </p>
       </div>
-
-      {/* Container Flex com dois cards */}
       <div className="form-card-container">
-        {/* Card Individual */}
         <div className="form-card">
           <div className="card-body">
             <label className="form-label">CNPJ:</label>
@@ -208,8 +197,6 @@ const ConsultaComercial = () => {
             {error && <div className="alert-erro mt-3">{error}</div>}
           </div>
         </div>
-
-        {/* Card Consulta em Massa */}
         <div className="form-card">
           <div className="card-body">
             <label className="form-label">Consulta em massa:</label>
@@ -261,8 +248,6 @@ const ConsultaComercial = () => {
           </div>
         </div>
       </div>
-
-      {/* Resultado Individual */}
       {result && (
         <div className="form-card mt-4">
           <div className="card-body">
@@ -278,8 +263,6 @@ const ConsultaComercial = () => {
           </div>
         </div>
       )}
-
-      {/* Modal de Detalhes */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -313,7 +296,6 @@ const ConsultaComercial = () => {
                   <p><strong>Nome da Mãe:</strong> {modalPersonData.BasicData?.MotherName || "N/A"}</p>
                   <p><strong>Status do CPF:</strong> {modalPersonData.BasicData?.TaxIdStatus || "N/A"}</p>
 
-                  {/* E-mails */}
                   {modalPersonData.Emails && (
                     <>
                       <h6 className="mt-3">E-mails:</h6>
@@ -330,7 +312,6 @@ const ConsultaComercial = () => {
                     </>
                   )}
 
-                  {/* Endereços */}
                   {modalPersonData.Addresses && (
                     <>
                       <h6 className="mt-3">Endereços:</h6>
@@ -351,7 +332,6 @@ const ConsultaComercial = () => {
                     </>
                   )}
 
-                  {/* Telefones */}
                   {modalPersonData.Phones && (
                     <>
                       <h6 className="mt-3">Telefones:</h6>

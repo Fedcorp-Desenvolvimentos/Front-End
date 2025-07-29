@@ -156,3 +156,50 @@
   display: none;
 }
 
+@media (max-width: 768px) {
+  .consulta-container {
+    padding: 1rem;
+  }
+
+  .titulo-pagina {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-options-wrapper {
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .card-option {
+    width: 100%;
+    max-width: 280px;
+    padding: 1rem;
+  }
+
+  .form-container,
+  .form-massa-container,
+  .card-resultado {
+    width: 100%;
+    padding: 1rem;
+    margin: 1rem 0;
+    box-sizing: border-box;
+  }
+
+  .form-container input,
+  .card-resultado input {
+    font-size: 0.95rem;
+    padding: 0.6rem;
+  }
+
+  .form-container button,
+  .form-massa-container button {
+    padding: 0.65rem;
+    font-size: 0.95rem;
+  }
+
+  .icon-container svg {
+    width: 30px;
+    height: 28px;
+  }
+}
