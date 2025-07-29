@@ -31,7 +31,7 @@ const Dropdown = () => {
   };
 
   return (
-    <div className="dropdown" ref={dropdownRef}>
+    <div className="dropdown dropdown-opcoes" ref={dropdownRef}>
       <button className="dropdown-btn" type="button" onClick={toggleDropdown}>
         <i className="bi bi-three-dots-vertical"></i> Opções
       </button>
