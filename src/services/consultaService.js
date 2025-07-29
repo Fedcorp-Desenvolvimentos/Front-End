@@ -3,7 +3,9 @@ import api from "./api"; // Certifique-se de que este 'api' é a instância do A
 
 export const ConsultaService = {
   getConsultaHistory: async (page = 1, page_size = 10) => {
-    const response = await api.get(`/consultas/historico/?page=${page}&page_size=${page_size}`);
+    const response = await api.get(
+      `/consultas/historico/?page=${page}&page_size=${page_size}`
+    );
     return response.data;
   },
 
@@ -14,7 +16,9 @@ export const ConsultaService = {
 
   getUserHistory: async (userId, page = 1, page_size = 10) => {
     // Supondo que o endpoint aceite paginação também
-    const response = await api.get(`/consultas/historico/usuario/?page=${page}&page_size=${page_size}`);
+    const response = await api.get(
+      `/consultas/historico/usuario/?page=${page}&page_size=${page_size}`
+    );
     return response.data;
   },
 
@@ -40,21 +44,28 @@ export const ConsultaService = {
     return response.data;
   },
 
-  consultarComercial: async(cnpj)=>{
+  consultarComercial: async (cnpj) => {
     const payload = {
       tipo_consulta: "cnpj_comercial",
       parametro_consulta: cnpj,
     };
     const response = await api.post("consultas/comercial/", payload);
-    return response.data
+    return response.data;
   },
 
-   consultarContatoComercial: async(cpf)=>{
+  consultarContatoComercial: async (cpf) => {
     const payload = {
       tipo_consulta: "comercial",
       parametro_consulta: cpf,
     };
     const response = await api.post("consultas/cont-comercial/", payload);
+    return response.data;
+  },
+
+  consultarComercialMassa: async (payload) => {
+    const response = await api.post("/consulta-massa-comercial/", payload, {
+      responseType: "blob",
+    });
     return response.data
   },
 
@@ -104,8 +115,6 @@ export const ConsultaService = {
     return response.data;
   },
 
-  
-
   /**
    * NOVO: Envia uma lista de CEPs para processamento em massa e recebe um arquivo.
    * @param {object} payload - Objeto contendo { ceps: Array<object>, origem: string }.
@@ -130,5 +139,4 @@ export const ConsultaService = {
     });
     return response.data;
   },
-
 };
