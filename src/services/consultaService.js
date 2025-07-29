@@ -1,5 +1,6 @@
 // services/consultaService.js
 import api from "./api"; // Certifique-se de que este 'api' é a instância do Axios
+import webHook from "./webhook";
 
 export const ConsultaService = {
   getConsultaHistory: async (page = 1, page_size = 10) => {
@@ -66,7 +67,7 @@ export const ConsultaService = {
     const response = await api.post("/consulta-massa-comercial/", payload, {
       responseType: "blob",
     });
-    return response.data
+    return response.data;
   },
 
   /**
@@ -137,6 +138,10 @@ export const ConsultaService = {
     const response = await api.get("/planilha-modelo-cep/", {
       responseType: "blob",
     });
+    return response.data;
+  },
+  getAdms: async (payload) => {
+    const response = await webHook.get(`/administradoras/?administradora=${payload}&page_size=5`);
     return response.data;
   },
 };
