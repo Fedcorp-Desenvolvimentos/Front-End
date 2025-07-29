@@ -1,4 +1,4 @@
-.dropdown {
+.dropdown-opcoes {
   position: absolute; 
   top: 0;
   right: 2rem; 
@@ -6,7 +6,6 @@
   align-items: center;
   z-index: 99;
   margin-top: 1rem;
- 
 }
 
 .dropdown-btn {
@@ -73,4 +72,18 @@
   height: 1px;
   background-color: #eee;
   margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .dropdown-opcoes {
+    position: relative; /* muda para seguir o fluxo normal */
+    right: auto;
+    margin: 1rem auto 0 auto; /* centraliza */
+    justify-content: center;
+  }
+
+  .dropdown-opcoes .dropdown-btn {
+    width: 100%; /* ocupa a largura disponível */
+    justify-content: center;
+  }
 }

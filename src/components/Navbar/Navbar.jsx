@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../styles/Navbar.css";
 import Dropdown from "../Dropdown/Dropdown";
@@ -6,33 +6,66 @@ import { useAuth } from "../../context/AuthContext";
 
 function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const timeoutRef = useRef(null);
-  const { user } = useAuth(); // <-- Puxando do contexto
+  const { user } = useAuth(); 
 
-  const nivelAcesso = user?.nivel_acesso; // admin, usuario, comercial, moderador
+  const nivelAcesso = user?.nivel_acesso; 
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleMouseEnter = () => {
-    clearTimeout(timeoutRef.current);
-    setDropdownOpen(true);
+    if (!isMobile) {
+      clearTimeout(timeoutRef.current);
+      setDropdownOpen(true);
+    }
   };
 
   const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setDropdownOpen(false);
-    }, 300);
+    if (!isMobile) {
+      timeoutRef.current = setTimeout(() => {
+        setDropdownOpen(false);
+      }, 300);
+    }
+  };
+
+  const handleDropdownToggle = () => {
+    if (isMobile) {
+      setDropdownOpen((prev) => !prev);
+    }
   };
 
   return (
-    <nav className="navbar border-bottom">
+    <nav className="navbar border-bottom" role="navigation" aria-label="Menu principal">
       <div className="container">
-        {/* Logo */}
-        <a className="navbar-brand d-flex align-items-center" href="../Home">
-          <img src="https://i.postimg.cc/Gh597vbr/LOGO.png" alt="Logo" className="logo me-2" />
-        </a>
+       
+        <Link className="navbar-brand d-flex align-items-center" to="/home">
+          <img
+            src="https://i.postimg.cc/Gh597vbr/LOGO.png"
+            alt="Logo"
+            className="logo me-2"
+          />
+        </Link>
 
-        <div className="navbar-collapse">
+        <button
+          className="hamburger d-md-none"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Abrir menu"
+          aria-expanded={mobileMenuOpen}
+        >
+          <i className="bi bi-list"></i>
+        </button>
+
+        <div className={`navbar-collapse ${mobileMenuOpen ? "show" : ""}`}>
           <ul className="navbar-nav">
-            {/* Sempre disponível */}
+         
             <li className="nav-item">
               <Link className="nav-link" to="/home">
                 <button type="button" className="btn">
@@ -42,7 +75,6 @@ function Navbar() {
               </Link>
             </li>
 
-            {/* Endereço → Admin, Usuário, Comercial */}
             {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
               <li className="nav-item">
                 <Link className="nav-link" to="/consulta-end">
@@ -54,7 +86,6 @@ function Navbar() {
               </li>
             )}
 
-            {/* Comercial → Admin, Comercial */}
             {["admin", "comercial"].includes(nivelAcesso) && (
               <li className="nav-item">
                 <Link className="nav-link" to="/consulta-comercial">
@@ -66,7 +97,6 @@ function Navbar() {
               </li>
             )}
 
-            {/* Administradora → Admin, Moderador */}
             {["admin", "moderador"].includes(nivelAcesso) && (
               <li className="nav-item">
                 <Link className="nav-link" to="/home-adm">
@@ -78,27 +108,37 @@ function Navbar() {
               </li>
             )}
 
-            {/* Consultas (Dropdown) → Admin, Usuário, Comercial */}
             {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
               <li
                 className={`nav-item dropdown ${dropdownOpen ? "show" : ""}`}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
+                onClick={handleDropdownToggle}
               >
                 <div className="nav-link btn d-flex align-items-center">
                   <i className="bi bi-clipboard2-minus-fill me-2"></i>
                   Consultar Dados
                 </div>
                 <ul className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}>
-                  <li><Link className="dropdown-item" to="/consulta-pf">Pessoa Física</Link></li>
-                  <li><Link className="dropdown-item" to="/consulta-cnpj">Pessoa Jurídica</Link></li>
-                  <li><Link className="dropdown-item" to="/consulta-segurados">Consulta Segurados</Link></li>
+                  <li>
+                    <Link className="dropdown-item" to="/consulta-pf">
+                      Pessoa Física
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/consulta-cnpj">
+                      Pessoa Jurídica
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/consulta-segurados">
+                      Consulta Segurados
+                    </Link>
+                  </li>
                 </ul>
               </li>
             )}
           </ul>
-
-          {/* Menu do usuário no canto direito */}
           <Dropdown />
         </div>
       </div>

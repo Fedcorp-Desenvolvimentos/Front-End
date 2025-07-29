@@ -132,8 +132,7 @@
 
 .nav-item.dropdown > .btn.nav-link {
   padding-right: 1rem;
-  position: relative;
-  margin-left: 2rem;
+  position: relative;  
 }
 
 
@@ -149,4 +148,38 @@
   list-style: none; 
   padding-left: 0;  
   margin: 0;         
+}
+
+.hamburger {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar-collapse {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 1rem 0;
+  }
+
+  .navbar-collapse.show {
+    display: flex;
+  }
+
+  .navbar-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+
+  .hamburger {
+    display: block;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #0d6efd;
+    background: none;
+    border: none;
+  }
 }
