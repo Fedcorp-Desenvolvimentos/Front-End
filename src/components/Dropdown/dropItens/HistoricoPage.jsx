@@ -28,7 +28,7 @@ const HistoricoConsulta = () => {
         if (user && (user.nivel_acesso === "admin" || user.nivel_acesso === "moderador")) {
           data = await ConsultaService.getConsultaHistory(paginaAtual, intensPorPagina);
         } else if (user && user.id && (user.nivel_acesso === "usuario" || user.nivel_acesso === "comercial")) {
-          data = await ConsultaService.getUserHistory(user.id, paginaAtual, intensPorPagina);
+          data = await ConsultaService.getConsultaHistory(paginaAtual, intensPorPagina);
         } else {
           setError('Usuário não autenticado ou sem permissão para ver o histórico.');
           setLoading(false);
