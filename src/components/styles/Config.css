@@ -124,16 +124,12 @@
   gap: 0.5rem;
 }
 
-
-/* Destaque para inputs em modo edição */
 input.editando {
   border: 2px solid #0d6efd !important;
   background-color: #ffffff !important;
   color: #000 !important;
 }
 
-
-/* Estilo para inputs com ícone */
 .input-with-icon {
   position: relative;
 }
@@ -152,7 +148,6 @@ input.editando {
   color: #555;
 }
 
-/* Remove aparência de link padrão no botão "Voltar" */
 .tab-button.voltar {
   all: unset;
   display: flex;

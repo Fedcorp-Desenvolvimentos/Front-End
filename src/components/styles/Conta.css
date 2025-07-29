@@ -117,7 +117,6 @@
   cursor: pointer;
 }
 
-/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -199,7 +198,6 @@
   outline: none;
 }
 
-/* Label dentro do modal */
 .modal-content label {
   display: block;
   font-weight: 500;

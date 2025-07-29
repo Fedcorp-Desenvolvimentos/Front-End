@@ -21,7 +21,6 @@
   gap: 1rem;
 }
 
-/* LOGO */
 .logo {
   height: 40px;
   margin-right: 1.5rem;
@@ -38,10 +37,9 @@
   transform: scale(1.1);
 }
 
-/* LINKS E BOTÕES */
 .navbar-nav {
   display: flex;
-  gap: 1rem; /* melhor controle de espaçamento entre botões */
+  gap: 1rem; 
   list-style: none;
   padding: 0;
   margin: 0;
@@ -72,7 +70,6 @@
   line-height: 1;
 }
 
-/* Remove margem individual*/
 .navbar-nav .nav-item:first-child .btn {
   margin-left: 0;
 }
@@ -81,13 +78,11 @@
   background-color: #0b5ed7;
 }
 
-/* DROPDOWN “Consultar Dados” */
 .nav-item.dropdown {
   position: relative;
   margin-top: 0 !important;
 }
 
-/* Esconde o menu por padrão */
 .nav-item.dropdown .dropdown-menu {
   display: none;
   opacity: 0;
@@ -95,14 +90,12 @@
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* Exibe o menu quando .show é adicionado */
 .nav-item.dropdown.show .dropdown-menu {
   display: block;
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Posiciona o menu abaixo do botão */
 .nav-item.dropdown .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -117,7 +110,6 @@
   padding: 0.5rem 0;
 }
 
-/* Itens do dropdown */
 .nav-item.dropdown .dropdown-item {
   display: block;
   width: 100%;
@@ -134,21 +126,18 @@
   color: #ffffff;
 }
 
-/* Remove triângulo padrão do Bootstrap */
 .nav-item.dropdown .dropdown-menu::before {
   display: none;
 }
 
-/* Botão dropdown com seta */
 .nav-item.dropdown > .btn.nav-link {
   padding-right: 1rem;
   position: relative;
   margin-left: 2rem;
 }
 
-/* Seta do dropdown */
+
 .nav-item.dropdown > .btn.nav-link::after {
-  
   font-size: 0.6rem;
   position: absolute;
   top: 50% !important;
@@ -157,7 +146,7 @@
 }
 
 .nav-item.dropdown .dropdown-menu {
-  list-style: none; /* remove as bolinhas */
-  padding-left: 0;   /* remove recuo padrão da lista */
-  margin: 0;         /* remove margem caso exista */
+  list-style: none; 
+  padding-left: 0;  
+  margin: 0;         
 }

@@ -7,7 +7,6 @@
 
 }
 
-/* Jumbotron */
 .jumbotron {
   padding: 0.10rem 0;
   text-align: center;
@@ -28,7 +27,6 @@
   margin-top: 0.5rem;
 }
 
-/* Cards */
 .cards-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -64,7 +62,6 @@
   margin-bottom: 2rem;
 }
 
-/* Ícones centralizados */
 .feature-icon {
   display: flex;
   align-items: center;
@@ -82,7 +79,6 @@
   font-size: 1.5rem;
 }
 
-/* Título e descrição dos cards */
 .card h2 {
   font-size: 1.3rem;
   font-weight: 600;
@@ -96,7 +92,6 @@
   margin-bottom: 1.25rem;
 }
 
-/* Botão */
 .btn-primary {
   background-color: transparent;
   margin-top: 1rem;
@@ -116,8 +111,6 @@
   border: 2px solid #0d6efd;
 }
 
-
-/* Responsividade */
 @media (max-width: 768px) {
   .jumbotron h1 {
     font-size: 2rem;
