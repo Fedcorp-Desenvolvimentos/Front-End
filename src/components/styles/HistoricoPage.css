@@ -214,3 +214,72 @@
     border-radius: 6px;
   }
   
+  @media (max-width: 768px) {
+    .historico-container {
+      padding: 1rem;
+      max-width: 100vw;
+    }
+  
+    .historico-container h2 {
+      font-size: 1.2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+  
+    .btn-voltar {
+      width: 100%;
+      padding: 10px;
+      font-size: 0.95rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+  
+    .input-pesquisa {
+      width: 100%;
+      font-size: 0.9rem;
+      padding: 10px;
+      margin-bottom: 1rem;
+    }
+  
+    .historico-table {
+      display: block;
+      overflow-x: auto;
+      width: 100%;
+      border-collapse: collapse;
+    }
+  
+    .historico-table th,
+    .historico-table td {
+      font-size: 0.85rem;
+      white-space: nowrap;
+      padding: 0.6rem;
+    }
+  
+    .detalhes-historico-panel {
+      padding: 1rem;
+    }
+  
+    .resultado-box {
+      padding: 0.75rem;
+      font-size: 0.85rem;
+    }
+  
+    .resultado-json {
+      max-height: 200px;
+      font-size: 0.8rem;
+    }
+  
+    .paginacao {
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+  
+    .paginacao button {
+      flex: 1 1 auto;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+  }
+  

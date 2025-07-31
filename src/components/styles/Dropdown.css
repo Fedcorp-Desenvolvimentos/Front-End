@@ -1,16 +1,13 @@
-/* Forçar que o dropdown fique à direita do container pai imediato */
-.dropdown {
-  position: absolute; /* TROCA de relative para absolute */
+.dropdown-opcoes {
+  position: absolute; 
   top: 0;
-  right: 2rem; /* Ajuste de margem da direita - ou 0 se quiser colado */
+  right: 2rem; 
   display: flex;
   align-items: center;
   z-index: 99;
   margin-top: 1rem;
- 
 }
 
-/* Botão de dropdown estilizado */
 .dropdown-btn {
   display: flex;
   align-items: center;
@@ -25,12 +22,10 @@
   transition: background-color 0.3s;
 }
 
-/* Hover no botão */
 .dropdown-btn:hover {
   background-color: #0b5ed7;
 }
 
-/* Container do menu dropdown */
 .dropdown-content {
   position: absolute;
   top: calc(100% + 0.5rem);
@@ -49,14 +44,12 @@
   padding-left: 0;
 }
 
-/* Classe de ativação do menu */
 .dropdown-content.show {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
 }
 
-/* Estilo dos itens */
 .dropdown-item {
   display: flex;
   align-items: center;
@@ -69,16 +62,28 @@
   cursor: pointer;
 }
 
-/* Hover nos itens */
 .dropdown-item:hover {
   background-color: #0b5ed7;
   color: white;
 }
 
-/* Linha divisória */
 .dropdown-divider {
   border: none;
   height: 1px;
   background-color: #eee;
   margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .dropdown-opcoes {
+    position: relative; /* muda para seguir o fluxo normal */
+    right: auto;
+    margin: 1rem auto 0 auto; /* centraliza */
+    justify-content: center;
+  }
+
+  .dropdown-opcoes .dropdown-btn {
+    width: 100%; /* ocupa a largura disponível */
+    justify-content: center;
+  }
 }
