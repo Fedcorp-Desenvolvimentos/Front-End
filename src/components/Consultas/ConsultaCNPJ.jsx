@@ -218,12 +218,12 @@ const ConsultaCNPJ = () => {
     // Se a consulta foi por CNPJ direto, resultado_api já é o objeto de dados do CNPJ
     if (resultado.historico_salvo?.tipo_consulta === "cnpj") {
       return resultado.resultado_api;
-    } 
+    }
     // Se a consulta foi por razão social (e a API retornou o resultado padrão de CNPJ)
     else if (resultado.historico_salvo?.tipo_consulta === "cnpj_razao_social") {
       // O resultado_api JÁ É o objeto de dados do CNPJ completo retornado pela sua view
       // Não precisamos mais de 'Result[0].BasicData' aqui, pois a API já fez isso.
-      return resultado.resultado_api; 
+      return resultado.resultado_api;
     }
     return null;
   };
@@ -240,9 +240,8 @@ const ConsultaCNPJ = () => {
 
       <div className="card-options-wrapper">
         <div
-          className={`card card-option ${
-            activeForm === "cnpj" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "cnpj" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("cnpj");
             setError(null);
@@ -267,9 +266,8 @@ const ConsultaCNPJ = () => {
         </div>
 
         <div
-          className={`card card-option ${
-            activeForm === "chaves" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "chaves" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("chaves");
             setError(null);
@@ -291,9 +289,8 @@ const ConsultaCNPJ = () => {
         </div>
 
         <div
-          className={`card card-option ${
-            activeForm === "massa" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "massa" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("massa");
             setError(null);
@@ -413,6 +410,13 @@ const ConsultaCNPJ = () => {
             disabled
           />
 
+          <label>CEP:</label>
+          <input
+            type="text"
+            value={cnpjData.cep || "N/A"}
+            disabled
+          />
+
           <label>UF (Sede):</label>
           <input type="text" value={cnpjData.uf || "N/A"} disabled />
 
@@ -428,12 +432,11 @@ const ConsultaCNPJ = () => {
             type="text"
             value={
               cnpjData.descricao_tipo_de_logradouro && cnpjData.logradouro
-                ? `${cnpjData.descricao_tipo_de_logradouro} ${
-                    cnpjData.logradouro
-                  }${cnpjData.numero ? `, ${cnpjData.numero}` : ""}`
+                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro
+                }${cnpjData.numero ? `, ${cnpjData.numero}` : ""}`
                 : cnpjData.descricao_tipo_de_logradouro ||
-                  cnpjData.logradouro ||
-                  "Não informada"
+                cnpjData.logradouro ||
+                "Não informada"
             }
             disabled
           />
@@ -448,13 +451,13 @@ const ConsultaCNPJ = () => {
           <label>Município</label>
           <input
             type="text"
-            value={cnpjData.municipio || "Não informada"} 
+            value={cnpjData.municipio || "Não informada"}
             disabled
           />
         </div>
       )}
 
-     
+
       {activeForm === "chaves" && cnpjData && (
         <div className="card-resultado">
           <h4>Resultado da busca realizada</h4>
@@ -479,6 +482,14 @@ const ConsultaCNPJ = () => {
             disabled
           />
 
+          <label>CEP:</label>
+          <input
+            type="text"
+            value={cnpjData.cep || "N/A"}
+            disabled
+          />
+
+
           <label>UF (Sede):</label>
           <input type="text" value={cnpjData.uf || "N/A"} disabled />
 
@@ -494,12 +505,11 @@ const ConsultaCNPJ = () => {
             type="text"
             value={
               cnpjData.descricao_tipo_de_logradouro && cnpjData.logradouro
-                ? `${cnpjData.descricao_tipo_de_logradouro} ${
-                    cnpjData.logradouro
-                  }${cnpjData.numero ? `, ${cnpjData.numero}` : ""}`
+                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro
+                }${cnpjData.numero ? `, ${cnpjData.numero}` : ""}`
                 : cnpjData.descricao_tipo_de_logradouro ||
-                  cnpjData.logradouro ||
-                  "Não informada"
+                cnpjData.logradouro ||
+                "Não informada"
             }
             disabled
           />
@@ -514,7 +524,7 @@ const ConsultaCNPJ = () => {
           <label>Município</label>
           <input
             type="text"
-            value={cnpjData.municipio || "Não informada"} 
+            value={cnpjData.municipio || "Não informada"}
             disabled
           />
         </div>
