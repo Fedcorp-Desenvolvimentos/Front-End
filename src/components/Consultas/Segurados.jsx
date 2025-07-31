@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import "../styles/Consulta.css";
-import { ConsultaService } from "../../services/consultaService"; // Certifique-se de que o caminho está correto
+import { ConsultaService } from "../../services/consultaService";
 
 const ConsultaSegurado = () => {
     const [activeForm, setActiveForm] = useState("vida");
@@ -9,28 +9,33 @@ const ConsultaSegurado = () => {
     const [resultado, setResultado] = useState(null);
     const [administradoraSuggestions, setAdministradoraSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [activeIndex, setActiveIndex] = useState(-1); // Para navegação por teclado
-    const suggestionsRef = useRef(null); // Ref para detectar cliques fora das sugestões
-    const debounceTimeout = useRef(null); // Ref para o debounce
+    const [activeIndex, setActiveIndex] = useState(-1);
+    const suggestionsRef = useRef(null);
+    const debounceTimeout = useRef(null);
+
+    // Estados para paginação
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(50);
+    const [totalPages, setTotalPages] = useState(1);
 
     const initialFormData = {
         cpf: "",
         nome: "",
         posto: "",
-        administradora: "", // Campo para o autocomplete
+        administradora: "",
         endereco: "",
         cnpj: "",
         certificado: "",
+        endosso: "",
     };
 
     const [formData, setFormData] = useState(initialFormData);
 
-    // Efeito para fechar as sugestões ao clicar fora do componente de autocomplete
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
                 setShowSuggestions(false);
-                setActiveIndex(-1); // Reseta o índice ativo
+                setActiveIndex(-1);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -39,7 +44,6 @@ const ConsultaSegurado = () => {
         };
     }, []);
 
-    // Função para resetar o formulário e estados relacionados
     const resetFormAndState = useCallback(() => {
         setFormData(initialFormData);
         setError(null);
@@ -47,12 +51,13 @@ const ConsultaSegurado = () => {
         setAdministradoraSuggestions([]);
         setShowSuggestions(false);
         setActiveIndex(-1);
+        setCurrentPage(1);
+        setTotalPages(1);
         if (debounceTimeout.current) {
             clearTimeout(debounceTimeout.current);
         }
-    }, []); // initialFormData é constante, então não precisa de dependência
+    }, [initialFormData]);
 
-    // Manipulador de mudança para campos de formulário genéricos (CPF, CNPJ, Nome, etc.)
     const handleFormChange = (e) => {
         const { name, value } = e.target;
         let formattedValue = value;
@@ -69,24 +74,21 @@ const ConsultaSegurado = () => {
         }));
     };
 
-    // Manipulador de mudança para o campo da Administradora com debounce
     const handleAdmFormChange = useCallback((e) => {
         const { value } = e.target;
         setFormData((prev) => ({
             ...prev,
             administradora: value,
         }));
-        setActiveIndex(-1); // Reseta o índice ativo ao digitar
+        setActiveIndex(-1);
 
         if (debounceTimeout.current) {
             clearTimeout(debounceTimeout.current);
         }
 
-        if (value.length > 0) { // Inicia a busca após 1 caractere (ajustável)
+        if (value.length > 0) {
             debounceTimeout.current = setTimeout(async () => {
                 try {
-                    // Chama o serviço passando o valor do input para o backend filtrar
-                    // A API deve retornar um array de objetos, onde cada objeto tem uma propriedade 'NOME'
                     const suggestions = await ConsultaService.getAdms(value);
 
                     console.log("Resposta da API (sugestões da administradora):", suggestions);
@@ -104,48 +106,45 @@ const ConsultaSegurado = () => {
                     setAdministradoraSuggestions([]);
                     setShowSuggestions(false);
                 }
-            }, 300); // Atraso de 300ms para debounce
+            }, 300);
         } else {
-            setAdministradoraSuggestions([]); // Limpa as sugestões se o campo estiver vazio
+            setAdministradoraSuggestions([]);
             setShowSuggestions(false);
         }
-    }, []); // Dependências: nenhuma, pois 'value' vem do evento e o timeout é gerenciado por ref.
+    }, []);
 
-    // Manipulador de clique em uma sugestão
     const handleSuggestionClick = useCallback((suggestion) => {
         setFormData((prev) => ({
             ...prev,
-            administradora: suggestion.NOME, // Assumindo que a sugestão tem a propriedade 'NOME'
+            administradora: suggestion.NOME,
         }));
-        setAdministradoraSuggestions([]); // Limpa as sugestões
-        setShowSuggestions(false); // Esconde o dropdown
-        setActiveIndex(-1); // Reseta o índice ativo
+        setAdministradoraSuggestions([]);
+        setShowSuggestions(false);
+        setActiveIndex(-1);
     }, []);
 
-    // Manipulador de teclas para navegação nas sugestões (ArrowUp, ArrowDown, Enter, Escape)
     const handleKeyDown = useCallback((e) => {
         if (!showSuggestions || administradoraSuggestions.length === 0) return;
 
         switch (e.key) {
             case "ArrowDown":
-                e.preventDefault(); // Evita que o cursor se mova no input
+                e.preventDefault();
                 setActiveIndex((prevIndex) =>
                     prevIndex < administradoraSuggestions.length - 1 ? prevIndex + 1 : 0
                 );
                 break;
             case "ArrowUp":
-                e.preventDefault(); // Evita que o cursor se mova no input
+                e.preventDefault();
                 setActiveIndex((prevIndex) =>
                     prevIndex > 0 ? prevIndex - 1 : administradoraSuggestions.length - 1
                 );
                 break;
             case "Enter":
                 if (activeIndex >= 0) {
-                    e.preventDefault(); // Evita o submit do formulário
+                    e.preventDefault();
                     handleSuggestionClick(administradoraSuggestions[activeIndex]);
                 } else {
-                    // Se Enter for pressionado sem sugestão selecionada, pode-se optar por submeter
-                    // ou fazer uma busca completa com o texto digitado. Aqui, apenas evita o erro.
+                    handleSubmit(e);
                 }
                 break;
             case "Escape":
@@ -157,29 +156,81 @@ const ConsultaSegurado = () => {
         }
     }, [showSuggestions, administradoraSuggestions, activeIndex, handleSuggestionClick]);
 
-    // Manipulador de submit do formulário
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const performConsulta = async (page = 1) => {
         setLoading(true);
         setError(null);
         setResultado(null);
+        setCurrentPage(page);
+
+        let parametroConsultaObj = {}; // Objeto temporário para construir os parâmetros
+
+        if (activeForm === "vida") {
+            parametroConsultaObj = {
+                ...(formData.cpf && { cpf_cnpj: formData.cpf.replace(/\D/g, "") }),
+                ...(formData.nome && { nome_segurado: formData.nome.toUpperCase() }),
+                ...(formData.posto && { posto: formData.posto.toUpperCase() }),
+                ...(formData.administradora && { administradora_nome: formData.administradora.toUpperCase() }),
+            };
+
+            const vidaFields = ['cpf', 'nome', 'posto', 'administradora'];
+            const isVidaFormEmpty = vidaFields.every(field => !formData[field]);
+            if (isVidaFormEmpty) {
+                throw new Error("Pelo menos um dos campos (CPF, Nome, Posto ou Administradora) é obrigatório para Consulta Vida.");
+            }
+
+        } else if (activeForm === "imoveis") {
+            parametroConsultaObj = {
+                ...(formData.cpf && { cpf_cnpj: formData.cpf.replace(/\D/g, "") }),
+                ...(formData.cnpj && { cpf_cnpj: formData.cnpj.replace(/\D/g, "") }),
+                ...(formData.nome && { nome: formData.nome.toUpperCase() }),
+                ...(formData.endereco && { endereco: formData.endereco.toUpperCase() }),
+                ...(formData.certificado && { certificado: formData.certificado }),
+                ...(formData.administradora && { administradora_nome: formData.administradora.toUpperCase() }),
+                ...(formData.endosso && { endosso: formData.endosso.replace(/\D/g, "") }),
+            };
+
+            const imoveisFields = ['cpf', 'cnpj', 'nome', 'endereco', 'certificado', 'administradora', 'endosso'];
+            const isImoveisFormEmpty = imoveisFields.every(field => !formData[field]);
+            if (isImoveisFormEmpty) {
+                throw new Error("Pelo menos um dos campos (CPF, CNPJ, Nome, Endereço, Certificado, Endosso ou Administradora) é obrigatório para Consulta Imóveis.");
+            }
+        }
+
+        // Remove parâmetros de consulta que estão vazios ou nulos do objeto temporário
+        for (const key in parametroConsultaObj) {
+            if (parametroConsultaObj[key] === null || parametroConsultaObj[key] === '') {
+                delete parametroConsultaObj[key];
+            }
+        }
+
+
+        const parametroConsultaJsonString = JSON.stringify(parametroConsultaObj);
+
+        let payload = {
+            tipo_consulta: activeForm === "vida" ? "vida" : "incendio", 
+            parametro_consulta: parametroConsultaJsonString, 
+            page: page,
+            page_size: pageSize,
+            origem: "manual",
+        };
 
         try {
-            if (activeForm === "vida") {
-                if (!formData.cpf) {
-                    throw new Error("CPF é obrigatório para Consulta Vida.");
-                }
-                const response = await ConsultaService.consultarCpf(formData.cpf);
-                setResultado(response);
-                console.log("Resultado VIDA:", response);
-            } else if (activeForm === "imoveis") {
-                if (!formData.cnpj) {
-                    throw new Error("CNPJ é obrigatório para Consulta Imóveis.");
-                }
-                const response = await ConsultaService.consultarCnpj(formData.cnpj);
-                setResultado(response);
-                console.log("Resultado IMÓVEIS:", response);
+            console.log(payload)
+            const response = await ConsultaService.consultarSegurados(payload);
+            setResultado(response.resultado_api);
+
+            
+            if (response.total_pages) {
+                setTotalPages(response.total_pages);
+                setCurrentPage(response.current_page || page);
+            } else if (response.resultado_api && response.resultado_api.length > 0) {
+                
+                setTotalPages(page + 1);
+            } else {
+                setTotalPages(page); 
             }
+
+            console.log("Resultado da Consulta Segurados:", response);
         } catch (err) {
             const message =
                 err.response?.data?.detail ||
@@ -187,9 +238,27 @@ const ConsultaSegurado = () => {
                 err.message ||
                 "Erro ao realizar a consulta.";
             setError(message);
-            console.error("Erro na consulta:", err);
+            console.error("Erro na consulta de segurados:", err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await performConsulta(1);
+    };
+
+    const handlePageChange = (newPage) => {
+        // Se houver totalPages vindo da API, use essa informação
+        if (totalPages > 1 && newPage > 0 && newPage <= totalPages) {
+            performConsulta(newPage);
+        } else if (totalPages === 1 && newPage > currentPage && resultado && resultado.length === pageSize) {
+            // Se totalPages não é conhecido ou é 1, mas a página atual está cheia, tente a próxima
+            performConsulta(newPage);
+        } else if (newPage < currentPage && newPage > 0) {
+            // Permite ir para páginas anteriores
+            performConsulta(newPage);
         }
     };
 
@@ -241,7 +310,7 @@ const ConsultaSegurado = () => {
                             onChange={handleFormChange}
                             placeholder="Digite o CPF"
                             disabled={loading}
-                            maxLength="11"
+                            maxLength="14"
                         />
 
                         <label htmlFor="nome">Nome</label>
@@ -267,109 +336,6 @@ const ConsultaSegurado = () => {
                         />
 
                         {/* Campo Administradora com Autocomplete */}
-                        <label htmlFor="administradora">Administradora</label>
-                        <div
-                            className="autocomplete-wrapper"
-                            ref={suggestionsRef}
-                            role="combobox"
-                            aria-haspopup="listbox"
-                            aria-expanded={showSuggestions && administradoraSuggestions.length > 0}
-                        >
-                            <input
-                                type="text"
-                                name="administradora"
-                                id="administradora"
-                                value={formData.administradora}
-                                onChange={handleAdmFormChange}
-                                onKeyDown={handleKeyDown} // Adiciona o manipulador de teclado
-                                placeholder="Digite a administradora"
-                                disabled={loading}
-                                onFocus={() => formData.administradora.length > 0 && setShowSuggestions(true)}
-                                autoComplete="off" // Desabilita o autocomplete nativo do navegador
-                                aria-autocomplete="list"
-                                aria-controls="administradora-suggestions"
-                                aria-activedescendant={activeIndex >= 0 ? `suggestion-item-${activeIndex}` : undefined}
-                            />
-                            {showSuggestions && administradoraSuggestions.length > 0 && (
-                                <ul className="suggestions-list" id="administradora-suggestions" role="listbox">
-                                    {administradoraSuggestions.map((suggestion, index) => (
-                                        <li
-                                            key={suggestion.id || suggestion.NOME || index} // Use um ID único se disponível, senão NOME ou index
-                                            id={`suggestion-item-${index}`}
-                                            className={index === activeIndex ? "active" : ""}
-                                            onMouseDown={() => handleSuggestionClick(suggestion)} // onMouseDown para evitar perda de foco
-                                            role="option"
-                                            aria-selected={index === activeIndex}
-                                        >
-                                            {suggestion.NOME} {/* Assumindo que a propriedade é NOME */}
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-
-                        <label htmlFor="cnpj">CNPJ</label>
-                        <input
-                            type="text"
-                            name="cnpj"
-                            id="cnpj"
-                            value={formData.cnpj}
-                            onChange={handleFormChange}
-                            placeholder="Digite o CNPJ"
-                            disabled={loading}
-                            maxLength="14"
-                        />
-                    </>
-                )}
-
-                {activeForm === "imoveis" && (
-                    <>
-                        <label htmlFor="cpf">CPF</label>
-                        <input
-                            type="text"
-                            name="cpf"
-                            id="cpf"
-                            value={formData.cpf}
-                            onChange={handleFormChange}
-                            placeholder="Digite o CPF"
-                            disabled={loading}
-                            maxLength="11"
-                        />
-
-                        <label htmlFor="nome">Nome</label>
-                        <input
-                            type="text"
-                            name="nome"
-                            id="nome"
-                            value={formData.nome}
-                            onChange={handleFormChange}
-                            placeholder="Digite o nome"
-                            disabled={loading}
-                        />
-
-                        <label htmlFor="endereco">Endereço</label>
-                        <input
-                            type="text"
-                            name="endereco"
-                            id="endereco"
-                            value={formData.endereco}
-                            onChange={handleFormChange}
-                            placeholder="Digite o endereço"
-                            disabled={loading}
-                        />
-
-                        <label htmlFor="certificado">Certificado</label>
-                        <input
-                            type="text"
-                            name="certificado"
-                            id="certificado"
-                            value={formData.certificado}
-                            onChange={handleFormChange}
-                            placeholder="Digite o certificado"
-                            disabled={loading}
-                        />
-
-                        {/* Campo Administradora com Autocomplete (repetido para Imóveis) */}
                         <label htmlFor="administradora">Administradora</label>
                         <div
                             className="autocomplete-wrapper"
@@ -410,8 +376,24 @@ const ConsultaSegurado = () => {
                                 </ul>
                             )}
                         </div>
+                    </>
+                )}
 
-                        <label htmlFor="cnpj">CNPJ</label>
+                {activeForm === "imoveis" && (
+                    <>
+                        <label htmlFor="cpf">CPF (Opcional)</label>
+                        <input
+                            type="text"
+                            name="cpf"
+                            id="cpf"
+                            value={formData.cpf}
+                            onChange={handleFormChange}
+                            placeholder="Digite o CPF"
+                            disabled={loading}
+                            maxLength="14"
+                        />
+
+                        <label htmlFor="cnpj">CNPJ (Opcional)</label>
                         <input
                             type="text"
                             name="cnpj"
@@ -420,8 +402,93 @@ const ConsultaSegurado = () => {
                             onChange={handleFormChange}
                             placeholder="Digite o CNPJ"
                             disabled={loading}
-                            maxLength="14"
+                            maxLength="18"
                         />
+
+                        <label htmlFor="nome">Nome (Opcional)</label>
+                        <input
+                            type="text"
+                            name="nome"
+                            id="nome"
+                            value={formData.nome}
+                            onChange={handleFormChange}
+                            placeholder="Digite o nome"
+                            disabled={loading}
+                        />
+
+                        <label htmlFor="endereco">Endereço (Opcional)</label>
+                        <input
+                            type="text"
+                            name="endereco"
+                            id="endereco"
+                            value={formData.endereco}
+                            onChange={handleFormChange}
+                            placeholder="Digite o endereço"
+                            disabled={loading}
+                        />
+
+                        <label htmlFor="certificado">Certificado (Opcional)</label>
+                        <input
+                            type="text"
+                            name="certificado"
+                            id="certificado"
+                            value={formData.certificado}
+                            onChange={handleFormChange}
+                            placeholder="Digite o certificado"
+                            disabled={loading}
+                        />
+
+                        <label htmlFor="endosso">Endosso (Opcional)</label>
+                        <input
+                            type="text"
+                            name="endosso"
+                            id="endosso"
+                            value={formData.endosso}
+                            onChange={handleFormChange}
+                            placeholder="Digite o endosso"
+                            disabled={loading}
+                        />
+
+                        <label htmlFor="administradora">Administradora (Obrigatório se CPF/CNPJ/Endosso vazios)</label>
+                        <div
+                            className="autocomplete-wrapper"
+                            ref={suggestionsRef}
+                            role="combobox"
+                            aria-haspopup="listbox"
+                            aria-expanded={showSuggestions && administradoraSuggestions.length > 0}
+                        >
+                            <input
+                                type="text"
+                                name="administradora"
+                                id="administradora"
+                                value={formData.administradora}
+                                onChange={handleAdmFormChange}
+                                onKeyDown={handleKeyDown}
+                                placeholder="Digite a administradora"
+                                disabled={loading}
+                                onFocus={() => formData.administradora.length > 0 && setShowSuggestions(true)}
+                                autoComplete="off"
+                                aria-autocomplete="list"
+                                aria-controls="administradora-suggestions"
+                                aria-activedescendant={activeIndex >= 0 ? `suggestion-item-${activeIndex}` : undefined}
+                            />
+                            {showSuggestions && administradoraSuggestions.length > 0 && (
+                                <ul className="suggestions-list" id="administradora-suggestions" role="listbox">
+                                    {administradoraSuggestions.map((suggestion, index) => (
+                                        <li
+                                            key={suggestion.id || suggestion.NOME || index}
+                                            id={`suggestion-item-${index}`}
+                                            className={index === activeIndex ? "active" : ""}
+                                            onMouseDown={() => handleSuggestionClick(suggestion)}
+                                            role="option"
+                                            aria-selected={index === activeIndex}
+                                        >
+                                            {suggestion.NOME}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
                     </>
                 )}
 
@@ -435,6 +502,24 @@ const ConsultaSegurado = () => {
                 <div className="card-resultado mt-4">
                     <h4>Resultado da Consulta</h4>
                     <pre>{JSON.stringify(resultado, null, 2)}</pre>
+
+                    {(totalPages > 1 || (resultado && resultado.length === pageSize)) && (
+                        <div className="pagination-controls">
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1 || loading}
+                            >
+                                Página Anterior
+                            </button>
+                            <span>Página {currentPage} de {totalPages}</span>
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage >= totalPages && resultado.length < pageSize || loading}
+                            >
+                                Próxima Página
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

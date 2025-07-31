@@ -140,6 +140,11 @@ export const ConsultaService = {
     });
     return response.data;
   },
+  consultarSegurados: async (payload) => {
+    const response = await api.post("consultas/segurados/", payload)
+    return response.data;
+  },
+
   getAdms: async (payload) => {
     const response = await webHook.get(`/administradoras/?administradora=${payload}&page_size=5`);
     return response.data;

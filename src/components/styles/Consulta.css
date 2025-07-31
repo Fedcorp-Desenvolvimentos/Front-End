@@ -156,3 +156,54 @@
   display: none;
 }
 
+.autocomplete-wrapper {
+    position: relative; 
+    width: 100%; 
+    margin-bottom: 10px; 
+}
+
+.suggestions-list {
+    position: absolute; 
+    width: 100%; 
+    max-height: 200px; 
+    overflow-y: auto; 
+    border: 1px solid #ddd; 
+    border-top: none; 
+    border-radius: 0 0 5px 5px; 
+    background-color: #fff; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    list-style: none; 
+    padding: 0;
+    margin: 0;
+    z-index: 1000; 
+}
+
+.suggestions-list li {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    color: black; 
+    font-size: 0.95rem;
+    transition: background-color 0.2s, color 0.2s; 
+}
+
+.suggestions-list li:last-child {
+    border-bottom: none; 
+}
+
+.suggestions-list li:hover,
+.suggestions-list li.active {
+    background-color: #007bff; 
+    color: white; 
+}
+
+.autocomplete-item.no-results,
+.autocomplete-item.error {
+    padding: 10px 15px;
+    color: #666; 
+    font-style: italic;
+    text-align: center;
+}
+
+.autocomplete-item.error {
+    color: #dc3545; 
+}
