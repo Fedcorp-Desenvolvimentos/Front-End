@@ -100,26 +100,20 @@ const HistoricoConsulta = () => {
       'cep_rua_cidade'
     ];
     if (tiposChave.includes(consulta.tipo_consulta)) {
-      // Se já temos detalhes (linha expandida)
       if (detalhes && detalhes.resultado && detalhes.resultado.Result && detalhes.resultado.Result.length > 0) {
-        // CPF/CNPJ: pega o nome do primeiro resultado
         if (detalhes.resultado.Result[0].BasicData && detalhes.resultado.Result[0].BasicData.Name) {
           return detalhes.resultado.Result[0].BasicData.Name;
         }
-        // CNPJ pode ser OfficialName
         if (detalhes.resultado.Result[0].BasicData && detalhes.resultado.Result[0].BasicData.OfficialName) {
           return detalhes.resultado.Result[0].BasicData.OfficialName;
         }
       }
-      // Endereço: pega o logradouro do primeiro resultado
       if (detalhes && detalhes.resultado && detalhes.resultado.resultados_viacep && detalhes.resultado.resultados_viacep.length > 0) {
         return detalhes.resultado.resultados_viacep[0].logradouro || detalhes.resultado.resultados_viacep[0].cep || 'Endereço encontrado';
       }
-      // Se não encontrou nada
       if (detalhes && ((detalhes.resultado && ((detalhes.resultado.Result && detalhes.resultado.Result.length === 0) || (detalhes.resultado.resultados_viacep && detalhes.resultado.resultados_viacep.length === 0))) || !detalhes.resultado)) {
         return 'Pesquisa falhou';
       }
-      // Se não tem detalhes ainda, mostra um resumo do parâmetro
       try {
         const param = typeof consulta.parametro_consulta === 'string' ? JSON.parse(consulta.parametro_consulta) : consulta.parametro_consulta;
         if (param && param.q) return param.q;
@@ -129,7 +123,6 @@ const HistoricoConsulta = () => {
         return 'Chaves alternativas';
       }
     }
-    // Para outros tipos, exibe normalmente
     return consulta.parametro_consulta;
   }
 
