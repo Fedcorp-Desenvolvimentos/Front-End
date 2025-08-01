@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import "../styles/Comercial.css";
 import "../styles/Conta.css";
 import { ConsultaService } from "../../services/consultaService";
-import { FaBuilding, FaSearch } from "react-icons/fa";
+import { FaBriefcase, FaFileExcel, FaSearch } from "react-icons/fa";
+
 import * as XLSX from "xlsx";
 
-
-
 const ConsultaComercial = () => {
-
+  const [activeCard, setActiveCard] = useState(null);
   const [form, setForm] = useState({ cnpj: "" });
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -23,6 +22,10 @@ const ConsultaComercial = () => {
   const [bulkResults, setBulkResults] = useState([]);
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
   const [massLoading, setMassLoading] = useState(false);
+
+  const handleCardClick = (card) => {
+    setActiveCard(card);
+  };
 
   const handleCnpjChange = (e) => {
     const onlyDigits = e.target.value.replace(/\D/g, "");
@@ -42,22 +45,15 @@ const ConsultaComercial = () => {
     }
     setLoading(true);
     try {
-      const { resultado_api } = await ConsultaService.consultarComercial(
-        form.cnpj
-      );
-      
+      const { resultado_api } = await ConsultaService.consultarComercial(form.cnpj);
       const empresa = resultado_api?.Result?.[0] || null;
       if (empresa) {
         setResult(empresa);
       } else {
-        setError(
-          "Nenhum resultado de empresa encontrado para o CNPJ fornecido."
-        );
+        setError("Nenhum resultado de empresa encontrado para o CNPJ fornecido.");
       }
     } catch (err) {
-      setError(
-        err.message || "Ocorreu um erro ao consultar o CNPJ da empresa."
-      );
+      setError(err.message || "Ocorreu um erro ao consultar o CNPJ da empresa.");
     } finally {
       setLoading(false);
     }
@@ -74,9 +70,7 @@ const ConsultaComercial = () => {
     setModalError(null);
     setModalPersonData(null);
     try {
-      const { resultado_api } = await ConsultaService.consultarContatoComercial(
-        cpf
-      )
+      const { resultado_api } = await ConsultaService.consultarContatoComercial(cpf);
       const regData = resultado_api?.Result?.[0]?.RegistrationData || null;
       if (regData) setModalPersonData(regData);
       else setModalError("Nenhum dado de contato encontrado para esta pessoa.");
@@ -97,7 +91,7 @@ const ConsultaComercial = () => {
         r.RelationshipType === "REPRESENTANTELEGAL"
     );
     if (!filtered.length) return null;
-    return (
+   return (
       <>
         <h6 className="rel-title">{title}:</h6>
         <ul className="rel-list">
@@ -248,106 +242,116 @@ const ConsultaComercial = () => {
   };
 
   return (
-    <div className="comercial-page">
-      <div className="card-opcoes">
-        <div className="icon-container">
-          <FaBuilding className="icon-opcao" />
-        </div>
-        <h2 className="titulo-principal">Consulta Comercial</h2>
-        <p className="opcao-texto">
-          Preencha o CNPJ da empresa para consultar os dados dos sócios e
-          representantes.
-        </p>
-      </div>
-      <div className="form-card-container">
-        <div className="form-card">
-          <div className="card-body">
-            <label className="form-label">CNPJ:</label>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Digite apenas os 14 dígitos do CNPJ"
-              value={form.cnpj}
-              onChange={handleCnpjChange}
-            />
-            <button
-              className="btn-primary"
-              onClick={handleSearch}
-              disabled={loading}
-            >
-              {loading ? (
-                "Consultando..."
-              ) : (
-                <>
-                  {" "}
-                  <FaSearch className="btn-icon" /> Consultar{" "}
-                </>
-              )}
-            </button>
-            {error && <div className="alert-erro mt-3">{error}</div>}
+    <div className="consulta-container">
+      <h2 className="titulo-pagina">Escolha a opção de consulta</h2>
+
+      <div className="card-options-wrapper">
+        <div
+          className={`card card-option ${activeCard === "cnpj" ? "active" : ""}`}
+          onClick={() => handleCardClick("cnpj")}
+        >
+          <div className="icon-container">
+          <FaBriefcase size={30} />
           </div>
+          <h5>Consulta CNPJ</h5>
         </div>
-        <div className="form-card">
-          <div className="card-body">
-            <label className="form-label">Consulta em massa:</label>
-            <input
-              type="file"
-              id="input-massa-cnpj"
-              accept=".xlsx, .xls"
-              style={{ display: "none" }}
-              onChange={handleImportFile}
-              disabled={massLoading}
-            />
-            <button
-              className="btn-primary"
-              type="button"
-              onClick={() =>
-                document.getElementById("input-massa-cnpj").click()
-              }
-              disabled={loading}
-            >
-              Importar Planilha de CNPJs
-            </button>
-            <button
-              className="btn-primary mt-2"
-              type="button"
-              onClick={handleDownloadModel}
-              disabled={loading}
-            >
-              Baixar Planilha Modelo
-            </button>
-            {massLoading && <p>Processando planilha...</p>}
-            {massConsultaMessage && (
-              <p
-                className={
-                  massConsultaMessage.includes("Erro")
-                    ? "error-message"
-                    : "message"
-                }
-              >
-                {massConsultaMessage}
-              </p>
-            )}
-            {bulkResults.length > 0 && (
-              <div className="bulk-results mt-3">
-                <h5>Resultados:</h5>
-                <ul>
-                  {bulkResults.map((item, idx) => (
-                    <li key={idx}>
-                      <strong>{item.cnpj}:</strong>{" "}
-                      {item.erro
-                        ? "Erro ao consultar"
-                        : `Empresa ${
-                            item.empresa ? "encontrada" : "não encontrada"
-                          }`}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+
+        <div
+          className={`card card-option ${activeCard === "massa" ? "active" : ""}`}
+          onClick={() => handleCardClick("massa")}
+        >
+          <div className="icon-container">
+          <FaFileExcel size={30} />
           </div>
+          <h5>Consulta em Massa</h5>
+        </div>
+
+        <div
+          className={`card card-option ${activeCard === "conteudo" ? "active" : ""}`}
+          onClick={() => handleCardClick("conteudo")}
+        >
+          <div className="icon-container">
+          <FaSearch size={30} />
+          </div>
+          <h5>Cotação Conteúdo</h5>
         </div>
       </div>
+
+      {activeCard === "cnpj" && (
+        <div className="form-container">
+          <label>Digite o CNPJ:</label>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Digite apenas os 14 dígitos do CNPJ"
+            value={form.cnpj}
+            onChange={handleCnpjChange}
+          />
+          <button
+            className="btn-primary"
+            onClick={handleSearch}
+            disabled={loading}
+          >
+            {loading ? "Consultando..." : <><FaSearch className="btn-icon" /> Consultar</>}
+          </button>
+          {error && <div className="alert-erro mt-3">{error}</div>}
+        </div>
+      )}
+
+      {activeCard === "massa" && (
+        <div className="form-massa-container">
+          <label className="form-label">Consulta em massa:</label>
+          <input
+            type="file"
+            id="input-massa-cnpj"
+            accept=".xlsx, .xls"
+            style={{ display: "none" }}
+            onChange={handleImportFile}
+            disabled={massLoading}
+          />
+          <button
+            className="btn-primary"
+            type="button"
+            onClick={() => document.getElementById("input-massa-cnpj").click()}
+            disabled={loading}
+          >
+            Importar Planilha de CNPJs
+          </button>
+          <button
+            className="btn-primary mt-2"
+            type="button"
+            onClick={handleDownloadModel}
+            disabled={loading}
+          >
+            Baixar Planilha Modelo
+          </button>
+          {massLoading && <p>Processando planilha...</p>}
+          {massConsultaMessage && (
+            <p className={massConsultaMessage.includes("Erro") ? "error-message" : "message"}>{massConsultaMessage}</p>
+          )}
+          {bulkResults.length > 0 && (
+            <div className="bulk-results mt-3">
+              <h5>Resultados:</h5>
+              <ul>
+                {bulkResults.map((item, idx) => (
+                  <li key={idx}>
+                    <strong>{item.cnpj}:</strong> {item.erro ? "Erro ao consultar" : `Empresa ${item.empresa ? "encontrada" : "não encontrada"}`}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeCard === "conteudo" && (
+        <div className="form-container">
+          <label>Digite o endereço:</label>
+          <input type="text" placeholder="Rua, número, bairro..." />
+          <button>Pesquisar Conteúdo</button>
+        </div>
+      )}
+
       {result && (
         <div className="form-card mt-4">
           <div className="card-body">
@@ -357,24 +361,18 @@ const ConsultaComercial = () => {
             )}
             {!result.Relationships.CurrentRelationships?.length && (
               <p className="no-rel-msg">
-                Nenhum sócio, administrador ou representante legal encontrado
-                para este CNPJ.
+                Nenhum sócio, administrador ou representante legal encontrado para este CNPJ.
               </p>
             )}
           </div>
         </div>
       )}
+
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Detalhes de Contato da Pessoa</h3>
-            <button
-              className="btn-icon modal-close"
-              onClick={() => setShowModal(false)}
-              title="Fechar"
-            >
-              ×
-            </button>
+            <button className="btn-icon modal-close" onClick={() => setShowModal(false)} title="Fechar">×</button>
             <div>
               {modalLoading && (
                 <div className="modal-loading">
@@ -386,54 +384,25 @@ const ConsultaComercial = () => {
               {modalPersonData && !modalLoading && !modalError && (
                 <div>
                   <h6>Informações Básicas:</h6>
-                  <p>
-                    <strong>Nome:</strong>{" "}
-                    {modalPersonData.BasicData?.Name || "N/A"}
-                  </p>
-                  <p>
-                    <strong>CPF:</strong>{" "}
-                    {modalPersonData.BasicData?.TaxIdNumber || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Gênero:</strong>{" "}
-                    {modalPersonData.BasicData?.Gender || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Data de Nascimento:</strong>{" "}
-                    {modalPersonData.BasicData?.BirthDate
-                      ? new Date(
-                          modalPersonData.BasicData.BirthDate
-                        ).toLocaleDateString()
-                      : "N/A"}
-                  </p>
-                  <p>
-                    <strong>Nome da Mãe:</strong>{" "}
-                    {modalPersonData.BasicData?.MotherName || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Status do CPF:</strong>{" "}
-                    {modalPersonData.BasicData?.TaxIdStatus || "N/A"}
-                  </p>
+                  <p><strong>Nome:</strong> {modalPersonData.BasicData?.Name || "N/A"}</p>
+                  <p><strong>CPF:</strong> {modalPersonData.BasicData?.TaxIdNumber || "N/A"}</p>
+                  <p><strong>Gênero:</strong> {modalPersonData.BasicData?.Gender || "N/A"}</p>
+                  <p><strong>Data de Nascimento:</strong> {modalPersonData.BasicData?.BirthDate ? new Date(modalPersonData.BasicData.BirthDate).toLocaleDateString() : "N/A"}</p>
+                  <p><strong>Nome da Mãe:</strong> {modalPersonData.BasicData?.MotherName || "N/A"}</p>
+                  <p><strong>Status do CPF:</strong> {modalPersonData.BasicData?.TaxIdStatus || "N/A"}</p>
 
                   {modalPersonData.Emails && (
                     <>
                       <h6 className="mt-3">E-mails:</h6>
                       {modalPersonData.Emails.Primary?.EmailAddress && (
-                        <p>
-                          <strong>Principal:</strong>{" "}
-                          {modalPersonData.Emails.Primary.EmailAddress}
-                        </p>
+                        <p><strong>Principal:</strong> {modalPersonData.Emails.Primary.EmailAddress}</p>
                       )}
                       {modalPersonData.Emails.Secondary?.EmailAddress && (
-                        <p>
-                          <strong>Secundário:</strong>{" "}
-                          {modalPersonData.Emails.Secondary.EmailAddress}
-                        </p>
+                        <p><strong>Secundário:</strong> {modalPersonData.Emails.Secondary.EmailAddress}</p>
                       )}
-                      {!modalPersonData.Emails.Primary?.EmailAddress &&
-                        !modalPersonData.Emails.Secondary?.EmailAddress && (
-                          <p>Nenhum e-mail disponível.</p>
-                        )}
+                      {!modalPersonData.Emails.Primary?.EmailAddress && !modalPersonData.Emails.Secondary?.EmailAddress && (
+                        <p>Nenhum e-mail disponível.</p>
+                      )}
                     </>
                   )}
 
@@ -441,23 +410,14 @@ const ConsultaComercial = () => {
                     <>
                       <h6 className="mt-3">Endereços:</h6>
                       {modalPersonData.Addresses.Primary && (
-                        <p>
-                          <strong>Principal:</strong>{" "}
-                          {modalPersonData.Addresses.Primary.AddressMain},{" "}
-                          {modalPersonData.Addresses.Primary.Number}
-                        </p>
+                        <p><strong>Principal:</strong> {modalPersonData.Addresses.Primary.AddressMain}, {modalPersonData.Addresses.Primary.Number}</p>
                       )}
                       {modalPersonData.Addresses.Secondary && (
-                        <p>
-                          <strong>Secundário:</strong>{" "}
-                          {modalPersonData.Addresses.Secondary.AddressMain},{" "}
-                          {modalPersonData.Addresses.Secondary.Number}
-                        </p>
+                        <p><strong>Secundário:</strong> {modalPersonData.Addresses.Secondary.AddressMain}, {modalPersonData.Addresses.Secondary.Number}</p>
                       )}
-                      {!modalPersonData.Addresses.Primary &&
-                        !modalPersonData.Addresses.Secondary && (
-                          <p>Nenhum endereço disponível.</p>
-                        )}
+                      {!modalPersonData.Addresses.Primary && !modalPersonData.Addresses.Secondary && (
+                        <p>Nenhum endereço disponível.</p>
+                      )}
                     </>
                   )}
 
@@ -465,33 +425,21 @@ const ConsultaComercial = () => {
                     <>
                       <h6 className="mt-3">Telefones:</h6>
                       {modalPersonData.Phones.Primary?.PhoneNumber && (
-                        <p>
-                          <strong>Principal:</strong>{" "}
-                          {modalPersonData.Phones.Primary.PhoneNumber}
-                        </p>
+                        <p><strong>Principal:</strong> {modalPersonData.Phones.Primary.PhoneNumber}</p>
                       )}
                       {modalPersonData.Phones.Secondary?.PhoneNumber && (
-                        <p>
-                          <strong>Secundário:</strong>{" "}
-                          {modalPersonData.Phones.Secondary.PhoneNumber}
-                        </p>
+                        <p><strong>Secundário:</strong> {modalPersonData.Phones.Secondary.PhoneNumber}</p>
                       )}
-                      {!modalPersonData.Phones.Primary?.PhoneNumber &&
-                        !modalPersonData.Phones.Secondary?.PhoneNumber && (
-                          <p>Nenhum telefone disponível.</p>
-                        )}
+                      {!modalPersonData.Phones.Primary?.PhoneNumber && !modalPersonData.Phones.Secondary?.PhoneNumber && (
+                        <p>Nenhum telefone disponível.</p>
+                      )}
                     </>
                   )}
                 </div>
               )}
             </div>
             <div className="modal-actions">
-              <button
-                className="btn-primary"
-                onClick={() => setShowModal(false)}
-              >
-                Fechar
-              </button>
+              <button className="btn-primary" onClick={() => setShowModal(false)}>Fechar</button>
             </div>
           </div>
         </div>
