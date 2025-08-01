@@ -49,6 +49,7 @@ const ConsultaComercial = () => {
       const empresa = resultado_api?.Result?.[0] || null;
       if (empresa) {
         setResult(empresa);
+        setForm({cnpj: ""});
       } else {
         setError("Nenhum resultado de empresa encontrado para o CNPJ fornecido.");
       }
