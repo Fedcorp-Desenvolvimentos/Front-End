@@ -37,7 +37,7 @@ const ConsultaCNPJ = () => {
     event.preventDefault();
     setLoading(true);
     setError(null);
-    setResultado(null);
+    setResultado(null); // Limpa o resultado anterior antes de uma nova consulta
     setMassConsultaMessage("");
 
     let payload = {};
@@ -71,6 +71,13 @@ const ConsultaCNPJ = () => {
           qParams.push(`name{${formData.razaoSocial.trim()}}`);
         }
 
+        // Você pode adicionar mais validações aqui para UF, email, telefone se a BigDataCorp suportar em 'q'
+        // Por enquanto, apenas a razão social é usada na query 'q' conforme sua implementação da API
+        // if (formData.uf.trim()) { qParams.push(`state{${formData.uf.trim()}}`); }
+        // if (formData.email.trim()) { qParams.push(`email{${formData.email.trim()}}`); }
+        // if (formData.telefone.trim()) { qParams.push(`phone{${formData.telefone.trim()}}`); }
+
+
         if (qParams.length === 0) {
           validationErrorMessage =
             "Nenhum parâmetro de busca válido para chaves alternativas.";
@@ -79,7 +86,7 @@ const ConsultaCNPJ = () => {
           const bigDataCorpPayload = {
             Datasets: "basic_data",
             q: qParams.join(", "),
-            Limit: 5,
+            Limit: 1, // Mudei para 1, pois você quer o CNPJ do primeiro resultado para a consulta padrão
           };
 
           payload = {
@@ -97,9 +104,9 @@ const ConsultaCNPJ = () => {
     }
 
     try {
-      const response = await ConsultaService.realizarConsulta(payload);
-      setResultado(response);
-      console.log("Resultado da consulta:", response);
+      const apiResponse = await ConsultaService.realizarConsulta(payload);
+      console.log("Resultado da consulta:", apiResponse);
+      setResultado(apiResponse); // Define o resultado aqui
     } catch (err) {
       const errorMessage =
         err.response?.data?.detail ||
@@ -203,19 +210,20 @@ const ConsultaCNPJ = () => {
     }
   };
 
+  // --- Função ajustada para extrair os dados do CNPJ corretamente ---
   const getCnpjData = () => {
+    // Se resultado ou resultado_api não existirem, retorna null
     if (!resultado || !resultado.resultado_api) return null;
+
+    // Se a consulta foi por CNPJ direto, resultado_api já é o objeto de dados do CNPJ
     if (resultado.historico_salvo?.tipo_consulta === "cnpj") {
       return resultado.resultado_api;
-    } else if (
-      resultado.historico_salvo?.tipo_consulta === "cnpj_razao_social"
-    ) {
-      if (
-        resultado.resultado_api.Result &&
-        resultado.resultado_api.Result.length > 0
-      ) {
-        return resultado.resultado_api.Result[0].BasicData;
-      }
+    }
+    // Se a consulta foi por razão social (e a API retornou o resultado padrão de CNPJ)
+    else if (resultado.historico_salvo?.tipo_consulta === "cnpj_razao_social") {
+      // O resultado_api JÁ É o objeto de dados do CNPJ completo retornado pela sua view
+      // Não precisamos mais de 'Result[0].BasicData' aqui, pois a API já fez isso.
+      return resultado.resultado_api;
     }
     return null;
   };
@@ -377,7 +385,8 @@ const ConsultaCNPJ = () => {
           {error && <p className="error-message">{error}</p>}
         </div>
       )}
-      {activeForm == "cnpj" && cnpjData && (
+
+      {activeForm === "cnpj" && cnpjData && (
         <div className="card-resultado">
           <h4>Resultado da busca realizada</h4>
 
@@ -395,7 +404,18 @@ const ConsultaCNPJ = () => {
           />
 
           <label>Telefone:</label>
-          <input type="text" value={cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"} disabled />
+          <input
+            type="text"
+            value={cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"}
+            disabled
+          />
+
+          <label>CEP:</label>
+          <input
+            type="text"
+            value={cnpjData.cep || "N/A"}
+            disabled
+          />
 
           <label>UF (Sede):</label>
           <input type="text" value={cnpjData.uf || "N/A"} disabled />
@@ -412,8 +432,8 @@ const ConsultaCNPJ = () => {
             type="text"
             value={
               cnpjData.descricao_tipo_de_logradouro && cnpjData.logradouro
-                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro}${cnpjData.numero ? `, ${cnpjData.numero}` : ""
-                }`
+                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro
+                }${cnpjData.numero ? `, ${cnpjData.numero}` : ""}`
                 : cnpjData.descricao_tipo_de_logradouro ||
                 cnpjData.logradouro ||
                 "Não informada"
@@ -424,70 +444,92 @@ const ConsultaCNPJ = () => {
           <label>Complemento</label>
           <input
             type="text"
-            value={cnpjData.municipio || "Não informada"}
+            value={cnpjData.complemento || "Não informada"} // Corrigido: era 'municipio', agora 'complemento'
             disabled
           />
 
           <label>Município</label>
           <input
             type="text"
-            value={cnpjData.complemento || "Não informada"}
+            value={cnpjData.municipio || "Não informada"}
+            disabled
+          />
+        </div>
+      )}
+
+
+      {activeForm === "chaves" && cnpjData && (
+        <div className="card-resultado">
+          <h4>Resultado da busca realizada</h4>
+
+          <label>Razão Social:</label>
+          <input type="text" value={cnpjData.razao_social || "N/A"} disabled />
+
+          <label>CNPJ:</label>
+          <input type="text" value={cnpjData.cnpj || "N/A"} disabled />
+
+          <label>Atividade Principal:</label>
+          <input
+            type="text"
+            value={cnpjData.cnae_fiscal_descricao || "N/A"}
             disabled
           />
 
-        </div>
-      )}
-      {activeForm == "chaves" && resultado?.resultado_api?.Result && resultado.resultado_api.Result.length > 0 && (
-        <div className="card-resultado">
-          <h4>Resultados encontrados</h4>
-          <table className="historico-table">
-            <thead>
-              <tr>
-                <th>Razão Social</th>
-                <th>CNPJ</th>
-                <th>UF</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {resultado.resultado_api.Result.map((item, idx) => (
-                <React.Fragment key={idx}>
-                  <tr
-                    className={selectedResultIndex === idx ? 'active-row' : ''}
-                    onClick={() => handleExpandResult(idx)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <td>{item.BasicData?.OfficialName || 'N/A'}</td>
-                    <td>{item.BasicData?.TaxIdNumber || 'N/A'}</td>
-                    <td>{item.BasicData?.HeadquarterState || 'N/A'}</td>
-                    <td className="expand-icon">
-                      <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
-                    </td>
-                  </tr>
-                  {selectedResultIndex === idx && (
-                    <tr>
-                      <td colSpan="4">
-                        <div className="detalhes-historico-panel">
-                          <p><strong>Razão Social:</strong> {item.BasicData?.OfficialName || 'N/A'}</p>
-                          <p><strong>Nome Fantasia:</strong> {item.BasicData?.TradeName || 'N/A'}</p>
-                          <p><strong>CNPJ:</strong> {item.BasicData?.TaxIdNumber || 'N/A'}</p>
-                          <p><strong>Atividade Principal:</strong> {item.BasicData?.Activities?.[0]?.Activity || 'N/A'}</p>
-                          <p><strong>Natureza Jurídica:</strong> {item.BasicData?.LegalNature?.Activity || 'N/A'}</p>
-                          <p><strong>UF (Sede):</strong> {item.BasicData?.HeadquarterState || 'N/A'}</p>
-                          <p><strong>Situação Cadastral:</strong> {item.BasicData?.TaxIdStatus || 'N/A'}</p>
-                          <p><strong>Data de Fundação:</strong> {item.BasicData?.FoundedDate || 'N/A'}</p>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
+          <label>Telefone:</label>
+          <input
+            type="text"
+            value={cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"}
+            disabled
+          />
+
+          <label>CEP:</label>
+          <input
+            type="text"
+            value={cnpjData.cep || "N/A"}
+            disabled
+          />
+
+
+          <label>UF (Sede):</label>
+          <input type="text" value={cnpjData.uf || "N/A"} disabled />
+
+          <label>Bairro</label>
+          <input
+            type="text"
+            value={cnpjData.bairro || "Não informada"}
+            disabled
+          />
+
+          <label>Rua</label>
+          <input
+            type="text"
+            value={
+              cnpjData.descricao_tipo_de_logradouro && cnpjData.logradouro
+                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro
+                }${cnpjData.numero ? `, ${cnpjData.numero}` : ""}`
+                : cnpjData.descricao_tipo_de_logradouro ||
+                cnpjData.logradouro ||
+                "Não informada"
+            }
+            disabled
+          />
+
+          <label>Complemento</label>
+          <input
+            type="text"
+            value={cnpjData.complemento || "Não informada"} // Corrigido: era 'municipio', agora 'complemento'
+            disabled
+          />
+
+          <label>Município</label>
+          <input
+            type="text"
+            value={cnpjData.municipio || "Não informada"}
+            disabled
+          />
         </div>
       )}
     </div>
-
   );
 };
 

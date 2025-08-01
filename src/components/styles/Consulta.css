@@ -156,50 +156,54 @@
   display: none;
 }
 
-@media (max-width: 768px) {
-  .consulta-container {
-    padding: 1rem;
-  }
+.autocomplete-wrapper {
+    position: relative; 
+    width: 100%; 
+    margin-bottom: 10px; 
+}
 
-  .titulo-pagina {
-    font-size: 1.3rem;
-    margin-bottom: 1rem;
-  }
+.suggestions-list {
+    position: absolute; 
+    width: 100%; 
+    max-height: 200px; 
+    overflow-y: auto; 
+    border: 1px solid #ddd; 
+    border-top: none; 
+    border-radius: 0 0 5px 5px; 
+    background-color: #fff; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    list-style: none; 
+    padding: 0;
+    margin: 0;
+    z-index: 1000; 
+}
 
-  .card-options-wrapper {
-    gap: 1rem;
-    justify-content: center;
-  }
-
-  .card-option {
-    width: 100%;
-    max-width: 280px;
-    padding: 1rem;
-  }
-
-  .form-container,
-  .form-massa-container,
-  .card-resultado {
-    width: 100%;
-    padding: 1rem;
-    margin: 1rem 0;
-    box-sizing: border-box;
-  }
-
-  .form-container input,
-  .card-resultado input {
+.suggestions-list li {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    color: black; 
     font-size: 0.95rem;
-    padding: 0.6rem;
-  }
+    transition: background-color 0.2s, color 0.2s; 
+}
 
-  .form-container button,
-  .form-massa-container button {
-    padding: 0.65rem;
-    font-size: 0.95rem;
-  }
+.suggestions-list li:last-child {
+    border-bottom: none; 
+}
 
-  .icon-container svg {
-    width: 30px;
-    height: 28px;
-  }
+.suggestions-list li:hover,
+.suggestions-list li.active {
+    background-color: #007bff; 
+    color: white; 
+}
+
+.autocomplete-item.no-results,
+.autocomplete-item.error {
+    padding: 10px 15px;
+    color: #666; 
+    font-style: italic;
+    text-align: center;
+}
+
+.autocomplete-item.error {
+    color: #dc3545; 
 }

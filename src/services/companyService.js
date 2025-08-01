@@ -74,9 +74,7 @@ export const CompanyService = {
     deleteCompany: async (id) => {
         try {
             await api.delete(`empresas/${id}/`);
-            console.log(`Empresa com ID ${id} deletada com sucesso.`);
         } catch (error) {
-            console.error(`Erro ao deletar empresa com ID ${id}:`, error);
             throw error;
         }
     },
