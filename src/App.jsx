@@ -9,7 +9,6 @@ import ConsultaPF from './components/Consultas/ConsultaPF';
 import ConsultaEnd from './components/Consultas/ConsultaEnd';
 import ConsultaCNPJ from './components/Consultas/ConsultaCNPJ';
 import Comercial from './components/Consultas/Comercial';
-import ComercialDefault from './components/Consultas/ComercialDefault';
 import Segurados from './components/Consultas/Segurados';
 
 import Conta from './components/Dropdown/dropItens/conta';
@@ -28,6 +27,7 @@ import { AuthProvider } from './context/AuthContext';
 
 import { LoadingProvider, useLoading } from './context/LoadingContext';
 import LoadingSpinner from './components/LoadingSpinner';
+import CotacaoConteudo from './components/Cotação/CotacaoConteudo';
 
 function AppRoutes() {
   const location = useLocation();
@@ -56,7 +56,7 @@ function AppRoutes() {
             <Route path="/consulta-end" element={<ConsultaEnd />} />
             <Route path="/consulta-cnpj" element={<ConsultaCNPJ />} />
             <Route path="/consulta-comercial" element={<Comercial />} />
-            <Route path="/comercial" element={<ComercialDefault />} />
+            <Route path="/cotacao-conteudo" element={<CotacaoConteudo />} />
             <Route path="/consulta-segurados" element={<Segurados />} />
             <Route path="/conta" element={<Conta />} />
             <Route path="/config" element={<Config />} />
