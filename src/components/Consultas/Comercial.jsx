@@ -3,6 +3,7 @@ import "../styles/Comercial.css";
 import "../styles/Conta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FaBriefcase, FaFileExcel, FaSearch } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 import * as XLSX from "xlsx";
 
@@ -23,9 +24,15 @@ const ConsultaComercial = () => {
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
   const [massLoading, setMassLoading] = useState(false);
 
-  const handleCardClick = (card) => {
-    setActiveCard(card);
-  };
+
+const navigate = useNavigate();
+
+const handleCardClick = (option) => {
+  setActiveCard(option);
+  if (option === "conteudo") {
+    navigate("/cotacao-conteudo"); 
+  }
+};
 
   const handleCnpjChange = (e) => {
     const onlyDigits = e.target.value.replace(/\D/g, "");
