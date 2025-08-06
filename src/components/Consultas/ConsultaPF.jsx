@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import * as XLSX from "xlsx"; 
+import * as XLSX from "xlsx";
 import "../styles/Consulta.css";
-import { ConsultaService } from "../../services/consultaService"; 
-import { FileSpreadsheet } from "lucide-react"; 
+import { ConsultaService } from "../../services/consultaService";
+import { FileSpreadsheet } from "lucide-react";
 
 function formatDateBR(dateStr) {
   if (!dateStr) return 'N/A';
@@ -14,7 +14,7 @@ function formatDateBR(dateStr) {
 }
 
 const ConsultaPF = () => {
-  const [activeForm, setActiveForm] = useState(""); 
+  const [activeForm, setActiveForm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resultado, setResultado] = useState(null);
@@ -24,7 +24,7 @@ const ConsultaPF = () => {
     nome: "",
     dataNascimento: "",
     motherName: "",
-    fatherName: "", 
+    fatherName: "",
   });
 
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
@@ -47,7 +47,7 @@ const ConsultaPF = () => {
     setLoading(true);
     setError(null);
     setResultado(null);
-    setMassConsultaMessage(""); 
+    setMassConsultaMessage("");
 
     let payload = {};
     let isFormValid = true;
@@ -115,7 +115,7 @@ const ConsultaPF = () => {
 
     setLoading(true);
     setError(null);
-    setResultado(null); 
+    setResultado(null);
     setMassConsultaMessage("Lendo planilha e preparando para consulta...");
 
     const reader = new FileReader();
@@ -156,14 +156,14 @@ const ConsultaPF = () => {
         const response = await ConsultaService.processarPlanilhaCPF(
           requestBody
         );
-        const blob = response; 
+        const blob = response;
         const url = window.URL.createObjectURL(new Blob([blob]));
         const link = document.createElement("a");
         link.href = url;
         link.setAttribute("download", "planilha-resultado-cpf.xlsx");
         document.body.appendChild(link);
         link.click();
-        link.parentNode.removeChild(link); 
+        link.parentNode.removeChild(link);
         setMassConsultaMessage(
           "Processamento concluído! O download da planilha de resultados iniciou."
         );
@@ -174,7 +174,7 @@ const ConsultaPF = () => {
           err.message ||
           "Erro inesperado: Verifique sua conexão e o formato do arquivo.";
         setError(`Erro ao processar a planilha: ${errorMessage}`);
-        setMassConsultaMessage(""); 
+        setMassConsultaMessage("");
       } finally {
         setLoading(false);
         if (event.target) {
@@ -182,15 +182,15 @@ const ConsultaPF = () => {
         }
       }
     };
-    reader.readAsArrayBuffer(file); 
+    reader.readAsArrayBuffer(file);
   };
   const handleDownloadModel = async () => {
     setLoading(true);
-    setError(null); 
+    setError(null);
     setMassConsultaMessage("Baixando planilha modelo de CPF...");
     try {
       const response = await ConsultaService.baixarPlanilhaModeloCPF();
-      const blob = response; 
+      const blob = response;
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement("a");
       link.href = url;
@@ -205,7 +205,7 @@ const ConsultaPF = () => {
         err.response?.data?.message ||
         err.message ||
         "Erro na comunicação com o servidor para baixar o modelo.";
-      setError(`Erro ao baixar modelo: ${errorMessage}`); 
+      setError(`Erro ao baixar modelo: ${errorMessage}`);
       setMassConsultaMessage("");
     } finally {
       setLoading(false);
@@ -224,15 +224,14 @@ const ConsultaPF = () => {
 
       <div className="card-options-wrapper">
         <div
-          className={`card card-option ${
-            activeForm === "cpf" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "cpf" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("cpf");
-            setFormData({ ...formData, cpf: "" }); 
+            setFormData({ ...formData, cpf: "" });
             setError(null);
             setResultado(null);
-            setMassConsultaMessage(""); 
+            setMassConsultaMessage("");
           }}
         >
           <div className="icon-container">
@@ -254,13 +253,12 @@ const ConsultaPF = () => {
         </div>
 
         <div
-          className={`card card-option ${
-            activeForm === "chaves" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "chaves" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("chaves");
             setFormData({
-              cpf: "", 
+              cpf: "",
               nome: "",
               dataNascimento: "",
               motherName: "",
@@ -285,14 +283,13 @@ const ConsultaPF = () => {
         </div>
 
         <div
-          className={`card card-option ${
-            activeForm === "massa" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "massa" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("massa");
             setError(null);
             setResultado(null);
-            setMassConsultaMessage(""); 
+            setMassConsultaMessage("");
           }}
         >
           <div className="icon-container">
@@ -318,9 +315,11 @@ const ConsultaPF = () => {
           <button
             type="submit"
             disabled={loading || formData.cpf.length !== 11}
+            className={`consulta-btn ${loading ? "loading" : ""}`}
           >
-            Consultar
+            {loading ? "Consultando..." : "Consultar"}
           </button>
+
           {error && <p className="error-message">{error}</p>}
         </form>
       )}
@@ -385,7 +384,7 @@ const ConsultaPF = () => {
             value={formData.nome}
             onChange={handleFormChange}
             placeholder="Digite o nome"
-            required 
+            required
             disabled={loading}
           />
           <label htmlFor="dataNascimento">Data de Nascimento</label>
@@ -418,9 +417,12 @@ const ConsultaPF = () => {
             placeholder="Digite o nome do pai"
             disabled={loading}
           />
-          <button type="submit" disabled={loading || !formData.nome.trim()}>
-            Consultar
-          </button>
+          <button type="submit" disabled={loading || !formData.nome.trim()}
+           className={`consulta-btn ${loading ? "loading" : ""}`}
+         >
+           {loading ? "Consultando..." : "Consultar"}
+         </button>
+
           {error && <p className="error-message">{error}</p>}
         </form>
       )}
@@ -464,55 +466,55 @@ const ConsultaPF = () => {
       )}
 
       {activeForm === "chaves" && resultado?.resultado_api?.Result && resultado.resultado_api.Result.length > 0 && (
-  <div className="card-resultado">
-    <h4>Resultados encontrados</h4>
-    <table className="historico-table">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>CPF</th>
-          <th>Data de Nascimento</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {resultado.resultado_api.Result.map((item, idx) => (
-          <React.Fragment key={idx}>
-            <tr
-              className={selectedResultIndex === idx ? 'active-row' : ''}
-              onClick={() => handleExpandResult(idx)}
-              style={{ cursor: 'pointer' }}
-            >
-              <td>{item.BasicData?.Name || 'N/A'}</td>
-              <td>{item.BasicData?.TaxIdNumber || 'N/A'}</td>
-              <td>{formatDateBR(item.BasicData?.BirthDate)}</td>
-              <td className="expand-icon">
-                <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
-              </td>
-            </tr>
-            {selectedResultIndex === idx && (
+        <div className="card-resultado">
+          <h4>Resultados encontrados</h4>
+          <table className="historico-table">
+            <thead>
               <tr>
-                <td colSpan="4">
-                  <div className="detalhes-historico-panel">
-                    <p><strong>Nome:</strong> {item.BasicData?.Name || 'N/A'}</p>
-                    <p><strong>CPF:</strong> {item.BasicData?.TaxIdNumber || 'N/A'}</p>
-                    <p><strong>Situação Cadastral:</strong> {item.BasicData?.TaxIdStatus || 'N/A'}</p>
-                    <p><strong>Data de Nascimento:</strong> {formatDateBR(item.BasicData?.BirthDate)}</p>
-                    <p><strong>Nome da Mãe:</strong> {item.BasicData?.MotherName || 'N/A'}</p>
-                    <p><strong>Nome do Pai:</strong> {item.BasicData?.FatherName || 'N/A'}</p>
-                    <p><strong>Gênero:</strong> {item.BasicData?.Gender || 'N/A'}</p>
-                    <p><strong>Alias:</strong> {item.BasicData?.Aliases?.CommonName || 'N/A'}</p>
-                    <p><strong>Indicação de Óbito:</strong> {item.BasicData?.HasObitIndication !== undefined ? (item.BasicData.HasObitIndication ? 'Sim' : 'Não') : 'N/A'}</p>
-                  </div>
-                </td>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Data de Nascimento</th>
+                <th></th>
               </tr>
-            )}
-          </React.Fragment>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
+            </thead>
+            <tbody>
+              {resultado.resultado_api.Result.map((item, idx) => (
+                <React.Fragment key={idx}>
+                  <tr
+                    className={selectedResultIndex === idx ? 'active-row' : ''}
+                    onClick={() => handleExpandResult(idx)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>{item.BasicData?.Name || 'N/A'}</td>
+                    <td>{item.BasicData?.TaxIdNumber || 'N/A'}</td>
+                    <td>{formatDateBR(item.BasicData?.BirthDate)}</td>
+                    <td className="expand-icon">
+                      <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
+                    </td>
+                  </tr>
+                  {selectedResultIndex === idx && (
+                    <tr>
+                      <td colSpan="4">
+                        <div className="detalhes-historico-panel">
+                          <p><strong>Nome:</strong> {item.BasicData?.Name || 'N/A'}</p>
+                          <p><strong>CPF:</strong> {item.BasicData?.TaxIdNumber || 'N/A'}</p>
+                          <p><strong>Situação Cadastral:</strong> {item.BasicData?.TaxIdStatus || 'N/A'}</p>
+                          <p><strong>Data de Nascimento:</strong> {formatDateBR(item.BasicData?.BirthDate)}</p>
+                          <p><strong>Nome da Mãe:</strong> {item.BasicData?.MotherName || 'N/A'}</p>
+                          <p><strong>Nome do Pai:</strong> {item.BasicData?.FatherName || 'N/A'}</p>
+                          <p><strong>Gênero:</strong> {item.BasicData?.Gender || 'N/A'}</p>
+                          <p><strong>Alias:</strong> {item.BasicData?.Aliases?.CommonName || 'N/A'}</p>
+                          <p><strong>Indicação de Óbito:</strong> {item.BasicData?.HasObitIndication !== undefined ? (item.BasicData.HasObitIndication ? 'Sim' : 'Não') : 'N/A'}</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
