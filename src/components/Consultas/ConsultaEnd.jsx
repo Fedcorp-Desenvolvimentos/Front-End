@@ -334,7 +334,9 @@ const ConsultaEnd = () => {
       {activeForm === "chaves" && (
         <form className="form-container" onSubmit={handleSubmit}>
           <p className="form-description"></p>
-          <label htmlFor="uf">UF:</label>
+          <label htmlFor="uf">
+            UF: <span className="obrigatorio" title="Campo obrigatório para busca por chaves alternativas">*</span>
+          </label>
           <input
             type="text"
             id="uf"
@@ -346,7 +348,10 @@ const ConsultaEnd = () => {
             required
             disabled={loading}
           />
-          <label htmlFor="cidade">Cidade:</label>
+
+          <label htmlFor="cidade">
+            Cidade: <span className="obrigatorio" title="Campo obrigatório para busca por chaves alternativas">*</span>
+          </label>
           <input
             type="text"
             id="cidade"
@@ -357,7 +362,10 @@ const ConsultaEnd = () => {
             required
             disabled={loading}
           />
-          <label htmlFor="rua">Rua:</label>
+
+          <label htmlFor="rua">
+            Rua: <span className="obrigatorio" title="Campo obrigatório para busca por chaves alternativas">*</span>
+          </label>
           <input
             type="text"
             id="rua"
@@ -368,6 +376,7 @@ const ConsultaEnd = () => {
             required
             disabled={loading}
           />
+
           <label htmlFor="bairro">Bairro (Opcional):</label>
           <input
             type="text"
@@ -378,6 +387,7 @@ const ConsultaEnd = () => {
             placeholder="Digite o nome do bairro"
             disabled={loading}
           />
+
           <button
             type="submit"
             disabled={
@@ -430,7 +440,6 @@ const ConsultaEnd = () => {
       )}
       {activeForm !== "massa" && resultado?.resultado_api && (
         <div className="card-resultado">
-          <h4>Resultado da busca realizada</h4>
           {resultado.historico_salvo.tipo_consulta === "endereco" && (
             <>
               <label>CEP:</label>
@@ -476,7 +485,7 @@ const ConsultaEnd = () => {
             Array.isArray(resultado.resultado_api.resultados_viacep) &&
             resultado.resultado_api.resultados_viacep.length > 0 ? (
             <>
-              {resultado.resultado_api.resultados_viacep.map((item, index) => (
+              {/* {resultado.resultado_api.resultados_viacep.map((item, index) => (
                 <div key={index} className="resultado-item">
                   <h5>Resultado {index + 1}</h5>
                   <label>CEP:</label>
@@ -508,7 +517,7 @@ const ConsultaEnd = () => {
                       <hr className="result-separator" />
                     )}
                 </div>
-              ))}
+              ))} */}
             </>
           ) : (
             resultado.tipo_consulta === "cep_rua_cidade" &&
