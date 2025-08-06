@@ -377,7 +377,9 @@ const ConsultaPF = () => {
 
       {activeForm === "chaves" && (
         <form className="form-container" onSubmit={handleSubmit}>
-          <label htmlFor="nome">Nome</label>
+          <label htmlFor="nome">
+            Nome <span className="obrigatorio" title="Campo obrigatório para busca por chaves alternativas">*</span>
+            </label>
           <input
             type="text"
             id="nome"
