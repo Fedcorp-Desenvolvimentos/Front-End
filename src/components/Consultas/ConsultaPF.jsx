@@ -6,11 +6,10 @@ import { FileSpreadsheet } from "lucide-react";
 
 function formatDateBR(dateStr) {
   if (!dateStr) return 'N/A';
-  // Extrai só a parte da data se vier com T ou espaço
   const onlyDate = dateStr.split('T')[0].split(' ')[0];
   const [yyyy, mm, dd] = onlyDate.split('-');
   if (yyyy && mm && dd) return `${dd}/${mm}/${yyyy}`;
-  return dateStr; // fallback
+  return dateStr; 
 }
 
 const ConsultaPF = () => {

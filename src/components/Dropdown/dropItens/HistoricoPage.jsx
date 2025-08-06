@@ -51,7 +51,7 @@ const HistoricoConsulta = () => {
   }, [user, paginaAtual]);
 
   useEffect(() => {
-    setPaginaAtual(1); // Resetar para página 1 quando filtro mudar
+    setPaginaAtual(1);
   }, [filtro]);
 
   const handleItemClick = async (consultaId) => {
@@ -85,15 +85,9 @@ const HistoricoConsulta = () => {
     );
   });
 
-  // Não faz mais sentido paginar no front, pois o backend já faz isso
-  // const totalPaginas = Math.ceil(consultasFiltradas.length / intensPorPagina);
-  // const inicio = (paginaAtual - 1) * intensPorPagina;
-  // const fim = inicio + intensPorPagina;
-  // const consultasFiltradasPaginadas = consultasFiltradas.slice(inicio, fim);
-  const consultasFiltradasPaginadas = consultasFiltradas; // Já está paginado do backend
+  const consultasFiltradasPaginadas = consultasFiltradas;
 
   function getParametroDisplay(consulta, detalhes = null) {
-    // Tipos de consulta por chaves alternativas
     const tiposChave = [
       'cpf_alternativa',
       'cnpj_razao_social',

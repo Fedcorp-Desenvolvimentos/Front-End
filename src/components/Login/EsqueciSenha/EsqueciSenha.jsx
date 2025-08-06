@@ -6,7 +6,7 @@ const EsqueciSenha = () => {
   const navigate = useNavigate();
 
   const handleVoltarLogin = () => {
-    navigate("/login"); // ajuste se sua rota for diferente
+    navigate("/login"); 
   };
   
   return (

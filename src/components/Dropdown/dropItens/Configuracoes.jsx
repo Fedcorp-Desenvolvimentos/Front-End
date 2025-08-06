@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/Config.css';
 import { Link } from 'react-router-dom';
-import { UserService } from '../../../services/userService'; // Certifique-se que este caminho está correto
+import { UserService } from '../../../services/userService';
 
 const Config = () => {
   const [activeTab, setActiveTab] = useState('perfil');
   const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState(''); // Estado para mensagens de erro
+  const [errorMessage, setErrorMessage] = useState('');
   const [editandoPerfil, setEditandoPerfil] = useState(false);
   const [editandoSenha, setEditandoSenha] = useState(false);
 
   const [userId, setUserId] = useState(null);
-  const [nomeCompleto, setNomeCompleto] = useState(''); // Nome do campo correspondente ao backend
+  const [nomeCompleto, setNomeCompleto] = useState('');
   const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
 
@@ -23,15 +23,12 @@ const Config = () => {
   const [showNovaSenha, setShowNovaSenha] = useState(false);
   const [showConfirmaSenha, setShowConfirmaSenha] = useState(false);
 
-  // Efeito para carregar dados do usuário ao montar o componente
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Assume que UserService.getMe() busca os dados do usuário logado
         const data = await UserService.getMe();
         setUserId(data.id);
-        // Garante que o nome do campo aqui (nomeCompleto) corresponde ao que vem do backend (nome_completo)
-        setNomeCompleto(data.nome_completo || ''); 
+        setNomeCompleto(data.nome_completo || '');
         setEmail(data.email || '');
         setCpf(data.cpf || '');
       } catch (error) {
@@ -51,7 +48,7 @@ const Config = () => {
 
   const handleSalvarPerfil = async (e) => {
     e.preventDefault();
-    clearMessages(); // Limpa mensagens anteriores
+    clearMessages();
 
     if (!userId) {
       setErrorMessage('ID do usuário não encontrado para atualização.');
@@ -59,11 +56,8 @@ const Config = () => {
     }
 
     try {
-      // Envia apenas os campos que podem ser atualizados para o perfil
       const updatedData = {
-        // Garante que os nomes dos campos aqui (nome_completo, cpf, email)
-        // correspondem exatamente aos esperados pelo seu serializer Django para UPDATE
-        nome_completo: nomeCompleto, 
+        nome_completo: nomeCompleto,
         cpf: cpf,
         email: email,
       };
@@ -73,7 +67,6 @@ const Config = () => {
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       console.error('Erro ao atualizar dados do usuário:', error);
-      // Extrai mensagens de erro específicas do backend para melhor feedback
       const errorDetail = error.response?.data?.detail || error.response?.data?.email || error.message || 'Erro ao atualizar os dados. Tente novamente.';
       setErrorMessage(`Erro: ${errorDetail}`);
       setTimeout(() => setErrorMessage(''), 5000);
@@ -82,7 +75,7 @@ const Config = () => {
 
   const handleSalvarSenha = async (e) => {
     e.preventDefault();
-    clearMessages(); // Limpa mensagens anteriores
+    clearMessages();
 
     if (!userId) {
       setErrorMessage('ID do usuário não encontrado para alteração de senha.');
@@ -94,30 +87,24 @@ const Config = () => {
       return;
     }
 
-    // Validação básica de preenchimento dos campos de senha
     if (!senhaAtual || !novaSenha || !confirmarSenha) {
-        setErrorMessage('Por favor, preencha todos os campos de senha.');
-        return;
+      setErrorMessage('Por favor, preencha todos os campos de senha.');
+      return;
     }
 
     try {
-      // Chama o endpoint de alteração de senha na UserService
-      // Garante que os nomes dos campos (current_password, new_password)
-      // correspondem aos esperados pelo seu endpoint de mudança de senha no Django
       await UserService.changePassword(userId, {
-        current_password: senhaAtual, 
-        new_password: novaSenha,     
+        current_password: senhaAtual,
+        new_password: novaSenha,
       });
       setSuccessMessage('Senha alterada com sucesso!');
       setEditandoSenha(false);
-      // Limpa os campos de senha após a alteração bem-sucedida
       setSenhaAtual('');
       setNovaSenha('');
       setConfirmarSenha('');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       console.error('Erro ao alterar senha:', error);
-      // Extrai mensagens de erro específicas do backend
       const errorDetail = error.response?.data?.detail || error.response?.data?.current_password || error.response?.data?.new_password || error.message || 'Erro ao alterar a senha. Verifique a senha atual e tente novamente.';
       setErrorMessage(`Erro: ${errorDetail}`);
       setTimeout(() => setErrorMessage(''), 5000);
@@ -147,7 +134,7 @@ const Config = () => {
             </div>
           )}
           {errorMessage && (
-            <div className="error-message"> {/* Usa uma classe dedicada para mensagens de erro */}
+            <div className="error-message"> 
               <i className="bi bi-exclamation-circle-fill"></i> {errorMessage}
             </div>
           )}
@@ -156,7 +143,7 @@ const Config = () => {
             <>
               <h3><i className="bi bi-gear"></i> Editar Conta</h3>
               <form onSubmit={handleSalvarPerfil}>
-                <label>Nome Completo:</label> {/* Label atualizado */}
+                <label>Nome Completo:</label> 
                 <input
                   type="text"
                   value={nomeCompleto}

@@ -28,7 +28,6 @@ export default function ImportacaoVida() {
     setError("");
     setSuccess(false);
 
-    // Validação básica
     for (let key in form) {
       if (!form[key]) {
         setError("Preencha todos os campos.");
@@ -37,11 +36,8 @@ export default function ImportacaoVida() {
     }
 
     try {
-      // TODO: substituir por chamada real à API
       console.log("Dados enviados:", form);
       setSuccess(true);
-      // após sucesso, navegar ou limpar form
-      // navigate('/home-adm');
     } catch (err) {
       setError("Erro ao enviar dados. Tente novamente.");
     }
