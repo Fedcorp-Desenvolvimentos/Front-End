@@ -310,11 +310,14 @@ const ConsultaCNPJ = () => {
             required
             disabled={loading}
           />
-          <button type="submit" disabled={loading || cnpj.length !== 14}
-           className={`consulta-btn ${loading ? "loading" : ""}`}
-         >
-           {loading ? "Consultando..." : "Consultar"}
-         </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className={`consulta-btn ${loading ? "loading" : ""}`}
+          >
+            {loading ? "Consultando..." : "Consultar"}
+          </button>
+
 
           {error && <p className="error-message">{error}</p>}
         </form>
