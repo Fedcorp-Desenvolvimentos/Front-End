@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/Conta.css';
 import { Link } from 'react-router-dom';
-import { UserService } from '../../../services/userService'; // Certifique-se de que este caminho está correto
+import { UserService } from '../../../services/userService';
 
 const ConfigConta = () => {
     const [usuarios, setUsuarios] = useState([]);
@@ -9,7 +9,7 @@ const ConfigConta = () => {
     const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
     const [mostrarModalEdicao, setMostrarModalEdicao] = useState(false);
     const [mensagemSucesso, setMensagemSucesso] = useState('');
-    const [mensagemErro, setMensagemErro] = useState(''); // Novo estado para mensagens de erro
+    const [mensagemErro, setMensagemErro] = useState('');
     const [filtroBusca, setFiltroBusca] = useState('');
 
     const [nomeEditado, setNomeEditado] = useState('');
@@ -18,11 +18,11 @@ const ConfigConta = () => {
     const [empresaEditada, setEmpresaEditada] = useState('');
     const [isFedEditado, setIsFedEditado] = useState(false);
 
-    
+
     const fetchUsuarios = async () => {
         try {
             const response = await UserService.getAllUsers();
-  
+
             setUsuarios(response.results || response);
         } catch (error) {
             console.error("Erro ao buscar usuários:", error);
@@ -31,7 +31,7 @@ const ConfigConta = () => {
         }
     };
 
- 
+
     useEffect(() => {
         fetchUsuarios();
     }, []);
@@ -58,7 +58,7 @@ const ConfigConta = () => {
             await UserService.deleteUser(usuarioSelecionado.id);
             exibirMensagem('sucesso', `Usuário ${usuarioSelecionado.nome_completo} excluído com sucesso!`);
             setMostrarModalExclusao(false);
-            fetchUsuarios(); 
+            fetchUsuarios();
         } catch (error) {
             console.error("Erro ao excluir usuário:", error);
             exibirMensagem('erro', `Erro ao excluir usuário ${usuarioSelecionado.nome_completo}.`);
@@ -72,7 +72,7 @@ const ConfigConta = () => {
         setEmailEditado(usuario.email);
         setNivelAcessoEditado(usuario.nivel_acesso);
         setEmpresaEditada(usuario.empresa?.id || '');
-        setIsFedEditado(usuario.is_fed); 
+        setIsFedEditado(usuario.is_fed);
         setMostrarModalEdicao(true);
     };
 
@@ -85,23 +85,23 @@ const ConfigConta = () => {
                 email: emailEditado,
                 nivel_acesso: nivelAcessoEditado,
                 empresa: empresaEditada,
-                is_fed: isFedEditado, 
+                is_fed: isFedEditado,
             };
             await UserService.updateUser(usuarioSelecionado.id, dadosAtualizados);
             exibirMensagem('sucesso', `Usuário ${nomeEditado} atualizado com sucesso!`);
             setMostrarModalEdicao(false);
-            fetchUsuarios(); 
+            fetchUsuarios();
         } catch (error) {
             console.error("Erro ao atualizar usuário:", error.response?.data || error);
             const errorData = error.response?.data;
             let errorMessage = "Erro ao atualizar usuário. Verifique os dados.";
             if (errorData) {
-               
+
                 if (errorData.email) errorMessage = `Erro no E-mail: ${errorData.email.join(', ')}`;
                 else if (errorData.nome_completo) errorMessage = `Erro no Nome: ${errorData.nome_completo.join(', ')}`;
                 else if (errorData.nivel_acesso) errorMessage = `Erro na Função: ${errorData.nivel_acesso.join(', ')}`;
                 else if (errorData.empresa) errorMessage = `Erro na Empresa: ${errorData.empresa.join(', ')}`;
-                else if (errorData.detail) errorMessage = errorData.detail; 
+                else if (errorData.detail) errorMessage = errorData.detail;
                 else if (typeof errorData === 'object') errorMessage = JSON.stringify(errorData);
                 else errorMessage = errorData;
             }
@@ -118,7 +118,7 @@ const ConfigConta = () => {
         );
     });
 
-    const niveisAcesso = ["admin", "usuario", "comercial", "moderador"]; 
+    const niveisAcesso = ["admin", "usuario", "comercial", "moderador"];
 
     return (
         <div className="conta-container">
@@ -183,7 +183,7 @@ const ConfigConta = () => {
                                             >
                                                 <i className="bi bi-pencil-square text-primary"></i>
                                             </button>
-                                           
+
                                             {usuario.id !== usuarios[0]?.id && (
                                                 <button
                                                     className="btn-icon"
@@ -220,7 +220,7 @@ const ConfigConta = () => {
                         </div>
                     </div>
                 )}
-                
+
                 {mostrarModalEdicao && (
                     <div className="modal-overlay">
                         <div className="modal-content">
@@ -244,12 +244,12 @@ const ConfigConta = () => {
                             >
                                 {niveisAcesso.map(nivel => (
                                     <option key={nivel} value={nivel}>
-                                        {nivel.charAt(0).toUpperCase() + nivel.slice(1)} 
-                                        
+                                        {nivel.charAt(0).toUpperCase() + nivel.slice(1)}
+
                                     </option>
                                 ))}
                             </select>
-                        
+
                             <div className="modal-actions">
                                 <button className="btn btn-primary" onClick={() => setMostrarModalEdicao(false)}>
                                     Cancelar

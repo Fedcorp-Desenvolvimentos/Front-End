@@ -81,7 +81,6 @@ const ConsultaCNPJ = () => {
             q: qParams.join(", "),
             Limit: 5,
           };
-
           payload = {
             tipo_consulta: "cnpj_razao_social",
             parametro_consulta: JSON.stringify(bigDataCorpPayload),
@@ -317,7 +316,6 @@ const ConsultaCNPJ = () => {
           >
             {loading ? "Consultando..." : "Consultar"}
           </button>
-
 
           {error && <p className="error-message">{error}</p>}
         </form>
