@@ -207,3 +207,9 @@
 .autocomplete-item.error {
     color: #dc3545; 
 }
+
+.obrigatorio {
+  color: red;
+  font-weight: bold;
+  cursor: help;
+}
