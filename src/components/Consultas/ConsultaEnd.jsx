@@ -105,7 +105,7 @@ const ConsultaEnd = () => {
       } else {
         setError(
           response.mensagem ||
-            "Resposta inesperada da API. Endereço não encontrado ou inválido."
+          "Resposta inesperada da API. Endereço não encontrado ou inválido."
         );
         setResultado(null);
       }
@@ -134,7 +134,7 @@ const ConsultaEnd = () => {
 
     setLoading(true);
     setError(null);
-    setResultado(null); 
+    setResultado(null);
     setMassConsultaMessage("Lendo planilha e preparando para consulta...");
 
     const reader = new FileReader();
@@ -212,7 +212,7 @@ const ConsultaEnd = () => {
       const url = window.URL.createObjectURL(new Blob([blobResponse]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "planilha-modelo-cep.xlsx"); 
+      link.setAttribute("download", "planilha-modelo-cep.xlsx");
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);
@@ -270,9 +270,8 @@ const ConsultaEnd = () => {
         </div>
 
         <div
-          className={`card card-option ${
-            activeForm === "chaves" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "chaves" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("chaves");
             resetFormState();
@@ -292,9 +291,8 @@ const ConsultaEnd = () => {
         </div>
 
         <div
-          className={`card card-option ${
-            activeForm === "massa" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "massa" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("massa");
             resetFormState();
@@ -320,9 +318,15 @@ const ConsultaEnd = () => {
             required
             disabled={loading}
           />
-          <button type="submit" disabled={loading || formData.cep.length !== 8}>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`consulta-btn ${loading ? "loading" : ""}`}
+          >
             {loading ? "Consultando..." : "Consultar"}
           </button>
+
           {error && <p className="error-message">{error}</p>}
         </form>
       )}
@@ -415,9 +419,8 @@ const ConsultaEnd = () => {
           {loading && <p>Processando planilha...</p>}
           {massConsultaMessage && (
             <p
-              className={`message ${
-                massConsultaMessage.includes("Erro") ? "error" : ""
-              }`}
+              className={`message ${massConsultaMessage.includes("Erro") ? "error" : ""
+                }`}
             >
               {massConsultaMessage}
             </p>
@@ -470,8 +473,8 @@ const ConsultaEnd = () => {
           )}
 
           {resultado.historico_salvo.tipo_consulta === "cep_rua_cidade" &&
-          Array.isArray(resultado.resultado_api.resultados_viacep) &&
-          resultado.resultado_api.resultados_viacep.length > 0 ? (
+            Array.isArray(resultado.resultado_api.resultados_viacep) &&
+            resultado.resultado_api.resultados_viacep.length > 0 ? (
             <>
               {resultado.resultado_api.resultados_viacep.map((item, index) => (
                 <div key={index} className="resultado-item">
@@ -502,8 +505,8 @@ const ConsultaEnd = () => {
                   />
                   {index <
                     resultado.resultado_api.resultados_viacep.length - 1 && (
-                    <hr className="result-separator" />
-                  )}
+                      <hr className="result-separator" />
+                    )}
                 </div>
               ))}
             </>
@@ -520,54 +523,54 @@ const ConsultaEnd = () => {
         </div>
       )}
       {activeForm === "chaves" && resultado?.resultado_api?.resultados_viacep && resultado.resultado_api.resultados_viacep.length > 0 && (
-  <div className="card-resultado">
-    <h4>Resultados encontrados</h4>
-    <table className="historico-table">
-      <thead>
-        <tr>
-          <th>CEP</th>
-          <th>Logradouro</th>
-          <th>Cidade</th>
-          <th>UF</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {resultado.resultado_api.resultados_viacep.map((item, idx) => (
-          <React.Fragment key={idx}>
-            <tr
-              className={selectedResultIndex === idx ? 'active-row' : ''}
-              onClick={() => handleExpandResult(idx)}
-              style={{ cursor: 'pointer' }}
-            >
-              <td>{item.cep || 'N/A'}</td>
-              <td>{item.logradouro || 'N/A'}</td>
-              <td>{item.localidade || 'N/A'}</td>
-              <td>{item.uf || 'N/A'}</td>
-              <td className="expand-icon">
-                <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
-              </td>
-            </tr>
-            {selectedResultIndex === idx && (
+        <div className="card-resultado">
+          <h4>Resultados encontrados</h4>
+          <table className="historico-table">
+            <thead>
               <tr>
-                <td colSpan="5">
-                  <div className="detalhes-historico-panel">
-                    <p><strong>CEP:</strong> {item.cep || 'N/A'}</p>
-                    <p><strong>Logradouro:</strong> {item.logradouro || 'N/A'}</p>
-                    <p><strong>Bairro:</strong> {item.bairro || 'N/A'}</p>
-                    <p><strong>Cidade:</strong> {item.localidade || 'N/A'}</p>
-                    <p><strong>UF:</strong> {item.uf || 'N/A'}</p>
-                    <p><strong>Complemento:</strong> {item.complemento || 'N/A'}</p>
-                  </div>
-                </td>
+                <th>CEP</th>
+                <th>Logradouro</th>
+                <th>Cidade</th>
+                <th>UF</th>
+                <th></th>
               </tr>
-            )}
-          </React.Fragment>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
+            </thead>
+            <tbody>
+              {resultado.resultado_api.resultados_viacep.map((item, idx) => (
+                <React.Fragment key={idx}>
+                  <tr
+                    className={selectedResultIndex === idx ? 'active-row' : ''}
+                    onClick={() => handleExpandResult(idx)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>{item.cep || 'N/A'}</td>
+                    <td>{item.logradouro || 'N/A'}</td>
+                    <td>{item.localidade || 'N/A'}</td>
+                    <td>{item.uf || 'N/A'}</td>
+                    <td className="expand-icon">
+                      <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
+                    </td>
+                  </tr>
+                  {selectedResultIndex === idx && (
+                    <tr>
+                      <td colSpan="5">
+                        <div className="detalhes-historico-panel">
+                          <p><strong>CEP:</strong> {item.cep || 'N/A'}</p>
+                          <p><strong>Logradouro:</strong> {item.logradouro || 'N/A'}</p>
+                          <p><strong>Bairro:</strong> {item.bairro || 'N/A'}</p>
+                          <p><strong>Cidade:</strong> {item.localidade || 'N/A'}</p>
+                          <p><strong>UF:</strong> {item.uf || 'N/A'}</p>
+                          <p><strong>Complemento:</strong> {item.complemento || 'N/A'}</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

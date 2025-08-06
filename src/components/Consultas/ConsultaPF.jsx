@@ -314,11 +314,12 @@ const ConsultaPF = () => {
           />
           <button
             type="submit"
-            disabled={loading || formData.cpf.length !== 11}
+            disabled={loading}
             className={`consulta-btn ${loading ? "loading" : ""}`}
           >
             {loading ? "Consultando..." : "Consultar"}
           </button>
+
 
           {error && <p className="error-message">{error}</p>}
         </form>
@@ -418,10 +419,10 @@ const ConsultaPF = () => {
             disabled={loading}
           />
           <button type="submit" disabled={loading || !formData.nome.trim()}
-           className={`consulta-btn ${loading ? "loading" : ""}`}
-         >
-           {loading ? "Consultando..." : "Consultar"}
-         </button>
+            className={`consulta-btn ${loading ? "loading" : ""}`}
+          >
+            {loading ? "Consultando..." : "Consultar"}
+          </button>
 
           {error && <p className="error-message">{error}</p>}
         </form>
