@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UserService } from '../../../services/userService';
-import { CompanyService } from '../../../services/companyService'; // Importe o CompanyService
+import { CompanyService } from '../../../services/companyService'; 
 import '../../styles/Cadastro.css';
 import { Link } from 'react-router-dom';
 
@@ -11,21 +11,18 @@ function Cadastro() {
         email: '',
         nivelAcesso: '',
         senha: '',
-        empresa: '' // Campo empresa inicializado como vazio para o ID
+        empresa: '' 
     });
-    const [empresas, setEmpresas] = useState([]); // Novo estado para armazenar a lista de empresas
+    const [empresas, setEmpresas] = useState([]); 
     const [erroCadastro, setErroCadastro] = useState('');
     const [sucessoCadastro, setSucessoCadastro] = useState('');
 
-    // Efeito para carregar as empresas quando o componente é montado
     useEffect(() => {
         const fetchCompanies = async () => {
             try {
-                const response = await CompanyService.getAllCompanies(); // Chamada para buscar empresas
-                // Certifique-se de que a resposta é um array de objetos Empresa com 'id' e 'nome'
-                setEmpresas(response.results || response); // DRF retorna results, ou pode ser o array direto
+                const response = await CompanyService.getAllCompanies(); 
+                setEmpresas(response.results || response);
                 if (response.results && response.results.length > 0) {
-                    // Define a primeira empresa como padrão ou 'Fedcorp' se existir
                     const fedcorp = response.results.find(emp => emp.nome === 'Fedcorp');
                     setNovoUsuario(prev => ({
                         ...prev,
@@ -39,7 +36,7 @@ function Cadastro() {
         };
 
         fetchCompanies();
-    }, []); // Array de dependências vazio para rodar apenas na montagem
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -57,7 +54,7 @@ function Cadastro() {
                 email: novoUsuario.email,
                 nivel_acesso: novoUsuario.nivelAcesso,
                 password: novoUsuario.senha,
-                empresa: novoUsuario.empresa, // Agora envia o ID da empresa
+                empresa: novoUsuario.empresa, 
                 is_fed: true
             };
 
@@ -70,7 +67,7 @@ function Cadastro() {
                 email: '',
                 nivelAcesso: '',
                 senha: '',
-                empresa: empresas.length > 0 ? empresas[0].id : '' // Reseta para a primeira empresa ou vazio
+                empresa: empresas.length > 0 ? empresas[0].id : ''
             });
 
             setTimeout(() => setSucessoCadastro(''), 5000);
@@ -85,16 +82,16 @@ function Cadastro() {
                     mensagem = `Erro no E-mail: ${Array.isArray(errorData.email) ? errorData.email.join(', ') : errorData.email}`;
                 } else if (errorData.password) {
                     mensagem = `Erro na Senha: ${Array.isArray(errorData.password) ? errorData.password.join(', ') : errorData.password}`;
-                } else if (errorData.empresa) { // Adicionado tratamento para erro na empresa
+                } else if (errorData.empresa) {
                     mensagem = `Erro na Empresa: ${Array.isArray(errorData.empresa) ? errorData.empresa.join(', ') : errorData.empresa}`;
                 }
                  else if (errorData.detail) {
                     mensagem = `Erro: ${errorData.detail}`;
                 } else if (typeof errorData === 'object') {
-                    // Para erros genéricos, tente stringificar o objeto completo
+                  
                     mensagem = `Erro: ${JSON.stringify(errorData)}`;
                 } else {
-                    mensagem = `Erro: ${errorData}`; // Para erros que são strings simples
+                    mensagem = `Erro: ${errorData}`;
                 }
             }
             setErroCadastro(mensagem);

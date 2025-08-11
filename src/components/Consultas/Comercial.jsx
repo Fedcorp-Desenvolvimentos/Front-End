@@ -391,17 +391,17 @@ const handleCardClick = (option) => {
               {modalError && <div className="alert-erro">{modalError}</div>}
               {modalPersonData && !modalLoading && !modalError && (
                 <div>
-                  <h6>Informações Básicas:</h6>
-                  <p><strong>Nome:</strong> {modalPersonData.BasicData?.Name || "N/A"}</p>
-                  <p><strong>CPF:</strong> {modalPersonData.BasicData?.TaxIdNumber || "N/A"}</p>
-                  <p><strong>Gênero:</strong> {modalPersonData.BasicData?.Gender || "N/A"}</p>
-                  <p><strong>Data de Nascimento:</strong> {modalPersonData.BasicData?.BirthDate ? new Date(modalPersonData.BasicData.BirthDate).toLocaleDateString() : "N/A"}</p>
-                  <p><strong>Nome da Mãe:</strong> {modalPersonData.BasicData?.MotherName || "N/A"}</p>
-                  <p><strong>Status do CPF:</strong> {modalPersonData.BasicData?.TaxIdStatus || "N/A"}</p>
+                  <h4 className="mt-3">Informações Básicas:</h4>
+                  <p className="mt-3"><strong>Nome:</strong> {modalPersonData.BasicData?.Name || "N/A"}</p>
+                  <p className="mt-3"><strong>CPF:</strong> {modalPersonData.BasicData?.TaxIdNumber || "N/A"}</p>
+                  <p className="mt-3"><strong>Gênero:</strong> {modalPersonData.BasicData?.Gender || "N/A"}</p>
+                  <p className="mt-3"><strong>Data de Nascimento:</strong> {modalPersonData.BasicData?.BirthDate ? new Date(modalPersonData.BasicData.BirthDate).toLocaleDateString() : "N/A"}</p>
+                  <p className="mt-3"><strong>Nome da Mãe:</strong> {modalPersonData.BasicData?.MotherName || "N/A"}</p>
+                  <p className="mt-3"><strong>Status do CPF:</strong> {modalPersonData.BasicData?.TaxIdStatus || "N/A"}</p>
 
                   {modalPersonData.Emails && (
                     <>
-                      <h6 className="mt-3">E-mails:</h6>
+                      <h4 className="mt-3">E-mails:</h4>
                       {modalPersonData.Emails.Primary?.EmailAddress && (
                         <p><strong>Principal:</strong> {modalPersonData.Emails.Primary.EmailAddress}</p>
                       )}
@@ -416,7 +416,7 @@ const handleCardClick = (option) => {
 
                   {modalPersonData.Addresses && (
                     <>
-                      <h6 className="mt-3">Endereços:</h6>
+                      <h4 className="mt-3">Endereços:</h4>
                       {modalPersonData.Addresses.Primary && (
                         <p><strong>Principal:</strong> {modalPersonData.Addresses.Primary.AddressMain}, {modalPersonData.Addresses.Primary.Number}</p>
                       )}
@@ -431,7 +431,7 @@ const handleCardClick = (option) => {
 
                   {modalPersonData.Phones && (
                     <>
-                      <h6 className="mt-3">Telefones:</h6>
+                      <h4 className="mt-3">Telefones:</h4>
                       {modalPersonData.Phones.Primary?.PhoneNumber && (
                         <p><strong>Principal:</strong> {modalPersonData.Phones.Primary.PhoneNumber}</p>
                       )}

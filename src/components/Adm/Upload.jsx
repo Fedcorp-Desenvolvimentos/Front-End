@@ -9,7 +9,7 @@ export default function UploadCard({ onDataParsed }) {
   const [success, setSuccess] = useState(false);
   const [dados, setDados] = useState([]);
   const [isSending, setIsSending] = useState(false);
-  const [produtorSelecionado, setProdutorSelecionado] = useState(true); // Ajuste conforme lógica real
+  const [produtorSelecionado, setProdutorSelecionado] = useState(true); 
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -48,8 +48,6 @@ export default function UploadCard({ onDataParsed }) {
   const handleSendSpreadsheet = async () => {
     try {
       setIsSending(true);
-
-      // Simulação de envio (substituir por lógica com API)
       await new Promise((resolve) => setTimeout(resolve, 1500));
       console.log("Dados prontos para envio:", dados);
 
@@ -72,7 +70,6 @@ export default function UploadCard({ onDataParsed }) {
           Importar Arquivo Excel
         </h2>
 
-        {/* Upload */}
         <label htmlFor="file-upload" className="upload-label">
           <FaUpload className="icon-sm" />
           Escolher arquivo

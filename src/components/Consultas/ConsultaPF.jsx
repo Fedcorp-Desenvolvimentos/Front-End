@@ -6,11 +6,10 @@ import { FileSpreadsheet } from "lucide-react";
 
 function formatDateBR(dateStr) {
   if (!dateStr) return 'N/A';
-  // Extrai só a parte da data se vier com T ou espaço
   const onlyDate = dateStr.split('T')[0].split(' ')[0];
   const [yyyy, mm, dd] = onlyDate.split('-');
   if (yyyy && mm && dd) return `${dd}/${mm}/${yyyy}`;
-  return dateStr; // fallback
+  return dateStr; 
 }
 
 const ConsultaPF = () => {
@@ -314,11 +313,12 @@ const ConsultaPF = () => {
           />
           <button
             type="submit"
-            disabled={loading || formData.cpf.length !== 11}
+            disabled={loading}
             className={`consulta-btn ${loading ? "loading" : ""}`}
           >
             {loading ? "Consultando..." : "Consultar"}
           </button>
+
 
           {error && <p className="error-message">{error}</p>}
         </form>
@@ -376,7 +376,9 @@ const ConsultaPF = () => {
 
       {activeForm === "chaves" && (
         <form className="form-container" onSubmit={handleSubmit}>
-          <label htmlFor="nome">Nome</label>
+          <label htmlFor="nome">
+            Nome <span className="obrigatorio" title="Campo obrigatório para busca por chaves alternativas">*</span>
+            </label>
           <input
             type="text"
             id="nome"
@@ -418,10 +420,10 @@ const ConsultaPF = () => {
             disabled={loading}
           />
           <button type="submit" disabled={loading || !formData.nome.trim()}
-           className={`consulta-btn ${loading ? "loading" : ""}`}
-         >
-           {loading ? "Consultando..." : "Consultar"}
-         </button>
+            className={`consulta-btn ${loading ? "loading" : ""}`}
+          >
+            {loading ? "Consultando..." : "Consultar"}
+          </button>
 
           {error && <p className="error-message">{error}</p>}
         </form>

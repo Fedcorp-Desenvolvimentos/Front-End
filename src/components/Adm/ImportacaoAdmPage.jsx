@@ -38,7 +38,7 @@ const AdminHome = () => {
 
         <div className="container">
           <div className="cards-container">
-            {/* Seguro de Vida */}
+
             <div className="card">
               <div className="card-body">
                 <div className="feature-icon">
@@ -49,15 +49,14 @@ const AdminHome = () => {
                   Importe os dados de apólices de seguros de vida e segurados vinculados.
                 </p>
                 <Link to="/upload" className="btn-primary">
-                    Importar em massa
-                  </Link>
-                  <Link to="/importacao-vida" className="btn-primary">
-                    Importar individual
-                  </Link>
+                  Importar em massa
+                </Link>
+                <Link to="/importacao-vida" className="btn-primary">
+                  Importar individual
+                </Link>
               </div>
             </div>
 
-            {/* Conteúdo */}
             <div className="card">
               <div className="card-body">
                 <div className="feature-icon">
@@ -68,8 +67,8 @@ const AdminHome = () => {
                   Importe os dados referentes aos bens assegurados dentro de imóveis.
                 </p>
                 <Link to="/upload" className="btn-primary">
-                    Importar em massa
-                  </Link>
+                  Importar em massa
+                </Link>
 
                 <button className="btn-primary" onClick={() => alert("Importar Conteúdo")}>
                   Importar individual
@@ -77,7 +76,6 @@ const AdminHome = () => {
               </div>
             </div>
 
-            {/* Garantia Cota */}
             <div className="card">
               <div className="card-body">
                 <div className="feature-icon">
@@ -88,16 +86,15 @@ const AdminHome = () => {
                   Importe garantias financeiras com base em cotas de consórcio ou valores agregados.
                 </p>
                 <Link to="/upload" className="btn-primary">
-                    Importar em massa
-                  </Link>
+                  Importar em massa
+                </Link>
 
                 <button className="btn-primary" onClick={() => alert("Importar Garantia Cota")}>
                   Importar individual
-                </button> 
+                </button>
               </div>
             </div>
 
-            {/* Aluguel */}
             <div className="card">
               <div className="card-body">
                 <div className="feature-icon">
@@ -108,15 +105,14 @@ const AdminHome = () => {
                   Importe informações relacionadas a seguros de locação e alug.
                 </p>
                 <Link to="/upload" className="btn-primary">
-                    Importar em massa
-                  </Link>
-                  <Link to="/importacao-alug" className="btn-primary">
-                    Importar individual
-                  </Link>
+                  Importar em massa
+                </Link>
+                <Link to="/importacao-alug" className="btn-primary">
+                  Importar individual
+                </Link>
               </div>
             </div>
 
-            {/* Vale Refeição */}
             <div className="card">
               <div className="card-body">
                 <div className="feature-icon">
@@ -127,18 +123,18 @@ const AdminHome = () => {
                   Importe as bases de dados de colaboradores para geração de benefícios VR/VA.
                 </p>
                 <Link to="/upload" className="btn-primary">
-                    Importar em massa
-                  </Link>
+                  Importar em massa
+                </Link>
                 <button className="btn-primary" onClick={() => alert("Importar VR")}>
                   Importar individual
                 </button>
               </div>
             </div>
-            {/* Manual do usuário */}
+  
             <div className="card">
               <div className="card-body">
                 <div className="feature-icon">
-                <i class="bi bi-card-checklist"></i>
+                  <i class="bi bi-card-checklist"></i>
                 </div>
                 <h2>Manual da API</h2>
                 <p>
@@ -150,8 +146,6 @@ const AdminHome = () => {
               </div>
             </div>
           </div>
-
-
         </div>
       </main>
     </div>
