@@ -35,7 +35,7 @@ function AppRoutes() {
 
   useEffect(() => {
     setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 800); // Ajustável
+    const timer = setTimeout(() => setLoading(false), 800); 
     return () => clearTimeout(timer);
   }, [location]);
 
@@ -43,12 +43,11 @@ function AppRoutes() {
     <>
       {loading && <LoadingSpinner />}
       <Routes>
-        {/* Rotas públicas */}
+  
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/esqueci-senha" element={<EsqueciSenha />} />
 
-        {/* Rotas privadas com layout padrão */}
         <Route element={<PrivateRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/home" element={<Home />} />
