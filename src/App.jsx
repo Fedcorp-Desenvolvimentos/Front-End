@@ -56,7 +56,6 @@ function AppRoutes() {
             <Route path="/consulta-end" element={<ConsultaEnd />} />
             <Route path="/consulta-cnpj" element={<ConsultaCNPJ />} />
             <Route path="/consulta-comercial" element={<Comercial />} />
-            <Route path="/cotacao-conteudo" element={<CotacaoConteudo />} />
             <Route path="/consulta-segurados" element={<Segurados />} />
             <Route path="/conta" element={<Conta />} />
             <Route path="/config" element={<Config />} />
