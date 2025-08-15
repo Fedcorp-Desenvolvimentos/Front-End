@@ -231,7 +231,7 @@ const ConfigEmail = () => {
           <div className="upload-box">
             <p>Arraste e solte o arquivo ou</p>
             <input type="file" accept=".xlsx, .xls" className="file-input" />
-            <button className="btn btn-secondary">Selecionar Arquivo</button>
+            <button className="btn btn-secondary">Enviar Arquivo</button>
           </div>
         </div>
       </div>
