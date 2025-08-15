@@ -1,29 +1,25 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
-import "../styles/Consulta.css";
+import "../styles/EnvEmail.css";
 import { Mail, History, Settings, FileSpreadsheet } from "lucide-react";
 
 const EnvioEmail = () => {
-    const [activeForm, setActiveForm] = useState(""); 
+    const [activeForm, setActiveForm] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [message, setMessage] = useState("");
 
     const [assunto, setAssunto] = useState("");
     const [mensagem, setMensagem] = useState("");
-    const [listaManual, setListaManual] = useState(""); 
-    const [planilhaInfo, setPlanilhaInfo] = useState(null); 
-    const [destinatariosPlanilha, setDestinatariosPlanilha] = useState([]); 
+    const [listaManual, setListaManual] = useState("");
+    const [planilhaInfo, setPlanilhaInfo] = useState(null);
+    const [destinatariosPlanilha, setDestinatariosPlanilha] = useState([]);
 
     const [historico, setHistorico] = useState([]);
     const [historicoLoading, setHistoricoLoading] = useState(false);
 
-    const [config, setConfig] = useState({
-        remetenteNome: "",
-        remetenteEmail: "",
-        replyTo: "",
-        produto: [],
-    });
+    const navigate = useNavigate();
 
     const emailRegex =
         /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -119,7 +115,7 @@ const EnvioEmail = () => {
         try {
             const payload = {
                 assunto,
-                mensagem, 
+                mensagem,
                 destinatarios: todos,
                 origem: {
                     manual: manuais.length,
@@ -196,44 +192,6 @@ const EnvioEmail = () => {
         }
     };
 
-    const handleConfigChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setConfig((prev) => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value,
-        }));
-    };
-
-    const handleSalvarConfig = async () => {
-        setLoading(true);
-        setError(null);
-        setMessage("");
-        try {
-            await EmailService.salvarConfiguracao(config);
-            setMessage("Configurações salvas com sucesso.");
-        } catch (err) {
-            console.error(err);
-            setError("Erro ao salvar configurações.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleTestarConfig = async () => {
-        setLoading(true);
-        setError(null);
-        setMessage("");
-        try {
-            const ok = await EmailService.testarConfiguracao(config);
-            setMessage(ok ? "Conexão SMTP/Provedor testada com sucesso." : "Falha no teste de configuração.");
-        } catch (err) {
-            console.error(err);
-            setError("Erro ao testar a configuração.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
     return (
         <div className="consulta-container">
             <h2 className="titulo-pagina">Escolha a opção:</h2>
@@ -275,31 +233,37 @@ const EnvioEmail = () => {
                         setMessage("");
                     }}
                 >
-                    <div className="icon-container">
-                        <Settings size={28} color="white" />
+                    <div
+                        onClick={() => navigate("/config-email")}
+                        style={{ cursor: "pointer" }}
+                    >
+                        <div className="icon-container">
+                            <Settings size={28} color="white" />
+                        </div>
+                        <h5>Configurações</h5>
                     </div>
-                    <h5>Configurações</h5>
                 </div>
             </div>
 
             {activeForm === "envio" && (
                 <div className="form-container">
                     <div className="assunto-container">
-                    <label htmlFor="assunto" className="assunto">Tipo de Envio</label>
-                 
-                    <select
-                        id="tipoEnvio"
-                        value={assunto}
-                        onChange={(e) => setAssunto(e.target.value)}
-                        disabled={loading}
-                    >
-                        <option value="">Selecione</option>
-                        <option value="Vida">Vida</option>
-                        <option value="Conteúdo">Conteúdo</option>
-                        <option value="SST">SST</option>
-                        <option value="VR">VR</option>
-                        <option value="Boat">Boat</option>
-                    </select>
+                        <label htmlFor="assunto" className="assunto">Tipo de Envio</label>
+
+                        <select
+                            id="tipoEnvio"
+                            value={assunto}
+                            className="select-tipo-envio"
+                            onChange={(e) => setAssunto(e.target.value)}
+                            disabled={loading}
+                        >
+                            <option value="">Selecione</option>
+                            <option value="Vida">Vida</option>
+                            <option value="Conteúdo">Conteúdo</option>
+                            <option value="SST">SST</option>
+                            <option value="VR">VR</option>
+                            <option value="Boat">Boat</option>
+                        </select>
                     </div>
                     <div className="upload-planilha-box">
                         <input
@@ -378,65 +342,6 @@ const EnvioEmail = () => {
 
                     {message && <p className="message">{message}</p>}
                     {error && <p className="error-message">{error}</p>}
-                </div>
-            )}
-
-            {/* CONFIGURAÇÕES */}
-            {/* Dividir entre Cadastro para Envio | Alterar Cadastro */}
-            {activeForm === "config" && (
-                <div className="form-container">
-                    <h3 className="title-cadastro">Cadastro para envio</h3>
-                    <label>Nome do Remetente</label>
-                    <input
-                        type="text"
-                        name="remetenteNome"
-                        value={config.remetenteNome}
-                        onChange={handleConfigChange}
-                        disabled={loading}
-                    />
-
-                    <label>E-mail do Remetente</label>
-                    <input
-                        type="email"
-                        name="remetenteEmail"
-                        value={config.remetenteEmail}
-                        onChange={handleConfigChange}
-                        disabled={loading}
-                    />
-
-                    <label>Reply-To (opcional)</label>
-                    <input
-                        type="email"
-                        name="replyTo"
-                        value={config.replyTo}
-                        onChange={handleConfigChange}
-                        disabled={loading}
-                    />
-
-                    <label className="assunto">Produtos</label>
-                    <select
-                        name="produto"
-                        multiple
-                        value={config.produto}
-                        onChange={(e) =>
-                            setConfig((prev) => ({
-                                ...prev,
-                                produto: Array.from(e.target.selectedOptions, (opt) => opt.value),
-                            }))
-                        }
-                        disabled={loading}
-                    >
-                        <option value="Vida">Vida</option>
-                        <option value="Conteúdo">Conteúdo</option>
-                        <option value="SST">SST</option>
-                        <option value="VR">VR</option>
-                        <option value="Boat">Boat</option>
-                    </select>
-
-                    {/* Alterar cadastro */}
-                    {/* Retirar / adicionar destinatarios */}
-                    {/* Retirar / adicionar produtos */}
-
                 </div>
             )}
         </div>

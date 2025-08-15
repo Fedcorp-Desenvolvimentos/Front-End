@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../styles/Home.css";
 import { useAuth } from "../../context/AuthContext";
+import { Mail } from "lucide-react";
 
 const Home = () => {
   const { user, isAuthenticated, loading } = useAuth();
@@ -38,7 +39,7 @@ const Home = () => {
 
         <div className="container">
           <div className="cards-container">
-            {/* Moderador vê somente a parte da Administradora */}
+          
             {currentUserType === "moderador" && (
               <div className="card">
                 <div className="card-body">
@@ -47,14 +48,14 @@ const Home = () => {
                   </div>
                   <h2>Administradora</h2>
                   <p>
-                    Acesse o painel da administradora para acompanhar e importar informações administrativas.
+                    Acesse o painel da administradora para acompanhar e importar 
+                    informações administrativas.
                   </p>
                   <Link to="/home-adm" className="btn-primary">Acessar</Link>
                 </div>
               </div>
             )}
 
-            {/* Pessoa Física */}
             {["admin", "usuario", "comercial"].includes(currentUserType) && (
               <div className="card">
                 <div className="card-body">
@@ -63,14 +64,14 @@ const Home = () => {
                   </div>
                   <h2>Dados Pessoais</h2>
                   <p>
-                    Informações sobre pessoas registradas, incluindo CPF, nome, filiação e data de nascimento.
+                    Informações sobre pessoas registradas, incluindo CPF, nome, 
+                    filiação e data de nascimento.
                   </p>
                   <Link to="/consulta-pf" className="btn-primary">Pesquisar</Link>
                 </div>
               </div>
             )}
 
-            {/* CNPJ */}
             {["admin", "usuario", "comercial"].includes(currentUserType) && (
               <div className="card">
                 <div className="card-body">
@@ -86,7 +87,6 @@ const Home = () => {
               </div>
             )}
 
-            {/* Endereço */}
             {["admin", "usuario", "comercial"].includes(currentUserType) && (
               <div className="card">
                 <div className="card-body">
@@ -102,7 +102,6 @@ const Home = () => {
               </div>
             )}
 
-            {/* Segurados */}
             {["admin", "usuario", "comercial"].includes(currentUserType) && (
               <div className="card">
                 <div className="card-body">
@@ -118,7 +117,6 @@ const Home = () => {
               </div>
             )}
 
-            {/* Comercial */}
             {["admin", "comercial"].includes(currentUserType) && (
               <div className="card">
                 <div className="card-body">
@@ -134,23 +132,20 @@ const Home = () => {
               </div>
             )}
 
-            
-            {/* envio de e-mail */}
             {["admin", "usuario", "comercial"].includes(currentUserType) && (
               <div className="card">
                 <div className="card-body">
                   <div className="feature-icon">
-                    <i className="bi bi-shield-check"></i>
+                    <Mail size={28} color="white" />
                   </div>
                   <h2>Envio de E-mail</h2>
                   <p>
                     Envie e-mail em massa de forma automática
                   </p>
-                  <Link to="/envio-email" className="btn-primary">Pesquisar</Link>
+                  <Link to="/envio-email" className="btn-primary">Acessar</Link>
                 </div>
               </div>
             )}
-
           </div>
         </div>
       </main>

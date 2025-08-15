@@ -10,7 +10,9 @@ import ConsultaEnd from './components/Consultas/ConsultaEnd';
 import ConsultaCNPJ from './components/Consultas/ConsultaCNPJ';
 import Comercial from './components/Consultas/Comercial';
 import Segurados from './components/Consultas/Segurados';
+
 import EnvEmail from './components/Views/EnvEmail';
+import ConfigEmail from './components/Views/ConfigEmail';
 
 import Conta from './components/Dropdown/dropItens/conta';
 import Config from './components/Dropdown/dropItens/Configuracoes';
@@ -29,6 +31,7 @@ import { AuthProvider } from './context/AuthContext';
 import { LoadingProvider, useLoading } from './context/LoadingContext';
 import LoadingSpinner from './components/LoadingSpinner';
 import CotacaoConteudo from './components/Cotação/CotacaoConteudo';
+
 
 function AppRoutes() {
   const location = useLocation();
@@ -65,6 +68,7 @@ function AppRoutes() {
             <Route path="/upload" element={<Upload />} />
             <Route path="/importacao-vida" element={<ImportVida />} />
             <Route path="/envio-email" element={<EnvEmail />} />
+            <Route path="/config-email" element={<ConfigEmail />} />
           </Route>
         </Route>
       </Routes>
