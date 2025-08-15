@@ -133,6 +133,24 @@ const Home = () => {
                 </div>
               </div>
             )}
+
+            
+            {/* envio de e-mail */}
+            {["admin", "usuario", "comercial"].includes(currentUserType) && (
+              <div className="card">
+                <div className="card-body">
+                  <div className="feature-icon">
+                    <i className="bi bi-shield-check"></i>
+                  </div>
+                  <h2>Envio de E-mail</h2>
+                  <p>
+                    Envie e-mail em massa de forma automática
+                  </p>
+                  <Link to="/envio-email" className="btn-primary">Pesquisar</Link>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       </main>

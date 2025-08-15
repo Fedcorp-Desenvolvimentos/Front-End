@@ -10,6 +10,7 @@ import ConsultaEnd from './components/Consultas/ConsultaEnd';
 import ConsultaCNPJ from './components/Consultas/ConsultaCNPJ';
 import Comercial from './components/Consultas/Comercial';
 import Segurados from './components/Consultas/Segurados';
+import EnvEmail from './components/Views/EnvEmail';
 
 import Conta from './components/Dropdown/dropItens/conta';
 import Config from './components/Dropdown/dropItens/Configuracoes';
@@ -63,7 +64,7 @@ function AppRoutes() {
             <Route path="/home-adm" element={<HomeAdm />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/importacao-vida" element={<ImportVida />} />
-            <Route path="/importacao-alug" element={<ImportAlug />} />
+            <Route path="/envio-email" element={<EnvEmail />} />
           </Route>
         </Route>
       </Routes>
