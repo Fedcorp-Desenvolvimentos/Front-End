@@ -1,0 +1,200 @@
+.config-container {
+    padding: 20px;
+    color: black;
+    max-width: 800px;
+    width: 90%;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #2a2a2a;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+  
+  .title-config {
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #007bff;
+    border-bottom: 2px solid #444;
+    padding-bottom: 15px;
+  }
+  
+  .mode-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .mode-buttons button {
+    padding: 12px 25px;
+    background-color: #333;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .mode-buttons button.active {
+    background-color: #007bff;
+  }
+  
+  .card {
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+
+  .card label {
+    display: block;
+    margin-top: 10px;
+  }
+  
+  .card input[type="text"],
+  .card input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .email-fields {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+  }
+  
+  .left-fields,
+  .right-fields {
+    flex: 1;
+  }
+  
+  .produtos-grid {
+    display: flex;
+    gap: 50px;
+  }
+  
+  .produtos-coluna {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  
+  .checkbox-item input[type="checkbox"] {
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  
+  .btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    color: #fff;
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+  
+  .input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .input-group input {
+    flex-grow: 1;
+  }
+  
+  .list-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #444;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .list-items::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .list-items::-webkit-scrollbar-thumb {
+    background-color: #444;
+    border-radius: 4px;
+  }
+  
+  .list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #444;
+  }
+  
+  .list-item:last-child {
+    border-bottom: none;
+  }
+  
+  .list-item span {
+    flex-grow: 1;
+  }
+  
+  .section {
+    margin-bottom: 30px;
+  }
+  
+  .section h3 {
+    color: #007bff;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 8px;
+  }
+  
+  .produtos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Espaço entre cada item */
+  }
+  
+  .input-group select {
+    padding: 8px;
+    border-radius: 5px;
+    border: none;
+  }
+  
+  .btn-add {
+    background-color: #28a745 !important;
+    color: #fff !important;
+  }
+  
+  .btn-remove {
+    background-color: #dc3545 !important;
+    color: #fff !important;
+  }
+  
