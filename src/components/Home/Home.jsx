@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../styles/Home.css";
 import { useAuth } from "../../context/AuthContext";
-import { Mail } from "lucide-react";
+import { Mail, LineChart, Link2, Funnel } from "lucide-react";
 
 const Home = () => {
   const { user, isAuthenticated, loading } = useAuth();
@@ -39,7 +39,7 @@ const Home = () => {
 
         <div className="container">
           <div className="cards-container">
-          
+
             {currentUserType === "moderador" && (
               <div className="card">
                 <div className="card-body">
@@ -48,7 +48,7 @@ const Home = () => {
                   </div>
                   <h2>Administradora</h2>
                   <p>
-                    Acesse o painel da administradora para acompanhar e importar 
+                    Acesse o painel da administradora para acompanhar e importar
                     informações administrativas.
                   </p>
                   <Link to="/home-adm" className="btn-primary">Acessar</Link>
@@ -64,7 +64,7 @@ const Home = () => {
                   </div>
                   <h2>Dados Pessoais</h2>
                   <p>
-                    Informações sobre pessoas registradas, incluindo CPF, nome, 
+                    Informações sobre pessoas registradas, incluindo CPF, nome,
                     filiação e data de nascimento.
                   </p>
                   <Link to="/consulta-pf" className="btn-primary">Pesquisar</Link>
@@ -141,6 +141,51 @@ const Home = () => {
                   <h2>Envio de E-mail</h2>
                   <p>
                     Envie e-mail em massa de forma automática
+                  </p>
+                  <Link to="/envio-email" className="btn-primary">Acessar</Link>
+                </div>
+              </div>
+            )}
+
+            {["admin", "comercial"].includes(currentUserType) && (
+              <div className="card">
+                <div className="card-body">
+                  <div className="feature-icon">
+                    <LineChart size={28} color="white" />
+                  </div>
+                  <h2>Métricas da Fedcorp</h2>
+                  <p>
+                    Obtenha insights com as métricas da Fedcorp e impulsione seus resultados.
+                  </p>
+                  <Link to="/envio-email" className="btn-primary">Acessar</Link>
+                </div>
+              </div>
+            )}
+
+            {["admin", "usuario", "comercial"].includes(currentUserType) && (
+              <div className="card">
+                <div className="card-body">
+                  <div className="feature-icon">
+                    <Link2 size={28} color="white" />
+                  </div>
+                  <h2>Ferramentas da Fedcorp</h2>
+                  <p>
+                    Acesse todas as plataformas da Fedcorp em um único lugar.
+                  </p>
+                  <Link to="/envio-email" className="btn-primary">Acessar</Link>
+                </div>
+              </div>
+            )}
+
+            {["admin", "comercial"].includes(currentUserType) && (
+              <div className="card">
+                <div className="card-body">
+                  <div className="feature-icon">
+                    <Funnel  size={28} color="white" />
+                  </div>
+                  <h2>Geração de Leads</h2>
+                  <p>
+                    Identifique os melhores locais para expandir sua atuação e alavancar suas vendas de forma estratégica.
                   </p>
                   <Link to="/envio-email" className="btn-primary">Acessar</Link>
                 </div>

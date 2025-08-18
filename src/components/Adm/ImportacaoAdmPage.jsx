@@ -44,7 +44,7 @@ const AdminHome = () => {
                 <div className="feature-icon">
                   <i className="bi bi-shield-lock-fill"></i>
                 </div>
-                <h2>Seguro de Vida</h2>
+                <h2>Total Corporativo Vida</h2>
                 <p>
                   Importe os dados de apólices de seguros de vida e segurados vinculados.
                 </p>
@@ -62,7 +62,7 @@ const AdminHome = () => {
                 <div className="feature-icon">
                   <i className="bi bi-file-earmark-text-fill"></i>
                 </div>
-                <h2>Conteúdo</h2>
+                <h2>Total Conteúdo</h2>
                 <p>
                   Importe os dados referentes aos bens assegurados dentro de imóveis.
                 </p>
