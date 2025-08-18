@@ -1,200 +1,280 @@
 .config-container {
-    padding: 20px;
-    color: black;
-    max-width: 800px;
-    width: 90%;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: #2a2a2a;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    background: #f8fafc;
+    padding: 40px 0;
+    min-height: 100vh;
+    
   }
   
-  .title-config {
-    margin-bottom: 1rem;
+  .config-container > .title-config {
+    color: #2463eb;
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 24px;
     text-align: center;
-    color: #007bff;
-    border-bottom: 2px solid #444;
-    padding-bottom: 15px;
+    letter-spacing: 1px;
+    border-bottom: none;
   }
   
-  .mode-buttons {
+  .config-container .mode-buttons {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 14px;
+    margin-bottom: 36px;
   }
   
-  .mode-buttons button {
-    padding: 12px 25px;
-    background-color: #333;
+  .config-container .mode-buttons button {
+    padding: 13px 38px;
+    font-size: 1.08rem;
+    font-weight: 600;
     border: none;
-    color: white;
-    cursor: pointer;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
+    border-radius: 28px;
+    background: #e0e7ef;
+    color: #444;
+    box-shadow: none;
+    transition: background 0.25s, color 0.18s;
   }
   
-  .mode-buttons button.active {
-    background-color: #007bff;
+  .config-container .mode-buttons button.active,
+  .config-container .mode-buttons button:hover {
+    background: linear-gradient(90deg, #2463eb 50%, #38bdf8 100%);
+    color: #fff;
+    box-shadow: 0 2px 12px 0 rgba(36,99,235,0.08);
   }
   
-  .card {
-    padding: 20px;
-    border-radius: 10px;
-  }
-
-
-  .card label {
-    display: block;
-    margin-top: 10px;
-  }
-  
-  .card input[type="text"],
-  .card input[type="email"] {
+  .config-container .card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 36px rgba(36,99,235,0.06);
+    padding: 40px 44px 36px 44px;
+    max-width: 700px;     
+    min-width: 300px;
+    margin: 0 auto 30px auto;
+    border: none;
     width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border: none;
-    border-radius: 5px;
+    box-sizing: border-box;
+    transition: max-width 0.2s;
   }
   
-  .email-fields {
+  .config-container .section h3 {
+    text-align: center;
+    color: #2463eb;
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e8e8e8;
+    padding-bottom: 5px;
+    font-weight: 700;
+  }
+  
+  .config-container .card input[type="text"],
+  .config-container .card input[type="email"],
+  .config-container .input-group select {
+    background: #f1f5f9;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 1rem;
+    color: #333;
+    outline: none;
+    margin-bottom: 8px;
+    transition: border 0.22s;
+  }
+  
+  .config-container .card input:focus,
+  .config-container .input-group select:focus {
+    border-color: #38bdf8;
+  }
+  
+  .config-container .input-group {
     display: flex;
-    gap: 30px;
-    margin-bottom: 20px;
-  }
-  
-  .left-fields,
-  .right-fields {
-    flex: 1;
-  }
-  
-  .produtos-grid {
-    display: flex;
-    gap: 50px;
-  }
-  
-  .produtos-coluna {
-    display: flex;
-    flex-direction: column;
     gap: 10px;
+    margin-bottom: 16px;
   }
   
-  .checkbox-item {
+  .config-container .input-group input,
+  .config-container .input-group select {
+    flex: 1 1 0;
+  }
+  
+  .config-container .input-group button {
+    flex-shrink: 0;
+  }
+  
+  .config-container .list-items {
+    background: #f6f7f9;
+    border-radius: 13px;
+    padding: 4px 0;
+    border: none;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px 0 rgba(36,99,235,0.04);
+  }
+  
+  .config-container .list-item {
     display: flex;
     align-items: center;
-    cursor: pointer;
-    white-space: nowrap;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e8e8e8;
   }
   
-  .checkbox-item input[type="checkbox"] {
-    margin-right: 10px;
-    cursor: pointer;
+  .config-container .list-item:last-child {
+    border-bottom: none;
   }
   
-  .btn {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+  .config-container .list-item span {
+    flex: 1;
+    color: #333;
+    font-size: 1.01rem;
   }
   
-  .btn:hover {
-    transform: translateY(-2px);
-  }
-  
-  .btn-primary {
-    background-color: #007bff;
+  .config-container .btn,
+  .config-container .btn-primary {
+    background: #2463eb;
     color: #fff;
+    border: none;
+    border-radius: 26px;
+    font-size: 1.07rem;
+    font-weight: 700;
+    padding: 10px 28px;
+    cursor: pointer;
+    transition: background 0.22s, box-shadow 0.18s, transform 0.14s;
+    box-shadow: 0 2px 10px 0 rgba(36,99,235,0.10);
+  }
+  
+  .config-container .btn-primary,
+  .config-container .btn-primary:hover {
     width: 100%;
     margin-top: 20px;
   }
   
-  .btn-primary:hover {
-    background-color: #0056b3;
+  .config-container .btn:hover,
+  .config-container .btn-primary:hover {
+    background: linear-gradient(90deg, #2463eb 60%, #002738 100%);
+    transform: translateY(-2px) scale(1.025);
+    box-shadow: 0 4px 18px 0 rgba(36,99,235,0.15);
   }
   
-  .input-group {
+  .config-container .btn-add {
+    background: #186918 !important;
+    color: #fff !important;
+    font-weight: 700;
+    border-radius: 25px;
+  }
+  
+  .config-container .btn-add:hover {
+    background: linear-gradient(90deg, #003610 30%, #16a34a 100%) !important;
+  }
+  
+  .config-container .btn-remove {
+    background: #ef4444 !important;
+    color: #fff !important;
+    border-radius: 24px;
+    padding: 8px 13px;
+    margin-left: 8px;
+    transition: background 0.22s;
+    font-size: 1.05rem;
+  }
+  
+  .config-container .btn-remove:hover {
+    background: #b91c1c !important;
+  }
+  
+  .config-container .upload-section {
+    margin-top: 34px;
+    margin-bottom: 18px;
+  }
+
+  .config-container, .btn-secondary{
+    margin-top: 15px;
+  }
+  
+  .config-container .upload-box {
+    background-color: #f4f8fb;
+    padding: 24px 18px;
+    border: 2px dashed #a7b5c8;
+    border-radius: 14px;
+    text-align: center;
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    transition: border-color 0.22s, color 0.22s;
+  }
+  
+  .config-container .upload-box:hover {
+    border-color: #2463eb;
+    color: #2463eb;
+  }
+
+  .config-container .email-fields {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 42px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .config-container .left-fields,
+  .config-container .right-fields {
+    flex: 1 1 0;
   }
   
-  .input-group input {
-    flex-grow: 1;
+  @media (max-width: 650px) {
+    .config-container .card {
+      padding: 16px 4vw;
+      max-width: 97vw;
+    }
+    .config-container {
+      padding: 0;
+    }
+    .config-container .mode-buttons button {
+      padding: 10px 14px;
+      font-size: 0.97rem;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .config-container .email-fields {
+      flex-direction: column;
+      gap: 0;
+    }
   }
   
-  .list-items {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #444;
-    border-radius: 8px;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-  
-  .list-items::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  .list-items::-webkit-scrollbar-thumb {
-    background-color: #444;
-    border-radius: 4px;
-  }
-  
-  .list-item {
+  .config-container .produtos-grid {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 15px;
-    border-bottom: 1px solid #444;
+    gap: 32px;
   }
-  
-  .list-item:last-child {
-    border-bottom: none;
-  }
-  
-  .list-item span {
-    flex-grow: 1;
-  }
-  
-  .section {
-    margin-bottom: 30px;
-  }
-  
-  .section h3 {
-    color: #007bff;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #dee2e6;
-    padding-bottom: 8px;
-  }
-  
-  .produtos-lista {
+  .config-container .produtos-coluna {
     display: flex;
     flex-direction: column;
-    gap: 12px; /* Espaço entre cada item */
+    gap: 11px;
+  }
+  @media (max-width: 700px) {
+    .config-container .produtos-grid {
+      flex-direction: column;
+      gap: 8px;
+    }
   }
   
-  .input-group select {
-    padding: 8px;
-    border-radius: 5px;
-    border: none;
+  .config-container .form-group label {
+    font-weight: 600;
+    color: #363636;
+    margin-bottom: 8px;
+    display: block;
+    text-align: start;
+  }
+  .config-container .form-group {
+    margin-bottom: 12px;
   }
   
-  .btn-add {
-    background-color: #28a745 !important;
-    color: #fff !important;
+  .config-container .checkbox-item {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    color: #444;
+    gap: 8px;
+    cursor: pointer;
   }
-  
-  .btn-remove {
-    background-color: #dc3545 !important;
-    color: #fff !important;
+  .config-container .checkbox-item input[type="checkbox"] {
+    accent-color: #2463eb;
+    width: 17px;
+    height: 17px;
+    margin-right: 5px;
   }
   
