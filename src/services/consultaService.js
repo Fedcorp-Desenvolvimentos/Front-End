@@ -146,7 +146,7 @@ export const ConsultaService = {
   },
 
   getAdms: async (payload) => {
-    const response = await webHook.get(`/administradoras/?administradora=${payload}&page_size=5`);
+    const response = await api.get(`/administradoras/?administradora=${payload}&page_size=5`);
     return response.data;
   },
 };
