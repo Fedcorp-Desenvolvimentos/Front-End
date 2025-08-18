@@ -277,7 +277,7 @@ const ConsultaSegurado = () => {
                             {
                                 segurado.NOME_SEGURADO ||
                                 segurado.NOME ||
-                                segurado.Nome || 
+                                segurado.Nome ||
                                 segurado.nome ||
                                 segurado.nome_segurado ||
                                 "Nome não informado"
@@ -436,7 +436,16 @@ const ConsultaSegurado = () => {
 
                 {activeForm === "imoveis" && (
                     <>
-                        <label htmlFor="cpf">CPF (Opcional)</label>
+                        <label htmlFor="cpf">
+                            CPF
+                            <span className="opcional-tooltip" tabIndex="0">
+                                <span className="interrogacao">?</span>
+                                <span className="tooltip-text">
+                                    Campo opcional, mas preencher pode aumentar a eficácia da busca.
+                                </span>
+                            </span>
+                        </label>
+
                         <input
                             type="text"
                             name="cpf"
@@ -448,7 +457,16 @@ const ConsultaSegurado = () => {
                             maxLength="14"
                         />
 
-                        <label htmlFor="cnpj">CNPJ (Opcional)</label>
+                        <label htmlFor="CNPJ">
+                            CNPJ
+                            <span className="opcional-tooltip" tabIndex="0">
+                                <span className="interrogacao">?</span>
+                                <span className="tooltip-text">
+                                    Campo opcional, mas preencher pode aumentar a eficácia da busca.
+                                </span>
+                            </span>
+                        </label>
+
                         <input
                             type="text"
                             name="cnpj"
@@ -460,7 +478,16 @@ const ConsultaSegurado = () => {
                             maxLength="18"
                         />
 
-                        <label htmlFor="nome">Nome (Opcional)</label>
+                        <label htmlFor="nome">
+                            Nome
+                            <span className="opcional-tooltip" tabIndex="0">
+                                <span className="interrogacao">?</span>
+                                <span className="tooltip-text">
+                                    Campo opcional, mas preencher pode aumentar a eficácia da busca.
+                                </span>
+                            </span>
+                        </label>
+
                         <input
                             type="text"
                             name="nome"
@@ -471,7 +498,16 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-                        <label htmlFor="endereco">Endereço (Opcional)</label>
+                        <label htmlFor="endereco">
+                            Endereço
+                            <span className="opcional-tooltip" tabIndex="0">
+                                <span className="interrogacao">?</span>
+                                <span className="tooltip-text">
+                                    Campo opcional, mas preencher pode aumentar a eficácia da busca.
+                                </span>
+                            </span>
+                        </label>
+
                         <input
                             type="text"
                             name="endereco"
@@ -482,7 +518,16 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-                        <label htmlFor="certificado">Certificado (Opcional)</label>
+<label htmlFor="certificado">
+  Certificado
+  <span className="opcional-tooltip" tabIndex="0">
+    <span className="interrogacao">?</span>
+    <span className="tooltip-text">
+      Campo opcional, mas preencher pode aumentar a eficácia da busca.
+    </span>
+  </span>
+</label>
+
                         <input
                             type="text"
                             name="certificado"
@@ -493,7 +538,16 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-                        <label htmlFor="endosso">Endosso (Opcional)</label>
+<label htmlFor="endosso">
+  Endosso
+  <span className="opcional-tooltip" tabIndex="0">
+    <span className="interrogacao">?</span>
+    <span className="tooltip-text">
+      Campo opcional, mas preencher pode aumentar a eficácia da busca.
+    </span>
+  </span>
+</label>
+
                         <input
                             type="text"
                             name="endosso"
@@ -504,7 +558,16 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-                        <label htmlFor="administradora">Administradora (Obrigatório se CPF/CNPJ/Endosso vazios)</label>
+<label htmlFor="administradora">
+  Administradora
+  <span className="obrigatorio-tooltip" tabIndex="0">
+    <span className="exclamacao">!</span>
+    <span className="tooltip-text obrigatorio">
+      Campo obrigatório se CPF, CNPJ e Endosso estiverem vazios.
+    </span>
+  </span>
+</label>
+
                         <div
                             className="autocomplete-wrapper"
                             ref={suggestionsRef}

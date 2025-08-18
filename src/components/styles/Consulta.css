@@ -314,6 +314,120 @@
   
 }
 
+.opcional-tooltip {
+  display: inline-block;
+  position: relative;
+  margin-left: 6px;
+  cursor: pointer;
+  outline: none;
+}
+
+.interrogacao {
+  display: inline-block;
+  background: #f3f4f6;
+  color: #2463eb;
+  border-radius: 50%;
+  width: 1.15em;
+  height: 1.15em;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.99em;
+  line-height: 1.15em;
+  border: 1.5px solid #2463eb;
+  transition: background 0.18s, color 0.18s;
+  vertical-align: middle;
+  margin-bottom: 2px;
+}
+
+.opcional-tooltip:hover .interrogacao,
+.opcional-tooltip:focus .interrogacao {
+  background: #2463eb;
+  color: #fff;
+}
+
+.tooltip-text {
+  display: none;
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2463eb;
+  color: #fff;
+  padding: 8px 13px;
+  border-radius: 7px;
+  font-size: 0.em;
+  white-space: nowrap;
+  z-index: 999;
+  box-shadow: 0 2px 12px 0 rgba(36,99,235,0.12);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+
+.opcional-tooltip:hover .tooltip-text,
+.opcional-tooltip:focus .tooltip-text {
+  display: block;
+  opacity: 1;
+}
+
+
+.obrigatorio-tooltip {
+  display: inline-block;
+  position: relative;
+  margin-left: 6px;
+  cursor: pointer;
+  outline: none;
+}
+
+.exclamacao {
+  display: inline-block;
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 50%;
+  width: 1.18em;
+  height: 1.18em;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1em;
+  line-height: 1.18em;
+  border: 1.5px solid #dc2626;
+  transition: background 0.18s, color 0.18s;
+  vertical-align: middle;
+  margin-bottom: 2px;
+}
+
+.obrigatorio-tooltip:hover .exclamacao,
+.obrigatorio-tooltip:focus .exclamacao {
+  background: #dc2626;
+  color: #fff;
+}
+
+.tooltip-text.obrigatorio {
+  display: none;
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #dc2626;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 7px;
+  font-size: 0.98em;
+  white-space: nowrap;
+  z-index: 999;
+  box-shadow: 0 2px 14px 0 rgba(220,38,38,0.12);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+
+.obrigatorio-tooltip:hover .tooltip-text.obrigatorio,
+.obrigatorio-tooltip:focus .tooltip-text.obrigatorio {
+  display: block;
+  opacity: 1;
+}
+
+
 @keyframes expandirDetalhe {
   from { opacity: 0; transform: translateY(-14px);}
   to { opacity: 1; transform: none;}
