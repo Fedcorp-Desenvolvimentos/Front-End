@@ -4,11 +4,12 @@ import "../styles/Conta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FaBriefcase, FaFileExcel, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
 import * as XLSX from "xlsx";
 
 const ConsultaComercial = () => {
   const [activeCard, setActiveCard] = useState(null);
+  const [accordionOpen, setAccordionOpen] = useState(null);
+
   const [form, setForm] = useState({ cnpj: "" });
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -24,15 +25,14 @@ const ConsultaComercial = () => {
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
   const [massLoading, setMassLoading] = useState(false);
 
+  const navigate = useNavigate();
 
-const navigate = useNavigate();
-
-const handleCardClick = (option) => {
-  setActiveCard(option);
-  if (option === "conteudo") {
-    navigate("/cotacao-conteudo"); 
-  }
-};
+  const handleCardClick = (option) => {
+    setActiveCard(option);
+    if (option === "conteudo") {
+      navigate("/cotacao-conteudo");
+    }
+  };
 
   const handleCnpjChange = (e) => {
     const onlyDigits = e.target.value.replace(/\D/g, "");
@@ -56,7 +56,7 @@ const handleCardClick = (option) => {
       const empresa = resultado_api?.Result?.[0] || null;
       if (empresa) {
         setResult(empresa);
-        setForm({cnpj: ""});
+        setForm({ cnpj: "" });
       } else {
         setError("Nenhum resultado de empresa encontrado para o CNPJ fornecido.");
       }
@@ -99,7 +99,7 @@ const handleCardClick = (option) => {
         r.RelationshipType === "REPRESENTANTELEGAL"
     );
     if (!filtered.length) return null;
-   return (
+    return (
       <>
         <h6 className="rel-title">{title}:</h6>
         <ul className="rel-list">
@@ -251,40 +251,67 @@ const handleCardClick = (option) => {
 
   return (
     <div className="consulta-container">
-      <h2 className="titulo-pagina">Escolha a opção de consulta</h2>
+      <h2 className="titulo-pagina">Escolha a opção de acesso</h2>
 
-      <div className="card-options-wrapper">
-        <div
-          className={`card card-option ${activeCard === "cnpj" ? "active" : ""}`}
-          onClick={() => handleCardClick("cnpj")}
-        >
-          <div className="icon-container">
-          <FaBriefcase size={30} />
-          </div>
-          <h5>Consulta CNPJ</h5>
+      <div className="card-options-accordion">
+        {/* Relacionamentos */}
+        <div className="accordion-card">
+          <button
+            className="accordion-header"
+            onClick={() =>
+              setAccordionOpen(accordionOpen === "relacionamentos" ? null : "relacionamentos")
+            }
+            aria-expanded={accordionOpen === "relacionamentos"}
+          >
+            <i className="bi bi-people-fill icon-categoria"></i>
+            <span>Relacionamentos</span>
+            <span className="accordion-arrow">
+              {accordionOpen === "relacionamentos" ? "▲" : "▼"}
+            </span>
+          </button>
+          {accordionOpen === "relacionamentos" && (
+            <div className="accordion-body">
+              <div className="subcard-option" onClick={() => setActiveCard("cnpj")}>
+                <FaBriefcase size={25} className="subcard-icon" />
+                <span>Consulta CNPJ</span>
+              </div>
+              <div className="subcard-option" onClick={() => setActiveCard("massa")}>
+                <FaFileExcel size={25} className="subcard-icon" />
+                <span>Consulta em Massa</span>
+              </div>
+            </div>
+          )}
         </div>
-
-        <div
-          className={`card card-option ${activeCard === "massa" ? "active" : ""}`}
-          onClick={() => handleCardClick("massa")}
-        >
-          <div className="icon-container">
-          <FaFileExcel size={30} />
-          </div>
-          <h5>Consulta em Massa</h5>
-        </div>
-
-        <div
-          className={`card card-option ${activeCard === "conteudo" ? "active" : ""}`}
-          onClick={() => handleCardClick("conteudo")}
-        >
-          <div className="icon-container">
-          <FaSearch size={30} />
-          </div>
-          <h5>Cotação Conteúdo</h5>
+        {/* Operacional */}
+        <div className="accordion-card">
+          <button
+            className="accordion-header"
+            onClick={() =>
+              setAccordionOpen(accordionOpen === "operacional" ? null : "operacional")
+            }
+            aria-expanded={accordionOpen === "operacional"}
+          >
+            <i className="bi bi-gear-fill icon-categoria"></i>
+            <span>Operacional</span>
+            <span className="accordion-arrow">
+              {accordionOpen === "operacional" ? "▲" : "▼"}
+            </span>
+          </button>
+          {accordionOpen === "operacional" && (
+            <div className="accordion-body">
+              <div
+                className="subcard-option"
+                onClick={() => navigate("/cotacao-conteudo")}
+              >
+                <FaSearch size={25} className="subcard-icon" />
+                <span>Cotação Conteúdo</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Formulários conforme card ativo */}
       {activeCard === "cnpj" && (
         <div className="form-container">
           <label>Digite o CNPJ:</label>

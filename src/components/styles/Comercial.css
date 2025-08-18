@@ -293,6 +293,122 @@
   margin-bottom: 1rem;
 }
 
+.card-options-accordion {
+  width: 100%;
+  max-width: 520px;
+  margin: 40px auto 38px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.accordion-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 3px 14px rgba(13,110,253,0.09);
+  overflow: hidden;
+  transition: box-shadow 0.16s;
+}
+
+.accordion-card:has(.accordion-body) {
+  box-shadow: 0 6px 20px rgba(13,110,253,0.14);
+}
+
+.accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 1.3rem 1.4rem;
+  background: #e9f2ff;
+  border: none;
+  border-radius: 1rem 1rem 0 0;
+  font-size: 1.13rem;
+  font-weight: 700;
+  color: black;
+  cursor: pointer;
+  transition: background 0.15s;
+  outline: none;
+}
+
+.accordion-header:hover,
+.accordion-header:focus {
+  background: #dbeafe;
+}
+
+.icon-categoria {
+  font-size: 1.7rem;
+  color: #2463eb;
+}
+
+.accordion-arrow {
+  font-size: 1.22rem;
+  color: #2463eb;
+  margin-left: auto;
+}
+
+.accordion-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #f7fafc;
+  padding: 1.15rem 1.2rem 1.2rem 2.8rem;
+  border-top: 1.5px solid #e0e8f6;
+  animation: fadeInDown .21s ease;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-12px);}
+  to { opacity: 1; transform: none;}
+}
+
+.subcard-option {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  background: #f4f8ff;
+  border-radius: 0.7rem;
+  padding: 1rem 1.1rem;
+  cursor: pointer;
+  font-size: 1.06rem;
+  color: #2463eb;
+  font-weight: 600;
+  border: 1.5px solid #e0eaf3;
+  box-shadow: 0 1px 6px 0 rgba(13,110,253,0.04);
+  transition: background 0.12s, color 0.14s, box-shadow 0.13s, border 0.13s;
+}
+
+.subcard-option:hover,
+.subcard-option:focus {
+  background: #e0edff;
+  color: #0d3b66;
+  box-shadow: 0 3px 14px 0 rgba(13,110,253,0.10);
+  border: 1.5px solid #b1c7ea;
+}
+
+.subcard-icon {
+  color: #2463eb;
+  font-size: 1.21rem;
+}
+
+/* Responsivo para mobile */
+@media (max-width: 600px) {
+  .card-options-accordion {
+    max-width: 98vw;
+    margin: 16px 0 24px 0;
+  }
+  .accordion-card {
+    max-width: 99vw;
+  }
+  .accordion-header,
+  .accordion-body {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+
 
 /* ----- Responsividade ----- */
 @media (max-width: 768px) {
