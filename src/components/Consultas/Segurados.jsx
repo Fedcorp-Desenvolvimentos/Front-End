@@ -13,10 +13,11 @@ const ConsultaSegurado = () => {
     const suggestionsRef = useRef(null);
     const debounceTimeout = useRef(null);
 
-    // Estados para paginação
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(50);
     const [totalPages, setTotalPages] = useState(1);
+
+    const [expandedIndex, setExpandedIndex] = useState(null);
 
     const initialFormData = {
         cpf: "",
@@ -91,18 +92,14 @@ const ConsultaSegurado = () => {
                 try {
                     const suggestions = await ConsultaService.getAdms(value);
 
-                    console.log("Resposta da API (sugestões da administradora):", suggestions);
-
                     if (Array.isArray(suggestions)) {
                         setAdministradoraSuggestions(suggestions);
                         setShowSuggestions(suggestions.length > 0);
                     } else {
-                        console.warn("ConsultaService.getAdms(value) não retornou um array. Verifique a estrutura da API.");
                         setAdministradoraSuggestions([]);
                         setShowSuggestions(false);
                     }
                 } catch (err) {
-                    console.error("Erro ao buscar administradoras:", err);
                     setAdministradoraSuggestions([]);
                     setShowSuggestions(false);
                 }
@@ -162,7 +159,7 @@ const ConsultaSegurado = () => {
         setResultado(null);
         setCurrentPage(page);
 
-        let parametroConsultaObj = {}; // Objeto temporário para construir os parâmetros
+        let parametroConsultaObj = {};
 
         if (activeForm === "vida") {
             parametroConsultaObj = {
@@ -196,41 +193,34 @@ const ConsultaSegurado = () => {
             }
         }
 
-        // Remove parâmetros de consulta que estão vazios ou nulos do objeto temporário
         for (const key in parametroConsultaObj) {
             if (parametroConsultaObj[key] === null || parametroConsultaObj[key] === '') {
                 delete parametroConsultaObj[key];
             }
         }
 
-
         const parametroConsultaJsonString = JSON.stringify(parametroConsultaObj);
 
         let payload = {
-            tipo_consulta: activeForm === "vida" ? "vida" : "incendio", 
-            parametro_consulta: parametroConsultaJsonString, 
+            tipo_consulta: activeForm === "vida" ? "vida" : "incendio",
+            parametro_consulta: parametroConsultaJsonString,
             page: page,
             page_size: pageSize,
             origem: "manual",
         };
 
         try {
-            console.log(payload)
             const response = await ConsultaService.consultarSegurados(payload);
             setResultado(response.resultado_api);
 
-            
             if (response.total_pages) {
                 setTotalPages(response.total_pages);
                 setCurrentPage(response.current_page || page);
             } else if (response.resultado_api && response.resultado_api.length > 0) {
-                
                 setTotalPages(page + 1);
             } else {
-                setTotalPages(page); 
+                setTotalPages(page);
             }
-
-            console.log("Resultado da Consulta Segurados:", response);
         } catch (err) {
             const message =
                 err.response?.data?.detail ||
@@ -238,7 +228,6 @@ const ConsultaSegurado = () => {
                 err.message ||
                 "Erro ao realizar a consulta.";
             setError(message);
-            console.error("Erro na consulta de segurados:", err);
         } finally {
             setLoading(false);
         }
@@ -250,17 +239,83 @@ const ConsultaSegurado = () => {
     };
 
     const handlePageChange = (newPage) => {
-        // Se houver totalPages vindo da API, use essa informação
         if (totalPages > 1 && newPage > 0 && newPage <= totalPages) {
             performConsulta(newPage);
         } else if (totalPages === 1 && newPage > currentPage && resultado && resultado.length === pageSize) {
-            // Se totalPages não é conhecido ou é 1, mas a página atual está cheia, tente a próxima
             performConsulta(newPage);
         } else if (newPage < currentPage && newPage > 0) {
-            // Permite ir para páginas anteriores
             performConsulta(newPage);
         }
     };
+
+    function formatarDataBR(data) {
+        if (!data || !/^\d{4}-\d{2}-\d{2}$/.test(data)) return data;
+        const [ano, mes, dia] = data.split("-");
+        return `${dia}/${mes}/${ano}`;
+    }
+
+    function formataChave(texto) {
+        return texto
+            .toLowerCase()
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, (l) => l.toUpperCase());
+    }
+
+
+    function SeguradoItem({ segurado }) {
+        const isExpanded = expandedIndex === segurado.MATRICULA;
+        return (
+            <li className={`item-segurado${isExpanded ? " expanded" : ""}`}>
+                <button
+                    className="seg-titulo"
+                    onClick={() => setExpandedIndex(isExpanded ? null : segurado.MATRICULA)}
+                    aria-expanded={isExpanded}
+                    type="button"
+                >
+                    <span style={{ display: "flex", flexDirection: "column", textAlign: "start" }}>
+                        <b>
+                            {
+                                segurado.NOME_SEGURADO ||
+                                segurado.NOME ||
+                                segurado.Nome || 
+                                segurado.nome ||
+                                segurado.nome_segurado ||
+                                "Nome não informado"
+                            }
+                        </b>
+                        {segurado.CPF_CNPJ && (
+                            <span className="cpf-label">
+                                CPF/CNPJ: <span className="cpf">{segurado.CPF_CNPJ}</span>
+                            </span>
+                        )}
+                    </span>
+                    <span className="icon">{isExpanded ? "▲" : "▼"}</span>
+                </button>
+                {isExpanded && (
+                    <div className="seg-detalhes">
+                        <ul>
+                            {Object.entries(segurado).map(([chave, valor]) =>
+                                chave === "NOME_SEGURADO" ||
+                                    chave === "NOME" ||
+                                    chave === "CPF_CNPJ" ||
+                                    chave === "FUNCAO"
+                                    ? null
+                                    : (
+                                        <li key={chave}>
+                                            <strong>{formataChave(chave)}:</strong>{" "}
+                                            {chave === "NASCIMENTO"
+                                                ? formatarDataBR(valor)
+                                                : valor ? valor : <i>não informado</i>
+                                            }
+                                        </li>
+                                    )
+                            )}
+                        </ul>
+                    </div>
+                )}
+            </li>
+        );
+    }
 
     return (
         <div className="consulta-container">
@@ -498,11 +553,14 @@ const ConsultaSegurado = () => {
                 {error && <p className="error-message">{error}</p>}
             </form>
 
-            {resultado && (
+            {resultado && Array.isArray(resultado) && (
                 <div className="card-resultado mt-4">
                     <h4>Resultado da Consulta</h4>
-                    <pre>{JSON.stringify(resultado, null, 2)}</pre>
-
+                    <ul className="lista-segurados">
+                        {resultado.map((seg, idx) => (
+                            <SeguradoItem key={idx} segurado={seg} />
+                        ))}
+                    </ul>
                     {(totalPages > 1 || (resultado && resultado.length === pageSize)) && (
                         <div className="pagination-controls">
                             <button
