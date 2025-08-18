@@ -3,15 +3,16 @@ import { Link } from "react-router-dom";
 import "../styles/Navbar.css";
 import Dropdown from "../Dropdown/Dropdown";
 import { useAuth } from "../../context/AuthContext";
+import { Mail, LineChart, Link2, Funnel } from "lucide-react";
 
 function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const timeoutRef = useRef(null);
-  const { user } = useAuth(); 
+  const { user } = useAuth();
 
-  const nivelAcesso = user?.nivel_acesso; 
+  const nivelAcesso = user?.nivel_acesso;
 
   useEffect(() => {
     const handleResize = () => {
@@ -45,7 +46,7 @@ function Navbar() {
   return (
     <nav className="navbar border-bottom" role="navigation" aria-label="Menu principal">
       <div className="container">
-       
+
         <Link className="navbar-brand d-flex align-items-center" to="/home">
           <img
             src="https://i.postimg.cc/Gh597vbr/LOGO.png"
@@ -65,7 +66,7 @@ function Navbar() {
 
         <div className={`navbar-collapse ${mobileMenuOpen ? "show" : ""}`}>
           <ul className="navbar-nav">
-         
+
             <li className="nav-item">
               <Link className="nav-link" to="/home">
                 <button type="button" className="btn">
@@ -77,10 +78,10 @@ function Navbar() {
 
             {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
               <li className="nav-item">
-                <Link className="nav-link" to="/consulta-end">
+                <Link className="nav-link" to="/envio-email">
                   <button type="button" className="btn">
-                    <i className="bi bi-geo-alt-fill"></i>
-                    Consultar Endereço
+                    <i className="bi bi-envelope-fill"></i>
+                    E-mail
                   </button>
                 </Link>
               </li>
@@ -108,6 +109,30 @@ function Navbar() {
               </li>
             )}
 
+
+            {["admin", "comercial"].includes(nivelAcesso) && (
+              <li className="nav-item">
+                <Link className="nav-link" to="">
+                  <button type="button" className="btn">
+                  <i className="bi bi-bar-chart-fill"></i>
+                    Métricas
+                  </button>
+                </Link>
+              </li>
+            )}
+
+
+            {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
+              <li className="nav-item">
+                <Link className="nav-link" to="">
+                  <button type="button" className="btn">
+                  <i className="bi bi-tools"></i>
+                    Ferramentas
+                  </button>
+                </Link>
+              </li>
+            )}
+
             {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
               <li
                 className={`nav-item dropdown ${dropdownOpen ? "show" : ""}`}
@@ -117,7 +142,7 @@ function Navbar() {
               >
                 <div className="nav-link btn d-flex align-items-center">
                   <i className="bi bi-clipboard2-minus-fill me-2"></i>
-                  Consultar Dados
+                  Consultas
                 </div>
                 <ul className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}>
                   <li>
@@ -133,6 +158,11 @@ function Navbar() {
                   <li>
                     <Link className="dropdown-item" to="/consulta-segurados">
                       Consulta Segurados
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/consulta-end">
+                      Consulta Endereço
                     </Link>
                   </li>
                 </ul>
