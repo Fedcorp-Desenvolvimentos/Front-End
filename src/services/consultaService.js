@@ -1,6 +1,5 @@
 // services/consultaService.js
 import api from "./api"; // Certifique-se de que este 'api' é a instância do Axios
-import webHook from "./webhook";
 
 export const ConsultaService = {
   getConsultaHistory: async (page = 1, page_size = 10) => {
