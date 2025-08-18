@@ -518,15 +518,15 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-<label htmlFor="certificado">
-  Certificado
-  <span className="opcional-tooltip" tabIndex="0">
-    <span className="interrogacao">?</span>
-    <span className="tooltip-text">
-      Campo opcional, mas preencher pode aumentar a eficácia da busca.
-    </span>
-  </span>
-</label>
+                        <label htmlFor="certificado">
+                            Certificado
+                            <span className="opcional-tooltip" tabIndex="0">
+                                <span className="interrogacao">?</span>
+                                <span className="tooltip-text">
+                                    Campo opcional, mas preencher pode aumentar a eficácia da busca.
+                                </span>
+                            </span>
+                        </label>
 
                         <input
                             type="text"
@@ -538,15 +538,15 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-<label htmlFor="endosso">
-  Endosso
-  <span className="opcional-tooltip" tabIndex="0">
-    <span className="interrogacao">?</span>
-    <span className="tooltip-text">
-      Campo opcional, mas preencher pode aumentar a eficácia da busca.
-    </span>
-  </span>
-</label>
+                        <label htmlFor="endosso">
+                            Endosso
+                            <span className="opcional-tooltip" tabIndex="0">
+                                <span className="interrogacao">?</span>
+                                <span className="tooltip-text">
+                                    Campo opcional, mas preencher pode aumentar a eficácia da busca.
+                                </span>
+                            </span>
+                        </label>
 
                         <input
                             type="text"
@@ -558,15 +558,15 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-<label htmlFor="administradora">
-  Administradora
-  <span className="obrigatorio-tooltip" tabIndex="0">
-    <span className="exclamacao">!</span>
-    <span className="tooltip-text obrigatorio">
-      Campo obrigatório se CPF, CNPJ e Endosso estiverem vazios.
-    </span>
-  </span>
-</label>
+                        <label htmlFor="administradora">
+                            Administradora
+                            <span className="obrigatorio-tooltip" tabIndex="0">
+                                <span className="exclamacao">!</span>
+                                <span className="tooltip-text obrigatorio">
+                                    Campo obrigatório se CPF, CNPJ e Endosso estiverem vazios.
+                                </span>
+                            </span>
+                        </label>
 
                         <div
                             className="autocomplete-wrapper"
