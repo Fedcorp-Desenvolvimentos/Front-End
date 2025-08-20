@@ -291,7 +291,6 @@
   background: #fff;
   border-radius: 1rem;
   box-shadow: 0 3px 14px rgba(13,110,253,0.09);
-  overflow: hidden;
   transition: box-shadow 0.16s;
 }
 

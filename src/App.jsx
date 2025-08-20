@@ -5,6 +5,7 @@ import Login from './components/Login/Login';
 import EsqueciSenha from './components/Login/EsqueciSenha/EsqueciSenha';
 
 import Home from './components/Home/Home';
+import ConsultasHome from './components/Consultas/ConsultasHome';
 import ConsultaPF from './components/Consultas/ConsultaPF';
 import ConsultaEnd from './components/Consultas/ConsultaEnd';
 import ConsultaCNPJ from './components/Consultas/ConsultaCNPJ';
@@ -58,6 +59,7 @@ function AppRoutes() {
         <Route element={<PrivateRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/home" element={<Home />} />
+            <Route path="/consultas" element={<ConsultasHome />} />
             <Route path="/consulta-pf" element={<ConsultaPF />} />
             <Route path="/consulta-end" element={<ConsultaEnd />} />
             <Route path="/consulta-cnpj" element={<ConsultaCNPJ />} />

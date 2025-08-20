@@ -1,0 +1,100 @@
+.home-grid {
+    padding-left: 320px;
+    min-height: 100vh;
+    box-sizing: border-box;
+    margin-top: 1rem;
+  }
+  
+  .container02 {
+    max-width: 900px;;
+  }
+  
+  .consultas-titulo {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 2.5rem;
+    color: #2463eb;
+    text-align: center;
+  }
+  
+  .cards-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem 1rem;
+    justify-items: center;
+  }
+  
+  .card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 18px rgba(35, 99, 235, 0.08);
+    padding: 1rem 1rem 1rem 1.5rem;
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+    transition: box-shadow .2s, transform .15s;
+    border: 1.5px solid #d8dde6;
+  }
+  
+  .card:hover {
+    box-shadow: 0 8px 28px rgba(44,99,255,0.16);
+    transform: translateY(-4px) scale(1.02);
+  }
+  
+  .feature-icon {
+    font-size: 2rem;
+    background: linear-gradient(135deg, #2166e3 60%, #4faaff 100%);
+    color: #fff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 16px rgba(33,102,227,0.15);
+  }
+  
+  .card h2 {
+    margin: 0.5rem 0 0.7rem 0;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #1a2340;
+  }
+  
+  .card p {
+    color: #474b53;
+    font-size: 1rem;
+    margin-bottom: 1.6rem;
+  }
+  
+  .btn-primary {
+    background: #2166e3;
+    color: #fff;
+    font-weight: 500;
+    font-size: 1rem;
+    border: none;
+    border-radius: 9px;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 1px 5px rgba(44,99,255,0.08);
+    transition: background 0.18s;
+  }
+  
+  .btn-primary:hover {
+    background: #1747b0;
+  }
+
+  @media (max-width: 900px) {
+    .container {
+      padding-left: 0;
+    }
+    .cards-container {
+      grid-template-columns: 1fr;
+      gap: 1.7rem;
+    }
+    .home-container {
+      padding-left: 0;
+    }
+  }
+  

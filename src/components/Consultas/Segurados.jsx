@@ -318,10 +318,10 @@ const ConsultaSegurado = () => {
     }
 
     return (
-        <div className="consulta-container">
+        <div className="consulta-container04">
             <h2 className="titulo-pagina">Escolha o tipo de consulta:</h2>
 
-            <div className="card-options-wrapper">
+            <div className="card-options-wrapper01">
                 <div
                     className={`card card-option ${activeForm === "vida" ? "active" : ""}`}
                     onClick={() => {

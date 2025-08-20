@@ -9,7 +9,7 @@ const AdminHome = () => {
 
   if (loading) {
     return (
-      <div className="home-container">
+      <div className="home-container02">
         <p>Carregando informações do usuário...</p>
       </div>
     );
@@ -17,14 +17,14 @@ const AdminHome = () => {
 
   if (!isAuthenticated || (currentUserType !== "admin" && currentUserType !== "master")) {
     return (
-      <div className="home-container">
+      <div className="home-container02">
         <p>Você não tem permissão para acessar esta página.</p>
       </div>
     );
   }
 
   return (
-    <div className="home-container">
+    <div className="home-container02">
       <main>
         <div className="container">
           <div className="cards-container">

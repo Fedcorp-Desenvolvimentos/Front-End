@@ -10,8 +10,9 @@
   font-size: 2.2rem;
   color: #2463eb;
   margin-bottom: 18px;
-  font-weight: bold;
+  font-weight: 500;
   letter-spacing: 1.1px;
+  margin-left: 200px;
 }
 
 .home-desc {
@@ -19,19 +20,19 @@
   color: #444;
   margin-bottom: 32px;
   line-height: 1.6;
+  margin-left: 200px;
 }
 
 .carousel-container {
   width: 100%;
-  max-width: 1100px;
+  max-width: 900px;
   margin: 0 auto 24px auto;
-  border-radius: 32px;
-  overflow: hidden;
+  border-radius: 30px;
   box-shadow: 0 10px 44px rgba(36,99,235,0.10), 0 1.5px 2px #c0c4ce21;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 140px;
+  margin-left: 280px;
 }
 
 .carousel-image {
@@ -41,36 +42,7 @@
   object-fit: cover;
   display: block;
   transition: opacity 0.18s;
-}
-
-.carousel-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #2463eb;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  font-size: 1.8rem;
-  z-index: 3;
-  cursor: pointer;
-  opacity: 0.93;
-  transition: background 0.18s, opacity 0.13s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.carousel-arrow.left {
-  left: 24px;
-}
-.carousel-arrow.right {
-  right: 24px;
-}
-.carousel-arrow:hover {
-  background: #1858d6;
-  opacity: 1;
+  border-radius: 10px;
 }
 
 .carousel-indicators {
@@ -81,6 +53,7 @@
   display: flex;
   gap: 11px;
   z-index: 3;
+  margin-left: 100px;
 }
 .carousel-dot {
   width: 13px;
