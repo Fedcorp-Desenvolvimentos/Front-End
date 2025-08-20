@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import '../styles/Dropdown.css';
 import { useAuth } from '../../context/AuthContext';
 
-const Dropdown = () => {
+const Dropdown = ({ sidebarOpen = true }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { user, logout } = useAuth();
@@ -21,23 +21,20 @@ const Dropdown = () => {
         setIsOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+  const toggleDropdown = () => setIsOpen((v) => !v);
 
   return (
-    <div className="dropdown dropdown-opcoes" ref={dropdownRef}>
-      <button className="dropdown-btn" type="button" onClick={toggleDropdown}>
-        <i className="bi bi-three-dots-vertical"></i> Opções
+    <div className={`dropdown-opcoes sidebar-dropdown${sidebarOpen ? "" : " collapsed"}`} ref={dropdownRef}>
+      <button className="dropdown-btn" type="button" onClick={toggleDropdown} title="Opções">
+        <i className="bi bi-three-dots-vertical"></i>
+        {sidebarOpen && <span>Opções</span>}
       </button>
 
-      <ul className={`dropdown-content ${isOpen ? 'show' : ''}`}>
-       
+      <ul className={`dropdown-content${isOpen ? " show" : ""}`}>
         {["admin", "usuario", "moderador", "comercial", "administradora"].includes(nivelAcesso) && (
           <>
             <li>
@@ -52,7 +49,6 @@ const Dropdown = () => {
             </li>
           </>
         )}
-
         {nivelAcesso === 'admin' && (
           <>
             <li>
@@ -67,9 +63,7 @@ const Dropdown = () => {
             </li>
           </>
         )}
-
         <li><hr className="dropdown-divider" /></li>
-
         <li>
           <Link to="/login" className="dropdown-item" onClick={handleLogout}>
             <i className="bi bi-door-open-fill"></i> Sair
