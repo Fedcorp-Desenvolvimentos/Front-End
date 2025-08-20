@@ -438,12 +438,6 @@ const ConsultaSegurado = () => {
                     <>
                         <label htmlFor="cpf">
                             CPF
-                            <span className="opcional-tooltip" tabIndex="0">
-                                <span className="interrogacao">?</span>
-                                <span className="tooltip-text">
-                                    Campo opcional, mas preencher pode aumentar a eficácia da busca.
-                                </span>
-                            </span>
                         </label>
 
                         <input
@@ -459,12 +453,6 @@ const ConsultaSegurado = () => {
 
                         <label htmlFor="CNPJ">
                             CNPJ
-                            <span className="opcional-tooltip" tabIndex="0">
-                                <span className="interrogacao">?</span>
-                                <span className="tooltip-text">
-                                    Campo opcional, mas preencher pode aumentar a eficácia da busca.
-                                </span>
-                            </span>
                         </label>
 
                         <input
@@ -480,12 +468,6 @@ const ConsultaSegurado = () => {
 
                         <label htmlFor="nome">
                             Nome
-                            <span className="opcional-tooltip" tabIndex="0">
-                                <span className="interrogacao">?</span>
-                                <span className="tooltip-text">
-                                    Campo opcional, mas preencher pode aumentar a eficácia da busca.
-                                </span>
-                            </span>
                         </label>
 
                         <input
@@ -500,12 +482,6 @@ const ConsultaSegurado = () => {
 
                         <label htmlFor="endereco">
                             Endereço
-                            <span className="opcional-tooltip" tabIndex="0">
-                                <span className="interrogacao">?</span>
-                                <span className="tooltip-text">
-                                    Campo opcional, mas preencher pode aumentar a eficácia da busca.
-                                </span>
-                            </span>
                         </label>
 
                         <input
@@ -520,12 +496,6 @@ const ConsultaSegurado = () => {
 
                         <label htmlFor="certificado">
                             Certificado
-                            <span className="opcional-tooltip" tabIndex="0">
-                                <span className="interrogacao">?</span>
-                                <span className="tooltip-text">
-                                    Campo opcional, mas preencher pode aumentar a eficácia da busca.
-                                </span>
-                            </span>
                         </label>
 
                         <input
@@ -540,12 +510,6 @@ const ConsultaSegurado = () => {
 
                         <label htmlFor="endosso">
                             Endosso
-                            <span className="opcional-tooltip" tabIndex="0">
-                                <span className="interrogacao">?</span>
-                                <span className="tooltip-text">
-                                    Campo opcional, mas preencher pode aumentar a eficácia da busca.
-                                </span>
-                            </span>
                         </label>
 
                         <input
@@ -560,12 +524,6 @@ const ConsultaSegurado = () => {
 
                         <label htmlFor="administradora">
                             Administradora
-                            <span className="obrigatorio-tooltip" tabIndex="0">
-                                <span className="exclamacao">!</span>
-                                <span className="tooltip-text obrigatorio">
-                                    Campo obrigatório se CPF, CNPJ e Endosso estiverem vazios.
-                                </span>
-                            </span>
                         </label>
 
                         <div
