@@ -286,6 +286,8 @@
 
 /* Card do resultado */
 .card-resultado {
+  display: flex;
+  flex-direction: column;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 4px 24px rgba(36,99,235,0.08);

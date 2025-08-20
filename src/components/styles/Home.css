@@ -64,6 +64,7 @@
   cursor: pointer;
   transition: background 0.16s;
   opacity: 0.7;
+  margin-bottom: 0.50rem;
 }
 .carousel-dot.active {
   background: #2463eb;

@@ -6,6 +6,7 @@
     box-shadow: 0 6px 28px rgba(36,99,235,0.07);
     box-sizing: border-box;
     text-align: center;
+    margin-left: 24vw;
   }
   
   .ferramentas-title {
@@ -36,7 +37,6 @@
     grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
     gap: 2.1rem;
     width: 100%;
-    margin: 0 auto;
   }
   
   .ferramenta-card {
