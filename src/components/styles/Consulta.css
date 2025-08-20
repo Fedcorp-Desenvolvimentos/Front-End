@@ -1,7 +1,15 @@
-.consulta-container {
+.consulta-container03 {
   padding: 36px 16px 24px 16px;
   max-width: 980px;
-  margin: 0 auto;
+  margin-left: 50vh;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.consulta-container04 {
+  padding: 36px 16px 24px 16px;
+  max-width: 980px;
+  margin-left: 50vh;
   border-radius: 16px;
   box-sizing: border-box;
 }
@@ -16,13 +24,26 @@
 }
 
 .card-options-wrapper {
-  display: flex;
-  justify-content: center;
-  gap: 2.3rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
   margin-bottom: 1.8rem;
-  flex-wrap: wrap;
+  justify-items: center;
+  align-items: stretch;
+  width: 100%;
 }
 
+
+.card-options-wrapper01 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+  justify-items: center;
+  align-items: stretch;
+  width: 100%;
+  margin-left: 11vw;
+}
 .card-option {
   background: #fff;
   border: 1.5px solid #e4e8ee;
