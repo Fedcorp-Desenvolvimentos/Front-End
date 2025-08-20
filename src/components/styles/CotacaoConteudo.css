@@ -1,69 +1,98 @@
 .cotacao-container {
-    padding: 2rem;
-    max-width: 900px;
-    margin: 0 auto;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.titulo-pagina {
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin-bottom: 2rem;
-    text-align: center;
-    color: #1e2a38;
-}
-
-.input-grid {
+    padding: 30px 18px 30px 18px;
+    max-width: 1040px;
+    margin: 34px auto;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(36,99,235,0.07);
+    transition: box-shadow 0.22s;
+    margin-left: 250px;
+  }
+  
+  .titulo-pagina {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.1rem;
+    font-weight: 800;
+    margin-bottom: 30px;
+    color: #2463eb;
+    letter-spacing: 0.8px;
+    gap: 0.7rem;
+    text-shadow: 0 2px 8px #2463eb0b;
+  }
+  
+  .input-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-}
-
-.campo {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.55rem;
+    width: 100%;
+  }
+  
+  .campo {
     display: flex;
     flex-direction: column;
-}
-
-.campo label {
-    font-size: 0.9rem;
-    color: #555;
-    margin-bottom: 0.5rem;
-}
-
-.campo input {
-    padding: 0.6rem 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-}
-
-.campo.readonly input {
-    background-color: #f4f4f4;
-    border-color: #ddd;
+    align-items: flex-start;
+  }
+  
+  .campo label {
+    font-size: 1.06rem;
+    color: #223;
+    margin-bottom: 0.43rem;
     font-weight: 600;
-    color: #444;
-}
-
-.titulo-pagina {
+    letter-spacing: 0.1px;
+  }
+  
+  .campo input {
+    padding: 0.9rem 1rem;
+    border: 1.5px solid #dbeafe;
+    border-radius: 9px;
+    font-size: 1.03rem;
+    background: #fff;
+    outline: none;
+    transition: border 0.21s, background 0.17s;
+    color: #222b3a;
+    font-weight: 500;
+  }
+  
+  .campo input:focus {
+    border-color: #2463eb;
+    background: #f0f7ff;
+  }
+  
+  .campo.readonly input {
+    background: #f3f7fd;
+    border-color: #dde4ef;
+    color: #6b7280;
+    font-weight: 700;
+  }
+  
+  .icone-cabecalho {
+    background: linear-gradient(120deg, #2463eb 68%, #38bdf8 100%);
+    color: #fff;
+    border-radius: 19%;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 1.25rem auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-.icone-cabecalho {
-    background-color: #0d6efd;
-    color: white;
-    border-radius: 12%;
-    width: 70px;
-    height: 70px;
-    margin: 0 auto 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    font-size: 2.4rem;
+    box-shadow: 0 2px 18px #2463eb16;
+  }
+  
+  @media (max-width: 800px) {
+    .cotacao-container {
+      padding: 20px 3vw 22px 3vw;
+      max-width: 99vw;
+      margin: 18px auto;
+    }
+    .input-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    .titulo-pagina {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+  }
+  

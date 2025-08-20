@@ -343,7 +343,7 @@ const ConsultaCNPJ = () => {
                 !formData.telefone.trim())
             }
           >
-            Consultar
+            {loading ? "Consultando..." : "Consultar"}
           </button>
           {error && <p className="error-message">{error}</p>}
         </form>

@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/Home.css";
+import "../styles/AdminHome.css";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -26,16 +26,6 @@ const AdminHome = () => {
   return (
     <div className="home-container">
       <main>
-        <div className="jumbotron">
-          <div className="container">
-            <h1>Bem-vindos à Plataforma Bigcorp!</h1>
-
-            <p>Centralize e importe dados com precisão para assegurar a qualidade das informações
-              dos produtos com a Fedcorp.</p>
-
-          </div>
-        </div>
-
         <div className="container">
           <div className="cards-container">
 

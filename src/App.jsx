@@ -12,6 +12,8 @@ import Comercial from './components/Consultas/Comercial';
 import Segurados from './components/Consultas/Segurados';
 import CotacaoConteudo from './components/Cotação/CotacaoConteudo';
 
+import Metricas from './components/Views/Metricas';
+import Ferramentas from './components/Views/Ferramentas';
 import EnvEmail from './components/Views/EnvEmail';
 import ConfigEmail from './components/Views/ConfigEmail';
 
@@ -31,6 +33,7 @@ import { AuthProvider } from './context/AuthContext';
 
 import { LoadingProvider, useLoading } from './context/LoadingContext';
 import LoadingSpinner from './components/LoadingSpinner';
+
 
 
 function AppRoutes() {
@@ -68,6 +71,8 @@ function AppRoutes() {
             <Route path="/upload" element={<Upload />} />
             <Route path='/cotacao-conteudo' element ={<CotacaoConteudo/>}/>
             <Route path="/importacao-vida" element={<ImportVida />} />
+            <Route path="/ferramentas" element={<Ferramentas />} />
+            <Route path="/metricas" element={<Metricas />} />
             <Route path="/envio-email" element={<EnvEmail />} />
             <Route path="/config-email" element={<ConfigEmail />} />
           </Route>

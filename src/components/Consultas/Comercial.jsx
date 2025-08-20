@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "../styles/Comercial.css";
-import "../styles/Conta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FaBriefcase, FaFileExcel, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -251,7 +250,7 @@ const ConsultaComercial = () => {
 
   return (
     <div className="consulta-container">
-      <h2 className="titulo-pagina">Escolha a opção de acesso</h2>
+      <h2 className="title-page">Escolha a opção de acesso</h2>
 
       <div className="card-options-accordion">
         {/* Relacionamentos */}

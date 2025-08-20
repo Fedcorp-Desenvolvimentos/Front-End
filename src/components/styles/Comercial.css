@@ -3,8 +3,8 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem;
-  background: linear-gradient(to right, #f9f9f9, #f1f5ff);
   min-height: 100vh;
+  background: #fff;  
 }
 
 .card-opcoes {
@@ -34,23 +34,15 @@
   color: #fff;
 }
 
-.titulo-principal {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #0d3b66;
-  margin-bottom: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.opcao-texto {
-  font-weight: 500;
-  color: #333;
+.title-page {
   font-size: 1.5rem;
+  font-weight: 500;
+  color: #0d6efd;
+  opacity: 0.82;
+  margin-bottom: 1.1rem;
+  background: none; 
+  text-align: center;
 }
-
 .form-card-container {
   display: flex;
   flex-wrap: wrap;
@@ -76,13 +68,6 @@
 
 .card-body {
   padding: 2rem;
-}
-
-.form-label {
-  display: block;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
 }
 
 .form-control {
