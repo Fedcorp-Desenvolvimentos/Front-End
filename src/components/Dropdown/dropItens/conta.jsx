@@ -18,19 +18,15 @@ const ConfigConta = () => {
     const [empresaEditada, setEmpresaEditada] = useState('');
     const [isFedEditado, setIsFedEditado] = useState(false);
 
-
     const fetchUsuarios = async () => {
         try {
             const response = await UserService.getAllUsers();
-
             setUsuarios(response.results || response);
         } catch (error) {
-            console.error("Erro ao buscar usuários:", error);
             setMensagemErro("Erro ao carregar usuários. Tente novamente.");
             setTimeout(() => setMensagemErro(''), 5000);
         }
     };
-
 
     useEffect(() => {
         fetchUsuarios();
@@ -53,14 +49,12 @@ const ConfigConta = () => {
 
     const confirmarExclusao = async () => {
         if (!usuarioSelecionado) return;
-
         try {
             await UserService.deleteUser(usuarioSelecionado.id);
             exibirMensagem('sucesso', `Usuário ${usuarioSelecionado.nome_completo} excluído com sucesso!`);
             setMostrarModalExclusao(false);
             fetchUsuarios();
         } catch (error) {
-            console.error("Erro ao excluir usuário:", error);
             exibirMensagem('erro', `Erro ao excluir usuário ${usuarioSelecionado.nome_completo}.`);
             setMostrarModalExclusao(false);
         }
@@ -78,7 +72,6 @@ const ConfigConta = () => {
 
     const confirmarEdicao = async () => {
         if (!usuarioSelecionado) return;
-
         try {
             const dadosAtualizados = {
                 nome_completo: nomeEditado,
@@ -92,11 +85,9 @@ const ConfigConta = () => {
             setMostrarModalEdicao(false);
             fetchUsuarios();
         } catch (error) {
-            console.error("Erro ao atualizar usuário:", error.response?.data || error);
             const errorData = error.response?.data;
             let errorMessage = "Erro ao atualizar usuário. Verifique os dados.";
             if (errorData) {
-
                 if (errorData.email) errorMessage = `Erro no E-mail: ${errorData.email.join(', ')}`;
                 else if (errorData.nome_completo) errorMessage = `Erro no Nome: ${errorData.nome_completo.join(', ')}`;
                 else if (errorData.nivel_acesso) errorMessage = `Erro na Função: ${errorData.nivel_acesso.join(', ')}`;
@@ -123,82 +114,75 @@ const ConfigConta = () => {
     return (
         <div className="conta-container">
             <main className="conta-content">
-                <div className="config-usuarios-wrapper">
-                    <aside className="config-sidebar">
-                        <Link to="/cadastro" className="tab-button">
-                            <i className="bi bi-person-plus-fill"></i> Cadastrar Usuário
-                        </Link>
-                        <Link to="/Home" className="tab-button voltar">
-                            <i className="bi bi-arrow-left-circle"></i> Voltar
-                        </Link>
-                    </aside>
-
-                    <div className="config-card">
-                        <h2 className="card-title">
+                <div className="config-card-user">
+                    <div className="card-header">
+                        <h2>
                             <i className="bi bi-people"></i> Gerenciar Usuários
                         </h2>
-
-                        {mensagemSucesso && (
-                            <div className="alert alert-sucesso">{mensagemSucesso}</div>
-                        )}
-                        {mensagemErro && (
-                            <div className="alert alert-erro">{mensagemErro}</div>
-                        )}
-
-                        <div className="search-bar">
-                            <i className="bi bi-search"></i>
-                            <input
-                                type="text"
-                                placeholder="Buscar por nome ou e-mail"
-                                value={filtroBusca}
-                                onChange={(e) => setFiltroBusca(e.target.value)}
-                            />
-                            <button className="btn-search">Pesquisar</button>
+                        <div className="header-actions">
+                            <Link to="/cadastro" className="btn btn-primary">
+                                <i className="bi bi-person-plus-fill"></i> Novo Usuário
+                            </Link>
                         </div>
+                    </div>
+                    {mensagemSucesso && (
+                        <div className="alert alert-sucesso">{mensagemSucesso}</div>
+                    )}
+                    {mensagemErro && (
+                        <div className="alert alert-erro">{mensagemErro}</div>
+                    )}
 
-                        <table className="user-table">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>E-mail</th>
-                                    <th>Função</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {usuariosFiltrados.map(usuario => (
-                                    <tr key={usuario.id}>
-                                        <td>{usuario.nome_completo}</td>
-                                        <td>{usuario.email}</td>
-                                        <td>
-                                            <span className="badge">
-                                                {usuario.nivel_acesso || 'Usuário'}
-                                            </span>
-                                        </td>
-                                        <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div className="search-bar">
+                        <i className="bi bi-search"></i>
+                        <input
+                            type="text"
+                            placeholder="Buscar por nome ou e-mail"
+                            value={filtroBusca}
+                            onChange={(e) => setFiltroBusca(e.target.value)}
+                        />
+                    </div>
+
+                    <table className="user-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Função</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {usuariosFiltrados.map(usuario => (
+                                <tr key={usuario.id}>
+                                    <td>{usuario.nome_completo}</td>
+                                    <td>{usuario.email}</td>
+                                    <td>
+                                        <span className="badge">
+                                            {usuario.nivel_acesso || 'Usuário'}
+                                        </span>
+                                    </td>
+                                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <button
+                                            className="btn-icon"
+                                            onClick={() => abrirModalEdicao(usuario)}
+                                            title="Editar usuário"
+                                        >
+                                            <i className="bi bi-pencil-square text-primary"></i>
+                                        </button>
+                                        {usuario.id !== usuarios[0]?.id && (
                                             <button
                                                 className="btn-icon"
-                                                onClick={() => abrirModalEdicao(usuario)}
-                                                title="Editar usuário"
+                                                onClick={() => abrirModalExclusao(usuario)}
+                                                title="Excluir usuário"
                                             >
-                                                <i className="bi bi-pencil-square text-primary"></i>
+                                                <i className="bi bi-trash text-danger"></i>
                                             </button>
-
-                                            {usuario.id !== usuarios[0]?.id && (
-                                                <button
-                                                    className="btn-icon"
-                                                    onClick={() => abrirModalExclusao(usuario)}
-                                                    title="Excluir usuário"
-                                                >
-                                                    <i className="bi bi-trash text-danger"></i>
-                                                </button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
 
                 {mostrarModalExclusao && (
@@ -213,8 +197,8 @@ const ConfigConta = () => {
                                 <button className="btn btn-secondary" onClick={() => setMostrarModalExclusao(false)}>
                                     Cancelar
                                 </button>
-                                <button className="btn btn-danger" onClick={confirmarExclusao}>
-                                    Excluir
+                                <button className="btn btn-secondary" onClick={confirmarExclusao}>
+                                    Confirmar
                                 </button>
                             </div>
                         </div>
@@ -245,11 +229,9 @@ const ConfigConta = () => {
                                 {niveisAcesso.map(nivel => (
                                     <option key={nivel} value={nivel}>
                                         {nivel.charAt(0).toUpperCase() + nivel.slice(1)}
-
                                     </option>
                                 ))}
                             </select>
-
                             <div className="modal-actions">
                                 <button className="btn btn-primary" onClick={() => setMostrarModalEdicao(false)}>
                                     Cancelar
