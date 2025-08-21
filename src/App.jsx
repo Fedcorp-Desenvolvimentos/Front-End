@@ -12,6 +12,7 @@ import ConsultaCNPJ from './components/Consultas/ConsultaCNPJ';
 import Comercial from './components/Consultas/Comercial';
 import Segurados from './components/Consultas/Segurados';
 import CotacaoConteudo from './components/Cotação/CotacaoConteudo';
+import BuscaRegiao from './components/Consultas/ComercialRegiao'
 
 import Metricas from './components/Views/Metricas';
 import Ferramentas from './components/Views/Ferramentas';
@@ -64,6 +65,7 @@ function AppRoutes() {
             <Route path="/consulta-end" element={<ConsultaEnd />} />
             <Route path="/consulta-cnpj" element={<ConsultaCNPJ />} />
             <Route path="/consulta-comercial" element={<Comercial />} />
+            <Route path="/comercial-regiao" element={<BuscaRegiao />} />
             <Route path="/consulta-segurados" element={<Segurados />} />
             <Route path="/conta" element={<Conta />} />
             <Route path="/config" element={<Config />} />
