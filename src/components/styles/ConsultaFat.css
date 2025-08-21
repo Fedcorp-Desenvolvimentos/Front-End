@@ -111,12 +111,9 @@
     .consulta-fatura-container {
       padding: 1.2rem 0.2rem;
     }
-  }
-
-  @media (max-width: 600px) {
     .resultado-dados {
-      grid-template-columns: 1fr;
-    }
+        grid-template-columns: 1fr;
+  }
   }
   
   
