@@ -106,6 +106,43 @@
   transition: box-shadow 0.22s, background 0.19s;
 }
 
+.form-container label[for="estado"] {
+  margin-top: 0.50rem;
+  color: black;
+  display: block;
+  margin-bottom: 0.20rem;
+}
+
+.form-container select[name="estado"] {
+  width: 100%;
+  padding: 0.5rem 0.5rem;
+  border: 1px solid #c8d2ec;
+  border-radius: 7px;
+  font-size: 1rem;
+  background: #f7faff;
+  color: #222;
+  margin-bottom: 0.50rem;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  outline: none;
+  appearance: none; 
+}
+
+.form-container select[name="estado"] option {
+  font-size: 0.80rem;
+}
+
+.form-container select[name="estado"]:focus {
+  border-color: #2463eb;
+  box-shadow: 0 0 0 2px #2463eb20;
+  background: #fff;
+}
+
+.form-container select[name="estado"]:disabled {
+  background: #f2f2f2;
+  color: #aaa;
+}
+
+
 .form-container input,
 .form-massa-container input[type="text"],
 .form-massa-container input[type="email"] {

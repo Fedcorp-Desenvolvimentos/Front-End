@@ -227,7 +227,9 @@ const ConsultaCNPJ = () => {
 
   return (
     <div className="consulta-container03">
-      <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
+      <h1 className="consultas-title">
+        <i className="bi-clipboard-data"></i> Consultas Disponíveis
+      </h1>
 
       <div className="card-options-wrapper">
         <div

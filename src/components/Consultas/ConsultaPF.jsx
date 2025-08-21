@@ -9,7 +9,7 @@ function formatDateBR(dateStr) {
   const onlyDate = dateStr.split('T')[0].split(' ')[0];
   const [yyyy, mm, dd] = onlyDate.split('-');
   if (yyyy && mm && dd) return `${dd}/${mm}/${yyyy}`;
-  return dateStr; 
+  return dateStr;
 }
 
 const ConsultaPF = () => {
@@ -24,6 +24,7 @@ const ConsultaPF = () => {
     dataNascimento: "",
     motherName: "",
     fatherName: "",
+    estado: "",
   });
 
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
@@ -219,7 +220,9 @@ const ConsultaPF = () => {
 
   return (
     <div className="consulta-container03">
-      <h2 className="titulo-pagina">Escolha a opção de consulta:</h2>
+      <h1 className="consultas-title">
+        <i className="bi-clipboard-data"></i> Consultas Disponíveis
+      </h1>
 
       <div className="card-options-wrapper">
         <div
@@ -378,7 +381,7 @@ const ConsultaPF = () => {
         <form className="form-container" onSubmit={handleSubmit}>
           <label htmlFor="nome">
             Nome <span className="obrigatorio" title="Campo obrigatório para busca por chaves alternativas">*</span>
-            </label>
+          </label>
           <input
             type="text"
             id="nome"
@@ -399,7 +402,29 @@ const ConsultaPF = () => {
             placeholder="DD/MM/AAAA"
             disabled={loading}
           />
-          <label htmlFor="motherName">Nome da Mãe</label>
+          <label htmlFor="estado">Estado</label>
+          <select
+            id="estado"
+            className="selecao"
+            name="estado"
+            value={formData.estado}
+            onChange={handleFormChange}
+            disabled={loading}
+          >
+            <option value="">Selecione uma região</option>
+            <option value="DF-GO-MS-MT-TO">DF, GO, MS, MT, TO</option>
+            <option value="AC-AM-AP-PA-RO-RR">AC, AM, AP, PA, RO, RR</option>
+            <option value="CE-MA-PI">CE, MA, PI</option>
+            <option value="AL-PB-PE-RN">AL, PB, PE, RN</option>
+            <option value="BA-SE">BA, SE</option>
+            <option value="MG">MG</option>
+            <option value="ES-RJ">ES, RJ</option>
+            <option value="SP">SP</option>
+            <option value="PR-SC">PR, SC</option>
+            <option value="RS">RS</option>
+          </select>
+
+          <label htmlFor="motherName" className="estado">Nome da Mãe</label>
           <input
             type="text"
             id="motherName"
