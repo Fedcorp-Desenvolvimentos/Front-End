@@ -63,13 +63,14 @@ const ConsultaEnd = () => {
         };
       }
     } else if (activeForm === "chaves") {
-      if (
-        !formData.uf.trim() ||
-        !formData.cidade.trim() ||
-        !formData.rua.trim()
-      ) {
-        validationErrorMessage =
-          "Para busca por chaves alternativas, os campos UF, Cidade e Rua são obrigatórios.";
+      const obrigatorios = [formData.uf.trim(), formData.cidade.trim(), formData.rua.trim()];
+      const filled = obrigatorios.filter(Boolean).length;
+    
+      if (filled === 0) {
+        validationErrorMessage = "Preencha os campos obrigatórios para buscar.";
+        isFormValid = false;
+      } else if (filled < 3) {
+        validationErrorMessage = "Por favor, preencha TODOS os campos obrigatórios: UF, Cidade e Rua.";
         isFormValid = false;
       } else {
         payload = {
@@ -81,7 +82,7 @@ const ConsultaEnd = () => {
           }),
           origem: "manual",
         };
-      }
+      }   
     } else {
       setLoading(false);
       return;
@@ -241,6 +242,13 @@ const ConsultaEnd = () => {
     setMassConsultaMessage("");
   };
 
+  function isBuscaChaveSemResultado(resultado) {
+    if (!resultado?.resultado_api) return false;
+    const arr = resultado.resultado_api.resultados_viacep;
+    return resultado.tipo_consulta === "cep_rua_cidade" && (!Array.isArray(arr) || arr.length === 0);
+  }
+
+
   return (
     <div className="consulta-container03">
       <h1 className="consultas-title">
@@ -392,10 +400,7 @@ const ConsultaEnd = () => {
           <button
             type="submit"
             disabled={
-              loading ||
-              !formData.uf.trim() ||
-              !formData.cidade.trim() ||
-              !formData.rua.trim()
+              loading 
             }
           >
             {loading ? "Consultando..." : "Consultar"}
@@ -546,6 +551,13 @@ const ConsultaEnd = () => {
               ))}
             </tbody>
           </table>
+
+          {activeForm === "chaves" && isBuscaChaveSemResultado(resultado) && (
+            <div className="no-results-message">
+              Nenhum endereço encontrado para os parâmetros fornecidos.
+            </div>
+          )}
+
         </div>
       )}
     </div>

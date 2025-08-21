@@ -484,6 +484,19 @@
   font-size: 1rem;
 }
 
+.no-results-message {
+  margin: 18px auto;
+  color: #d23c3c;
+  background: #fff3f3;
+  border-radius: 7px;
+  padding: 13px 18px;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 500;
+  max-width: 390px;
+}
+
+
 /* Responsividade */
 @media (max-width: 900px) {
   .consulta-container { padding: 13px 0.9rem; }
