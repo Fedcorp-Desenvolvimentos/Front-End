@@ -9,13 +9,17 @@
   box-sizing: border-box;
 }
 
-.historico-container h2 {
-  font-size: 1.8rem;
-  font-weight: 600;
+.historico-title {
+  font-size: 2rem;
   color: #2463eb;
-  margin-bottom: 1.8rem;
-  text-align: center;
-  letter-spacing: 0.3px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 3rem;
+  margin-bottom: 2rem;
 }
 
 

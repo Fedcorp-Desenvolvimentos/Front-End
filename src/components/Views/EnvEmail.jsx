@@ -194,7 +194,10 @@ const EnvioEmail = () => {
 
     return (
         <div className="consulta-container03">
-            <h2 className="titulo-pagina">Escolha a opção:</h2>
+            <h1 className="email-title">
+            <i className="bi bi-envelope-fill"></i> Escolha a opção desejada
+            </h1>
+
 
             <div className="card-options-wrapper">
                 <div

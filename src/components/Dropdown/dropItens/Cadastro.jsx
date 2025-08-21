@@ -101,7 +101,9 @@ function Cadastro() {
 
     return (
         <main className="cadastro-container">
-            <h1 className="config-title">Configurações da Plataforma</h1>
+            <h1 className="cadastro-title">
+            <i className="bi bi-tools"></i> Configurações da Plataforma
+            </h1>
 
             <div className="cadastro-layout">
                 <section className="cadastro-card">
