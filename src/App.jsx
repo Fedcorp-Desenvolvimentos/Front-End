@@ -11,6 +11,7 @@ import ConsultaEnd from './components/Consultas/ConsultaEnd';
 import ConsultaCNPJ from './components/Consultas/ConsultaCNPJ';
 import Comercial from './components/Consultas/Comercial';
 import Segurados from './components/Consultas/Segurados';
+import ConsultaFat from './components/Consultas/ConsultaFat';
 import CotacaoConteudo from './components/Cotação/CotacaoConteudo';
 import BuscaRegiao from './components/Consultas/ComercialRegiao'
 
@@ -67,6 +68,7 @@ function AppRoutes() {
             <Route path="/consulta-comercial" element={<Comercial />} />
             <Route path="/comercial-regiao" element={<BuscaRegiao />} />
             <Route path="/consulta-segurados" element={<Segurados />} />
+            <Route path="/consulta-faturas" element={<ConsultaFat />} />
             <Route path="/conta" element={<Conta />} />
             <Route path="/config" element={<Config />} />
             <Route path="/cadastro" element={<Cadastro />} />
