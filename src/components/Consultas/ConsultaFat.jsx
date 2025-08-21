@@ -53,18 +53,7 @@ const ConsultaFatura = () => {
             disabled={administradora.length > 0}
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="administradora">Administradora:</label>
-          <input
-            type="text"
-            id="administradora"
-            name="administradora"
-            value={administradora}
-            onChange={handleInputChange(setAdministradora, setFatura)}
-            placeholder="Digite o nome da administradora"
-            disabled={fatura.length > 0}
-          />
-        </div>
+ 
         {erro && <div className="erro-msg">{erro}</div>}
         <button type="submit" className="btn btn-primary" disabled={loading}>
           {loading ? 'Consultando...' : 'Consultar'}
