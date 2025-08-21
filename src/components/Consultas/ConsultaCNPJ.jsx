@@ -492,6 +492,18 @@ const ConsultaCNPJ = () => {
           </table>
         </div>
       )}
+
+{activeForm === "chaves" &&
+  resultado?.resultado_api &&
+  (
+    (Array.isArray(resultado.resultado_api.Result) && resultado.resultado_api.Result.length === 0)
+    || (resultado.resultado_api && resultado.resultado_api.Result === undefined)
+  ) && (
+    <div className="no-results-message">
+      Nenhum resultado encontrado para os filtros informados. Adicione mais informações.
+    </div>
+)}
+
     </div>
 
   );

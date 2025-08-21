@@ -542,6 +542,13 @@ const ConsultaPF = () => {
           </table>
         </div>
       )}
+      {activeForm === "chaves" &&
+        resultado?.resultado_api?.Result &&
+        resultado.resultado_api.Result.length === 0 && (
+          <div className="no-results-message">
+            Nenhum resultado encontrado para os filtros informados. Adicione mais informações.
+          </div>
+        )}
     </div>
   );
 };
