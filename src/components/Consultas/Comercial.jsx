@@ -217,8 +217,7 @@ const ConsultaComercial = () => {
     } catch (serviceError) {
       console.error("Erro na consulta em massa:", serviceError);
       setMassConsultaMessage(
-        `Erro na consulta em massa: ${
-          serviceError.message || "Verifique o console para mais detalhes."
+        `Erro na consulta em massa: ${serviceError.message || "Verifique o console para mais detalhes."
         }`
       );
       setMassLoading(false);
@@ -250,7 +249,9 @@ const ConsultaComercial = () => {
 
   return (
     <div className="consulta-container">
-      <h2 className="title-page">Escolha a opção de acesso</h2>
+      <h1 className="comercial-title">
+        <i className="bi bi-clipboard2-check"></i> Consultas Disponíveis
+      </h1>
 
       <div className="card-options-accordion">
         {/* Relacionamentos */}

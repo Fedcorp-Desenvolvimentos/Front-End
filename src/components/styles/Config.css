@@ -6,14 +6,19 @@
   padding-top: 40px;
 }
 
-.config-title {
+.configuracoes-title {
   font-size: 2rem;
   color: #2463eb;
   font-weight: 700;
-  text-align: center;
-  margin-bottom: 2.1rem;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.50rem;
+  margin-bottom: 2rem;
 }
+
 
 .config-form {
   margin-left: 250px;

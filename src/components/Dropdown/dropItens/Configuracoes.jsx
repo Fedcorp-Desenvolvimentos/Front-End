@@ -102,7 +102,9 @@ const Config = () => {
 
   return (
     <div className="config-container">
-      <h2 className="config-title">Configurações da Conta</h2>
+    <h1 className="configuracoes-title">
+      <i className="bi bi-tools"></i> Configurações da Conta
+    </h1>
       <div className="config-form">
         <div className="tab-abas">
           <button className={activeTab === 'perfil' ? 'tab-aba active' : 'tab-aba'} onClick={() => setActiveTab('perfil')}>

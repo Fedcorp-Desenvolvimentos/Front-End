@@ -122,7 +122,9 @@ const HistoricoConsulta = () => {
 
   return (
     <div className="historico-container">
-      <h2 className='historico-title'>Histórico de Consultas</h2>
+      <h1 className="historico-title">
+      <i className="bi bi-search"></i> Histórico de Consultas
+    </h1>
 
       <input 
         type="text"

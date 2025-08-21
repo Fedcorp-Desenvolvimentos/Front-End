@@ -8,6 +8,19 @@
   .container02 {
     max-width: 900px;;
   }
+
+  .consultas-title {
+        font-size: 2rem;
+        color: #2463eb;
+        font-weight: 700;
+        letter-spacing: 0.7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 3rem;
+        margin-bottom: 2rem;
+  }
   
   .consultas-titulo {
     font-size: 2rem;
