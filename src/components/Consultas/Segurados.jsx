@@ -319,7 +319,9 @@ const ConsultaSegurado = () => {
 
     return (
         <div className="consulta-container04">
-            <h2 className="titulo-pagina">Escolha o tipo de consulta:</h2>
+            <h1 className="consultas-title">
+                <i className="bi-clipboard-data"></i> Consultas Disponíveis
+            </h1>
 
             <div className="card-options-wrapper01">
                 <div
