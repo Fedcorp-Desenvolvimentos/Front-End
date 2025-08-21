@@ -30,13 +30,21 @@ const consultas = [
     },
     {
         key: "segurados",
-        icon: <i className="bi bi-shield-check" />,
+        icon:<i className="bi bi-shield-check" />,
         title: "Consulta Segurados",
         desc: "Localize informações sobre segurados com base nos registros disponíveis.",
         to: "/consulta-segurados",
         niveis: ["admin", "usuario", "comercial"],
     },
-    // Adicione mais consultas aqui quando precisar!
+    {
+        key: "faturas",
+        icon: <i className="bi bi-file-earmark-text"></i>,
+        title: "Consultar Faturas",
+        desc: "Localize informações sobre faturamento com base nos registros disponíveis.",
+        to: "/consulta-faturas",
+        niveis: ["admin", "usuario", "comercial"],
+    },
+    
 ];
 
 const ConsultasHome = () => {
@@ -77,12 +85,6 @@ const ConsultasHome = () => {
                                 </div>
                             </div>
                         ))}
-                        {/* Se quiser deixar uma mensagem padrão se não tiver consultas */}
-                        {consultas.filter((c) => c.niveis.includes(currentUserType)).length === 0 && (
-                            <div className="no-consultas">
-                                <p>Você não possui consultas disponíveis.</p>
-                            </div>
-                        )}
                     </div>
                 </div>
             </main>
