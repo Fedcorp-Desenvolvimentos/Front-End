@@ -82,10 +82,19 @@
     padding: 1.3rem 1.2rem;
     box-shadow: 0 1.5px 7px #2463eb11;
   }
+  
   .resultado-fatura h3 {
     color: #2463eb;
     font-size: 1.1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.1rem;
+  }
+  
+  .resultado-dados {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem 1.2rem;
+    font-size: 1rem;
+    color: #1a2340;
   }
   
   /* Responsivo */
@@ -103,4 +112,11 @@
       padding: 1.2rem 0.2rem;
     }
   }
+
+  @media (max-width: 600px) {
+    .resultado-dados {
+      grid-template-columns: 1fr;
+    }
+  }
+  
   
