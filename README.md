@@ -15,8 +15,26 @@ Capacita consultores e administradores a buscar dados específicos ou em massa (
 📊 Consulta de Pessoa Jurídica (CNPJ)
   - Permite verificar informações cadastrais da empresa, como razão social, nome fantasia, situação, CNAE, natureza jurídica e endereço oficial.
     
- 🔎 Consulta de Endereço
+🔎 Consulta de Endereço
   - Busca de endereços a partir de CEPs com retorno de logradouro, bairro, cidade e estado.
+
+🔎 Consulta em Massa 
+  - Busca de endereços, dados básicos, dados empresariais a partir de uma planilha com retorno devolvido com os dados preenchidos em planilha.
+
+🔎 Consulta de Beneficiários  
+  - Busca de beneficiários no banco de dados da organização para consulta, trazendo o histórico dos serviços feitos com a companhia.
+
+🔎 Consulta de Faturas  
+  - Busca de faturamento no banco de dados da organização para consulta, trazendo os dados do que foi faturado para controle financeiro.
+
+🔎 Ferramentas da Companhia  
+  - Centralização dos acessos de todas as ferramentas em um único lugar.
+
+🔎 Métricas da Companhia  
+  - Acompanhamento das métricas produzidas pela organização em tempo real.
+
+📊 Cotação de Produtos
+  - Permite cotar um seguro em tempo real.
 
 🧑‍💻 **Gerenciamento de Usuários**
   - Cadastro de novos usuários com função (ex: administrador).
@@ -36,13 +54,18 @@ Capacita consultores e administradores a buscar dados específicos ou em massa (
 
 🔐 Login e esqueci senha estruturados, prontos para integração com API de autenticação.
 
-📦 Front-end puro com React e CSS customizado, sem Bootstrap.
+📦 Front-end puro com React e CSS customizado.
 
 ## 📂 Funcionalidades Futuras
 
-- **Consulta em Massa via Planilha**
-  - Upload de arquivos `.csv` ou `.xlsx` com múltiplos CPFs/CNPJs para processamento em lote.
+- **Consulta em de Leads**
+  - Consulta de Leads para comercial buscar informações.
   - Geração de relatório consolidado com os dados retornados.
+ 
+- **Envio de E-mails em Massa**
+  - Upload de uma planilha com informações feitas durante o dia a dia para envio em formato de e-mail.
+  - Histórico de envio.
+  - Cadastro e manutenção da rede de contatos.
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -72,6 +95,8 @@ Capacita consultores e administradores a buscar dados específicos ou em massa (
 │  ├── EsqueciSenha/ 
 │    ├── EsqueciSenha.jsx/ 
 │ ├── Navbar/ (componente reutilizável)
+│ ├── Cotação/ 
+│   ├── CotacaoConteudo.jsx
 │ ├── styles/ # Arquivos CSS separados
 │ ├── App.jsx # Roteamento principal
 │ └── main.jsz
