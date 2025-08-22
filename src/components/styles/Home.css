@@ -16,7 +16,7 @@
 }
 
 .home-desc {
-  font-size: 0.98rem;
+  font-size: 0.99rem;
   color: #444;
   margin-bottom: 32px;
   line-height: 1.6;
@@ -37,8 +37,8 @@
 
 .carousel-image {
   width: 100%;
-  min-height: 320px;
-  max-height: 400px;
+  min-height: 400px;
+  max-height: 420px;
   object-fit: cover;
   display: block;
   transition: opacity 0.18s;

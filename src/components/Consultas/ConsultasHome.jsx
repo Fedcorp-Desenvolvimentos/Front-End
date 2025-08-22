@@ -38,7 +38,7 @@ const consultas = [
     },
     {
         key: "faturas",
-        icon: <i className="bi bi-file-earmark-text"></i>,
+        icon: <i class="bi bi-file-earmark-text"></i>,
         title: "Consultar Faturas",
         desc: "Localize informações sobre faturamento com base nos registros disponíveis.",
         to: "/consulta-faturas",
