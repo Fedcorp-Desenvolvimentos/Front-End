@@ -584,23 +584,6 @@ const ConsultaSegurado = () => {
                             <SeguradoItem key={idx} segurado={seg} />
                         ))}
                     </ul>
-                    {(totalPages > 1 || (resultado && resultado.length === pageSize)) && (
-                        <div className="pagination-controls">
-                            <button
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1 || loading}
-                            >
-                                Página Anterior
-                            </button>
-                            <span>Página {currentPage} de {totalPages}</span>
-                            <button
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage >= totalPages && resultado.length < pageSize || loading}
-                            >
-                                Próxima Página
-                            </button>
-                        </div>
-                    )}
                 </div>
             )}
         </div>

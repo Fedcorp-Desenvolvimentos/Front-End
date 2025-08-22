@@ -54,7 +54,6 @@ const ConsultaFatura = () => {
 
     console.log('Resultado:', resultado);
 
-
     return (
         <div className="consulta-fatura-container">
             <h1 className="consultas-title">
