@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import "../styles/Home.css";
 
 const imagensCarrossel = [
@@ -8,6 +9,7 @@ const imagensCarrossel = [
 ];
 
 const Home = () => {
+  const { withSidebar } = useOutletContext();
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -18,7 +20,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="home-container">
+    <div className={`home-container${withSidebar ? " with-sidebar" : ""}`}>
       <h1 className="home-title">Bem-vindos à Plataforma Bigcorp!</h1>
       <p className="home-desc">
         A plataforma Bigcorp foi criada para simplificar a rotina da empresa e centralizar as soluções.<br />
