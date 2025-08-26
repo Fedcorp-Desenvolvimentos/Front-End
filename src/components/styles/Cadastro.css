@@ -87,8 +87,8 @@
   box-shadow: 0 2px 16px rgba(36,99,235,0.07);
   padding: 2.2rem 2.3rem 1.7rem 2.3rem;
   flex: 1 1 0;
-  min-width: 320px;
-  max-width: 525px;
+  min-width: 400px;
+  max-width: 605px;
   margin-top: 0.2rem;
 }
 
@@ -98,7 +98,8 @@
   font-weight: 600;
   margin-bottom: 1.1rem;
   display: flex;
-  align-items: center;
+  align-items: center !important;
+  justify-items: center;
   gap: 0.5rem;
 }
 
@@ -112,6 +113,7 @@
   flex-direction: column;
   gap: 1.04rem;
   width: 100%;
+  min-width: 400px !important;
 }
 
 .form-group {
@@ -137,6 +139,7 @@
   font-size: 0.90rem;
   background: #f8fafc;
   transition: border 0.16s, background 0.16s;
+  width: 100%;
 }
 
 .form-group input:focus,
