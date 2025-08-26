@@ -80,19 +80,49 @@
     box-shadow: 0 2px 18px #2463eb16;
   }
   
-  @media (max-width: 800px) {
+  @media (max-width: 700px) {
     .cotacao-container {
-      padding: 20px 3vw 22px 3vw;
-      max-width: 99vw;
-      margin: 18px auto;
-    }
-    .input-grid {
-      grid-template-columns: 1fr;
-      gap: 1rem;
+      max-width: 100vw !important;
+      width: 100vw !important;
+      margin-left: 1rem;
+      border-radius: 14px !important;
+      box-sizing: border-box !important;
     }
     .titulo-pagina {
-      font-size: 1.2rem;
-      margin-bottom: 20px;
+      font-size: 1.07rem !important;
+      margin-bottom: 14px !important;
+      text-align: center !important;
+      gap: 0.4rem !important;
+      flex-direction: column !important;
+    }
+    .icone-cabecalho {
+      width: 44px !important;
+      height: 44px !important;
+      font-size: 1.25rem !important;
+      margin-bottom: 0.65rem !important;
+    }
+    .input-grid {
+      grid-template-columns: 1fr !important;
+      gap: 0.8rem !important;
+      width: 100vw !important;
+      box-sizing: border-box !important;
+      margin-left: 1.5rem;
+    }
+    .campo {
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .campo label {
+      font-size: 0.97rem !important;
+      margin-bottom: 0.25rem !important;
+      padding-left: 2px !important;
+    }
+    .campo input {
+      width: 80% !important;
+      font-size: 0.99rem !important;
+      padding: 0.7rem 0.8rem !important;
+      box-sizing: border-box !important;
     }
   }
+  
   

@@ -382,32 +382,129 @@
   font-size: 1.21rem;
 }
 
-/* Responsivo para mobile */
-@media (max-width: 600px) {
+@media (max-width: 700px) {
+  .comercial-page {
+    padding: 1rem 0.2rem 1rem 0.2rem !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  .comercial-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    margin-top: 1.2rem;
+    gap: 0.3rem;
+    letter-spacing: 0.5px;
+    margin-left: 1.5rem;
+  }
+
+  .card-opcoes {
+    max-width: 99vw !important;
+    width: 100vw !important;
+    padding: 1rem 0.5rem !important;
+    margin-bottom: 1.2rem;
+    box-sizing: border-box !important;
+    margin-left: 1rem;
+  }
+
+  .form-card-container {
+    flex-direction: column !important;
+    gap: 1.1rem !important;
+    max-width: 90vw !important;
+    width: 80vw !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .form-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 1.2rem 0.7rem !important;
+    box-sizing: border-box !important;
+  }
+
+  .card-body {
+    width: 100% !important;
+    padding: 0.6rem 0.3rem !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+  }
+
+  .form-control {
+    width: 100% !important;
+    margin-bottom: 0.95rem !important;
+    font-size: 1rem !important;
+    border-radius: 0.5rem !important;
+    box-sizing: border-box !important;
+    text-align: left !important;
+  }
+
+  .btn-primary {
+    margin-top: 0.8rem !important;
+  }
+
   .card-options-accordion {
-    max-width: 98vw;
-    margin: 16px 0 24px 0;
+    width: 80vw !important;
+    max-width: 90vw !important;
+    margin-left: 3rem;
+    padding: 0 0 !important;
+    box-sizing: border-box !important;
   }
   .accordion-card {
-    max-width: 99vw;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 auto 14px auto !important;
+    border-radius: 1rem !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
   }
-  .accordion-header,
+  .accordion-header {
+    padding: 1rem 0.6rem !important;
+    font-size: 1rem !important;
+    border-radius: 1rem 1rem 0 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .accordion-arrow {
+    margin-left: auto !important;
+    font-size: 1rem !important;
+  }
   .accordion-body {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 0.95rem 0.7rem 1.15rem 0.7rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 13px !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .subcard-option {
+    padding: 1rem 0.8rem !important;
+    font-size: 1rem !important;
+    gap: 10px !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    border-radius: 0.7rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .subcard-icon {
+    font-size: 1.13rem !important;
   }
 }
 
 
 
-/* ----- Responsividade ----- */
-@media (max-width: 768px) {
-  .form-card {
-    flex: 1 1 100%;
-  }
-  .card-opcoes,
-  .form-card-container {
-    max-width: 100%;
-    margin: 0;
-  }
-}
+
