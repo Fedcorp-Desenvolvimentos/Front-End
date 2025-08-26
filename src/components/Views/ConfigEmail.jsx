@@ -110,18 +110,18 @@ const ConfigEmail = () => {
             </div>
 
             <div className="form-group">
-                <label>Produtos</label>
+                <label className="title-produto">Produtos</label>
                 <div className="produtos-grid">
                     <div className="produtos-coluna">
                         {listaProdutosDisponiveis.slice(0, 5).map((produto) => (
-                            <label key={produto} className="checkbox-item">
-                                <input
-                                    type="checkbox"
-                                    checked={produtosSelecionados.includes(produto)}
-                                    onChange={() => toggleProduto(produto)}
-                                />
-                                {produto}
-                            </label>
+                             <label key={produto} className="checkbox-item">
+                             <input
+                               type="checkbox"
+                               checked={produtosSelecionados.includes(produto)}
+                               onChange={() => toggleProduto(produto)}
+                             />
+                             {produto}
+                           </label>
                         ))}
                     </div>
                     <div className="produtos-coluna">

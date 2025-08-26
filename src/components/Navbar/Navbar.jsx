@@ -12,10 +12,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   const nivelAcesso = user?.nivel_acesso;
 
-  // Fecha o dropdown ao trocar de rota
   useEffect(() => setDropdownOpen(false), [location.pathname]);
 
-  // Fecha dropdown/menu ao clicar fora (mobile)
   useEffect(() => {
     function handleClickOutside(e) {
       if (
@@ -33,7 +31,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   return (
     <>
-      {/* Botão hamburguer - aparece só no mobile */}
       <button
         className="sidebar-hamburger"
         aria-label="Abrir/fechar menu"

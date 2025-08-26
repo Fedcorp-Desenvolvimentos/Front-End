@@ -160,11 +160,11 @@ const HistoricoConsulta = () => {
                     className={selectedConsultaId === consulta.id ? 'active-row' : ''}
                     onClick={() => handleItemClick(consulta.id)}
                   >
-                    <td>{consulta.tipo_consulta_display || consulta.tipo_consulta}</td>
-                    <td>{getParametroDisplay(consulta)}</td>
-                    <td>{consulta.usuario_email || 'N/A'}</td>
-                    <td>{new Date(consulta.data_consulta).toLocaleDateString()}</td>
-                    <td className="expand-icon">
+                    <td data-label="Tipo de Consulta">{consulta.tipo_consulta_display || consulta.tipo_consulta}</td>
+                    <td data-label="Parâmetro">{getParametroDisplay(consulta)}</td>
+                    <td data-label="Realizada por">{consulta.usuario_email || 'N/A'}</td>
+                    <td data-label="Data">{new Date(consulta.data_consulta).toLocaleDateString()}</td>
+                    <td  data-label="" className="expand-icon">
                       <i className={`bi ${selectedConsultaId === consulta.id ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
                     </td>
                   </tr>

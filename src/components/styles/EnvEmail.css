@@ -1,7 +1,7 @@
 .env-email-container {
     padding: 2rem;
     max-width: 900px;
- 
+
 }
 
 .env-email-title {
@@ -79,25 +79,25 @@
     background-position: right 10px center;
     cursor: pointer;
     gap: 1rem;
-    margin-bottom: 1rem; 
-  }
-  
-  .select-tipo-envio:focus {
+    margin-bottom: 1rem;
+}
+
+.select-tipo-envio:focus {
     outline: none;
     border-color: #0d6efd;
     box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
-  }
-  
-  .select-tipo-envio:disabled {
+}
+
+.select-tipo-envio:disabled {
     background-color: #f4f4f4;
     color: #777;
     cursor: not-allowed;
-  }
+}
 
-  .upload-planilha-box {
+.upload-planilha-box {
     margin-top: 12px;
     padding: 12px;
-    width: 400px;
+    width: 450px;
     height: 100px;
     border: 1px dashed #cfd6df;
     border-radius: 10px;
@@ -105,25 +105,25 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-  }
-  
-  .upload-planilha-box:hover {
+}
+
+.upload-planilha-box:hover {
     border-color: rgba(13, 110, 253, 0.3);
     background: #f8fbff;
-  }
-  
-  .btn-upload .btn-upload-content {
+}
+
+.btn-upload .btn-upload-content {
     display: inline-flex;
     gap: 8px;
     align-items: center;
-  }
+}
 
-  .upload-info {
+.upload-info {
     font-size: 0.9rem;
     color: #48566a;
-  }
-  
-  .config-tabs {
+}
+
+.config-tabs {
     display: flex;
     gap: 10px;
     margin-bottom: 16px;
@@ -185,3 +185,134 @@
     cursor: pointer;
     font-weight: bold;
 }
+
+@media (max-width: 700px) {
+    .env-email-container, .consulta-container03 {
+      max-width: 100vw !important;
+      width: 98vw;
+      padding: 0 8px !important;
+      margin: 0 !important;
+      box-sizing: border-box;
+    }
+  
+    .email-title {
+      font-size: 1.2rem !important;
+      margin-top: 2.2rem;
+      margin-bottom: 2rem;
+      text-align: center !important;
+      padding: 0 1vw;
+      line-height: 1.3;
+      margin-left: 3rem;
+    }
+  
+    .card-options-wrapper {
+      grid-template-columns: 1fr !important;
+      gap: 1rem;
+      padding: 0 6px;
+    }
+    .card-option {
+      max-width: 97vw !important;
+      width: 80% !important;
+      margin: 0 auto;
+      padding: 1.1rem 0.4rem;
+      box-sizing: border-box;
+    }
+    .icon-container {
+      width: 48px;
+      height: 48px;
+      font-size: 1.7rem;
+      padding: 0.7rem;
+      margin-bottom: 0.5rem;
+    }
+    .card-option h5 {
+      font-size: 1rem !important;
+      word-break: break-word;
+      line-height: 1.2;
+    }
+  
+    .form-container {
+      max-width: 99vw !important;
+      width: 80% !important;
+      padding: 14px 1vw 18px 1vw !important;
+      box-sizing: border-box;
+    }
+  
+    .assunto-container label,
+    .form-container label {
+      font-size: 0.98rem !important;
+      margin-bottom: 0.25rem;
+    }
+  
+    .select-tipo-envio {
+      font-size: 0.95rem !important;
+      padding: 0.55rem 2.2rem 0.55rem 0.7rem;
+    }
+  
+    .select-tipo-envio option {
+      font-size: 0.70rem !important;
+    }
+  
+    .upload-planilha-box {
+      width: 74vw !important;
+      max-width: 97vw !important;
+      height: auto;
+      min-height: 74px;
+      padding: 10px 3vw;
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+  
+    .btn-upload {
+      width: 80% !important;
+      font-size: 1rem !important;
+      padding: 0.7rem 0 !important;
+      border-radius: 7px;
+    }
+  
+    .btn-upload-content {
+      font-size: 0.98rem;
+      gap: 7px;
+    }
+  
+    .upload-info {
+      font-size: 0.95rem;
+    }
+  
+    .consulta-btn {
+      font-size: 1rem !important;
+      width: 100% !important;
+      padding: 0.8rem 0 !important;
+      border-radius: 7px;
+      margin-top: 1rem !important;
+    }
+  
+    .message, .error-message {
+      font-size: 0.97rem !important;
+      padding: 0.5rem 2vw;
+      margin-bottom: 0.5rem;
+    }
+  
+    /* Histórico de envios (tabela) */
+    .card-resultado {
+      padding: 10px 2vw 12px 2vw !important;
+      width: 82vw !important;
+      max-width: 98vw !important;
+      min-width: 0 !important;
+      box-sizing: border-box;
+    }
+    .card-resultado h4 {
+      font-size: 1.03rem;
+      margin-bottom: 1.1rem;
+    }
+    .historico-table {
+      font-size: 0.95rem;
+      width: 100%;
+      min-width: 320px;
+      overflow-x: auto;
+    }
+    .historico-table th,
+    .historico-table td {
+      padding: 6px 2px !important;
+    }
+  }
+  

@@ -116,8 +116,9 @@
       gap: 1.2rem;
     }
     .ferramentas-container {
-      padding: 16px 2vw 6vw 2vw;
-      margin: 13px auto;
+      padding: 20px 2vw 6vw 2vw;
+      margin: 20px auto;
+      margin-left: 2.5rem;
     }
     .ferramentas-title {
       font-size: 1.15rem;
