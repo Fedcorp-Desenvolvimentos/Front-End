@@ -4,7 +4,7 @@
   box-sizing: border-box;
   margin-top: 1rem;
   transition: padding-left 0.2s;
-  margin-left: 5.5rem;
+  margin-left: 1.6rem;
 }
 
 .container02 {
@@ -126,7 +126,7 @@
     max-width: 100vw;
     padding: 0 10px !important;
     margin-left: 0 !important;
-    margin-right: 5rem !important;
+    margin-right: 0 !important;
   }
 
   .consultas-title {
