@@ -249,7 +249,7 @@ const ConsultaComercial = () => {
   };
 
   return (
-    <div className="consulta-container">
+    <div className="comercial-page">
       <h1 className="comercial-title">
         <i className="bi bi-clipboard2-check"></i> Consultas Disponíveis
       </h1>

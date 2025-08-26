@@ -34,7 +34,7 @@
 
 .carousel-container,
 .carousel-indicators {
-  margin-left: 180px !important;
+  margin-left: 100px !important;
 }
 
 .home-desc {
@@ -71,7 +71,7 @@
 .carousel-indicators {
   position: absolute;
   bottom: 26px;
-  left: 32%;
+  left: 40%;
   transform: translateX(-50%);
   display: flex;
   gap: 11px;
