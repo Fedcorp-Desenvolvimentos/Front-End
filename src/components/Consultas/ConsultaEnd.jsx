@@ -478,12 +478,7 @@ const ConsultaEnd = () => {
                 value={resultado.resultado_api.state || "N/A"}
                 disabled
               />
-              <label>Complemento:</label>
-              <input
-                type="text"
-                value={resultado.resultado_api.complement || "N/A"}
-                disabled
-              />
+              
             </>
           )}
 
