@@ -1,19 +1,18 @@
 .import-vida-container {
   padding: 38px 18px 30px 18px;
-  max-width: 540px;
-  margin: 36px auto 0 auto;
-  background: #f8fafc;
+  max-width: 520px;
   border-radius: 18px;
   box-shadow: 0 6px 30px rgba(36,99,235,0.08);
   box-sizing: border-box;
   transition: box-shadow 0.19s;
+  margin-left: 38vw;
 }
 
 .import-vida-container h1 {
   text-align: center;
   margin-bottom: 2.1rem;
   color: #2463eb;
-  font-size: 2.1rem;
+  font-size: 1.9rem;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -43,7 +42,7 @@
   padding: 0.82rem 1rem;
   border: 1.5px solid #dbeafe;
   border-radius: 10px;
-  font-size: 1.04rem;
+  font-size: 1rem;
   background: #fff;
   transition: border 0.18s, background 0.16s;
   color: #222b3a;
@@ -67,7 +66,7 @@
   border-radius: 10px;
   cursor: pointer;
   font-weight: 700;
-  font-size: 1.07rem;
+  font-size: 1rem;
   margin-top: 0.6rem;
   box-shadow: 0 2px 12px #2463eb12;
   transition: background 0.19s, color 0.17s;
@@ -83,7 +82,7 @@
 .success-alert {
   text-align: center;
   font-weight: 700;
-  font-size: 1.08rem;
+  font-size: 1rem;
   border-radius: 8px;
   margin-top: 1.3rem;
   padding: 0.7rem 1.1rem;

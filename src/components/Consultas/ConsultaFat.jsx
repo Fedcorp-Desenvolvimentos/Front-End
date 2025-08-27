@@ -103,16 +103,16 @@ const ConsultaFatura = () => {
                         </div>
                         <div className="campo"><strong>Comissão 2:</strong> {(resultado.COMISSAO2)} %</div>
                         <div className="campo"><strong>Data da Fatura:</strong> {formatarData(resultado.DATA_FAT)}</div>
-                        <div className="campo"><strong>Vencimento:</strong> {formatarData(resultado.VENCIMENTO)}</div>
-                        <div className="campo"><strong>Início Vigência:</strong> {formatarData(resultado.DT_INI_VIG)}</div>
-                        <div className="campo"><strong>Fim Vigência:</strong> {formatarData(resultado.DT_FIM_VIG)}</div>
-
                         <div className="campo">
                             <strong>Status: </strong>
                             <span className="status-badge">
                                 {resultado.STATUS ? resultado.STATUS : 'Indefinido'}
                             </span>
                         </div>
+                        <div className="campo"><strong>Início Vigência:</strong> {formatarData(resultado.DT_INI_VIG)}</div>
+                        <div className="campo"><strong>Fim Vigência:</strong> {formatarData(resultado.DT_FIM_VIG)}</div>
+
+                        
                         {resultado.DT_CANCEL && (
                             <div>
                                 <strong>Data Cancelamento:</strong> {formatarData(resultado.DT_CANCEL)}

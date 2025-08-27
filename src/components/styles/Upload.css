@@ -5,8 +5,8 @@
   height: calc(100vh - 64px);
   padding: 1rem;
   box-sizing: border-box;
-  background: linear-gradient(120deg, #f8fafc 70%, #e0ecfa 100%);
   overflow: hidden;
+  margin-left: 45vh;
 }
 
 .upload-container {
@@ -14,7 +14,7 @@
   flex-direction: column;
   align-items: center;
   gap: 1.35rem;
-  background: #fff;
+  background: #f8fafc;
   padding: 2.8rem 2.3rem;
   border-radius: 22px;
   box-shadow: 0 8px 32px rgba(36,99,235,0.12);
