@@ -10,6 +10,8 @@ const ConsultaCNPJ = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resultado, setResultado] = useState(null);
+  const [hasQueried, setHasQueried] = useState(false);
+
   const [formData, setFormData] = useState({
     razaoSocial: "",
     uf: "",
@@ -33,12 +35,95 @@ const ConsultaCNPJ = () => {
     }));
   };
 
+  const flatToBasicData = (flat) => {
+    if (!flat) return null;
+
+    const Contact = {
+      Phone1: flat.ddd_telefone_1 ?? null,
+      Phone2: flat.ddd_telefone_2 ?? null,
+      Email: flat.email ?? null,
+    };
+
+    const Address = {
+      Neighborhood: flat.bairro ?? null,
+      ZipCode: flat.cep ?? null,
+      StreetType: flat.descricao_tipo_de_logradouro ?? null,
+      Street: flat.logradouro ?? null,
+      Complement: flat.complemento ?? null,
+      Number: flat.numero ?? null,
+      City: flat.municipio ?? null,
+      State: flat.uf ?? null,
+    };
+
+    return {
+      OfficialName: flat.razao_social ?? null,
+      TradeName: flat.nome_fantasia ?? null,
+      TaxIdNumber: flat.cnpj ?? null,
+      HeadquarterState: flat.uf ?? null,
+      Activities: flat.cnae_fiscal_descricao
+        ? [{ Activity: flat.cnae_fiscal_descricao }]
+        : [],
+      LegalNature: flat.natureza_juridica
+        ? { Activity: flat.natureza_juridica }
+        : null,
+      TaxIdStatus: flat.descricao_situacao_cadastral ?? null,
+      FoundedDate: flat.data_inicio_atividade ?? null,
+
+      Contact,
+      Address,
+    };
+  };
+
+  const getRoot = (res) => (res?.resultado_api ?? res);
+
+  const getResultList = (res) => {
+    if (!res) return [];
+    const root = getRoot(res);
+
+    if (Array.isArray(root?.Result)) return root.Result;
+    if (Array.isArray(root?.results)) return root.results;
+    if (Array.isArray(root?.items)) return root.items;
+    if (Array.isArray(root?.data)) return root.data;
+
+    if (root && (root.cnpj || root.razao_social)) {
+      const basic = flatToBasicData(root);
+      return basic ? [{ BasicData: basic }] : [];
+    }
+
+    return [];
+  };
+
+  const getCnpjData = (res) => {
+    if (!res) return null;
+    const tipo = res?.historico_salvo?.tipo_consulta;
+
+    if (tipo === "cnpj") {
+      return res?.resultado_api ?? res;
+    }
+
+    if (tipo === "cnpj_razao_social") {
+      const list = getResultList(res);
+      const item0 = list?.[0];
+      if (item0?.BasicData) return item0.BasicData;
+
+      const root = getRoot(res);
+      if (root && (root.cnpj || root.razao_social)) {
+        return flatToBasicData(root);
+      }
+      return null;
+    }
+
+    const list = getResultList(res);
+    return list?.[0]?.BasicData ?? null;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
     setResultado(null);
     setMassConsultaMessage("");
+    setHasQueried(true);
 
     let payload = {};
     let isFormValid = true;
@@ -66,7 +151,7 @@ const ConsultaCNPJ = () => {
           "Por favor, preencha pelo menos um campo para busca por chaves alternativas.";
         isFormValid = false;
       } else {
-        let qParams = [];
+        const qParams = [];
         if (formData.razaoSocial.trim()) {
           qParams.push(`name{${formData.razaoSocial.trim()}}`);
         }
@@ -97,7 +182,7 @@ const ConsultaCNPJ = () => {
 
     try {
       const response = await ConsultaService.realizarConsulta(payload);
-      setResultado(response);
+      setResultado(response?.data ?? response);
       console.log("Resultado da consulta:", response);
     } catch (err) {
       const errorMessage =
@@ -202,27 +287,20 @@ const ConsultaCNPJ = () => {
     }
   };
 
-  const getCnpjData = () => {
-    if (!resultado || !resultado.resultado_api) return null;
-    if (resultado.historico_salvo?.tipo_consulta === "cnpj") {
-      return resultado.resultado_api;
-    } else if (
-      resultado.historico_salvo?.tipo_consulta === "cnpj_razao_social"
-    ) {
-      if (
-        resultado.resultado_api.Result &&
-        resultado.resultado_api.Result.length > 0
-      ) {
-        return resultado.resultado_api.Result[0].BasicData;
-      }
-    }
-    return null;
-  };
-
-  const cnpjData = getCnpjData();
+  const cnpjData = getCnpjData(resultado);
+  const resultList = getResultList(resultado);
 
   const handleExpandResult = (idx) => {
     setSelectedResultIndex(selectedResultIndex === idx ? null : idx);
+  };
+
+  const resetStateOnTab = (tab) => {
+    setActiveForm(tab);
+    setError(null);
+    setResultado(null);
+    setMassConsultaMessage("");
+    setSelectedResultIndex(null);
+    setHasQueried(false);
   };
 
   return (
@@ -233,14 +311,8 @@ const ConsultaCNPJ = () => {
 
       <div className="card-options-wrapper">
         <div
-          className={`card card-option ${activeForm === "cnpj" ? "active" : ""
-            }`}
-          onClick={() => {
-            setActiveForm("cnpj");
-            setError(null);
-            setResultado(null);
-            setMassConsultaMessage("");
-          }}
+          className={`card card-option ${activeForm === "cnpj" ? "active" : ""}`}
+          onClick={() => resetStateOnTab("cnpj")}
         >
           <div className="icon-container">
             <svg
@@ -259,14 +331,8 @@ const ConsultaCNPJ = () => {
         </div>
 
         <div
-          className={`card card-option ${activeForm === "chaves" ? "active" : ""
-            }`}
-          onClick={() => {
-            setActiveForm("chaves");
-            setError(null);
-            setResultado(null);
-            setMassConsultaMessage("");
-          }}
+          className={`card card-option ${activeForm === "chaves" ? "active" : ""}`}
+          onClick={() => resetStateOnTab("chaves")}
         >
           <div className="icon-container">
             <svg
@@ -282,14 +348,8 @@ const ConsultaCNPJ = () => {
         </div>
 
         <div
-          className={`card card-option ${activeForm === "massa" ? "active" : ""
-            }`}
-          onClick={() => {
-            setActiveForm("massa");
-            setError(null);
-            setResultado(null);
-            setMassConsultaMessage("");
-          }}
+          className={`card card-option ${activeForm === "massa" ? "active" : ""}`}
+          onClick={() => resetStateOnTab("massa")}
         >
           <div className="icon-container">
             <FileSpreadsheet size={35} />
@@ -383,7 +443,8 @@ const ConsultaCNPJ = () => {
           {error && <p className="error-message">{error}</p>}
         </div>
       )}
-      {activeForm == "cnpj" && cnpjData && (
+
+      {activeForm === "cnpj" && cnpjData && (
         <div className="card-resultado">
           <h4>Resultado da busca realizada</h4>
 
@@ -401,7 +462,11 @@ const ConsultaCNPJ = () => {
           />
 
           <label>Telefone:</label>
-          <input type="text" value={cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"} disabled />
+          <input
+            type="text"
+            value={cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"}
+            disabled
+          />
 
           <label>UF (Sede):</label>
           <input type="text" value={cnpjData.uf || "N/A"} disabled />
@@ -418,8 +483,7 @@ const ConsultaCNPJ = () => {
             type="text"
             value={
               cnpjData.descricao_tipo_de_logradouro && cnpjData.logradouro
-                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro}${cnpjData.numero ? `, ${cnpjData.numero}` : ""
-                }`
+                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro}${cnpjData.numero ? `, ${cnpjData.numero}` : ""}`
                 : cnpjData.descricao_tipo_de_logradouro ||
                 cnpjData.logradouro ||
                 "Não informada"
@@ -430,82 +494,96 @@ const ConsultaCNPJ = () => {
           <label>Complemento</label>
           <input
             type="text"
-            value={cnpjData.municipio || "Não informada"}
+            value={cnpjData.complemento || "Não informada"}
             disabled
           />
 
           <label>Município</label>
           <input
             type="text"
-            value={cnpjData.complemento || "Não informada"}
+            value={cnpjData.municipio || "Não informada"}
             disabled
           />
-
-        </div>
-      )}
-      {activeForm == "chaves" && resultado?.resultado_api?.Result && resultado.resultado_api.Result.length > 0 && (
-        <div className="card-resultado">
-          <h4>Resultados encontrados</h4>
-          <table className="historico-table">
-            <thead>
-              <tr>
-                <th>Razão Social</th>
-                <th>CNPJ</th>
-                <th>UF</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {resultado.resultado_api.Result.map((item, idx) => (
-                <React.Fragment key={idx}>
-                  <tr
-                    className={selectedResultIndex === idx ? 'active-row' : ''}
-                    onClick={() => handleExpandResult(idx)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <td>{item.BasicData?.OfficialName || 'N/A'}</td>
-                    <td>{item.BasicData?.TaxIdNumber || 'N/A'}</td>
-                    <td>{item.BasicData?.HeadquarterState || 'N/A'}</td>
-                    <td className="expand-icon">
-                      <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
-                    </td>
-                  </tr>
-                  {selectedResultIndex === idx && (
-                    <tr>
-                      <td colSpan="4">
-                        <div className="detalhes-historico-panel">
-                          <p><strong>Razão Social:</strong> {item.BasicData?.OfficialName || 'N/A'}</p>
-                          <p><strong>Nome Fantasia:</strong> {item.BasicData?.TradeName || 'N/A'}</p>
-                          <p><strong>CNPJ:</strong> {item.BasicData?.TaxIdNumber || 'N/A'}</p>
-                          <p><strong>Atividade Principal:</strong> {item.BasicData?.Activities?.[0]?.Activity || 'N/A'}</p>
-                          <p><strong>Natureza Jurídica:</strong> {item.BasicData?.LegalNature?.Activity || 'N/A'}</p>
-                          <p><strong>UF (Sede):</strong> {item.BasicData?.HeadquarterState || 'N/A'}</p>
-                          <p><strong>Situação Cadastral:</strong> {item.BasicData?.TaxIdStatus || 'N/A'}</p>
-                          <p><strong>Data de Fundação:</strong> {item.BasicData?.FoundedDate || 'N/A'}</p>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
         </div>
       )}
 
-{activeForm === "chaves" &&
-  resultado?.resultado_api &&
-  (
-    (Array.isArray(resultado.resultado_api.Result) && resultado.resultado_api.Result.length === 0)
-    || (resultado.resultado_api && resultado.resultado_api.Result === undefined)
-  ) && (
-    <div className="no-results-message">
-      Nenhum resultado encontrado para os filtros informados. Adicione mais informações.
-    </div>
-)}
+      {activeForm === "chaves" &&
+        Array.isArray(resultList) &&
+        resultList.length > 0 && (
+          <div className="card-resultado">
+            <h4>Resultados encontrados</h4>
+            <table className="historico-table">
+              <thead>
+                <tr>
+                  <th>Razão Social</th>
+                  <th>CNPJ</th>
+                  <th>UF</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {resultList.map((item, idx) => {
+                  const BD = item.BasicData ?? item.basicData ?? flatToBasicData(item) ?? {};
+                  const AD = BD.Address ?? {};
+                  const CT = BD.Contact ?? {};
 
-    </div>
+                  return (
+                    <React.Fragment key={idx}>
+                      <tr
+                        className={selectedResultIndex === idx ? "active-row" : ""}
+                        onClick={() => handleExpandResult(idx)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <td>{BD?.OfficialName || "N/A"}</td>
+                        <td>{BD?.TaxIdNumber || "N/A"}</td>
+                        <td>{BD?.HeadquarterState || "N/A"}</td>
+                        <td className="expand-icon">
+                          <i
+                            className={`bi ${selectedResultIndex === idx ? "bi-chevron-up" : "bi-chevron-down"}`}
+                          ></i>
+                        </td>
+                      </tr>
+                      {selectedResultIndex === idx && (
+                        <tr>
+                          <td colSpan="4">
+                            <div className="detalhes-historico-panel">
+                              <p><strong>Razão Social:</strong> {BD?.OfficialName || "Não localizado"}</p>
+                              <p><strong>Nome Fantasia:</strong> {BD?.TradeName || "Não localizado"}</p>
+                              <p><strong>CNPJ:</strong> {BD?.TaxIdNumber || "Não localizado"}</p>
+                              <p><strong>Situação Cadastral:</strong> {BD?.TaxIdStatus || "Não localizado"}</p>
+                              <p><strong>Telefone:</strong> {CT?.Phone1 || CT?.Phone2 || "N/A"}</p>
+                              <p><strong>Email:</strong> {CT?.Email || "Não localizado"}</p>
+                              <p><strong>CEP:</strong> {AD?.ZipCode || "Não localizado"}</p>
+                              <p>
+                                <strong>Endereço:</strong>{" "}
+                                {AD?.StreetType || AD?.Street || AD?.Number || AD?.Complement
+                                  ? `${AD?.StreetType ?? ""} ${AD?.Street ?? ""}${AD?.Number ? `, ${AD?.Number}` : ""}${AD?.Complement ? ` - ${AD?.Complement}` : ""}`
+                                  : "N/A"}
+                              </p>
+                              <p><strong>Bairro:</strong> {AD?.Neighborhood || "Não localizado"}</p>
+                              <p><strong>Município:</strong> {AD?.City || "Não localizado"}</p>
+                              <p><strong>UF:</strong> {BD?.HeadquarterState || "Não localizado"}</p>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
 
+      {activeForm === "chaves" &&
+        hasQueried &&
+        Array.isArray(resultList) &&
+        resultList.length === 0 && (
+          <div className="no-results-message">
+            Nenhum resultado encontrado para os filtros informados. Adicione mais informações.
+          </div>
+        )}
+    </div>
   );
 };
 
