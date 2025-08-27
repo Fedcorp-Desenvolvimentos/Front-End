@@ -35,6 +35,7 @@ const ConsultaCNPJ = () => {
     }));
   };
 
+  // ---- Normalização de shapes ----
   const flatToBasicData = (flat) => {
     if (!flat) return null;
 
@@ -63,12 +64,9 @@ const ConsultaCNPJ = () => {
       Activities: flat.cnae_fiscal_descricao
         ? [{ Activity: flat.cnae_fiscal_descricao }]
         : [],
-      LegalNature: flat.natureza_juridica
-        ? { Activity: flat.natureza_juridica }
-        : null,
+      LegalNature: flat.natureza_juridica ? { Activity: flat.natureza_juridica } : null,
       TaxIdStatus: flat.descricao_situacao_cadastral ?? null,
       FoundedDate: flat.data_inicio_atividade ?? null,
-
       Contact,
       Address,
     };
@@ -123,7 +121,6 @@ const ConsultaCNPJ = () => {
     setError(null);
     setResultado(null);
     setMassConsultaMessage("");
-    setHasQueried(true);
 
     let payload = {};
     let isFormValid = true;
@@ -131,14 +128,10 @@ const ConsultaCNPJ = () => {
 
     if (activeForm === "cnpj") {
       if (cnpj.length !== 14) {
-        validationErrorMessage =
-          "Por favor, insira um CNPJ válido com 14 dígitos.";
+        validationErrorMessage = "Por favor, insira um CNPJ válido com 14 dígitos.";
         isFormValid = false;
       } else {
-        payload = {
-          tipo_consulta: "cnpj",
-          parametro_consulta: cnpj,
-        };
+        payload = { tipo_consulta: "cnpj", parametro_consulta: cnpj };
       }
     } else if (activeForm === "chaves") {
       if (
@@ -152,13 +145,10 @@ const ConsultaCNPJ = () => {
         isFormValid = false;
       } else {
         const qParams = [];
-        if (formData.razaoSocial.trim()) {
-          qParams.push(`name{${formData.razaoSocial.trim()}}`);
-        }
+        if (formData.razaoSocial.trim()) qParams.push(`name{${formData.razaoSocial.trim()}}`);
 
         if (qParams.length === 0) {
-          validationErrorMessage =
-            "Nenhum parâmetro de busca válido para chaves alternativas.";
+          validationErrorMessage = "Nenhum parâmetro de busca válido para chaves alternativas.";
           isFormValid = false;
         } else {
           const bigDataCorpPayload = {
@@ -194,6 +184,7 @@ const ConsultaCNPJ = () => {
       console.error("Erro na consulta:", err.response?.data || err);
     } finally {
       setLoading(false);
+      setHasQueried(true); // marca a busca só após finalizar (evita flash)
     }
   };
 
@@ -218,19 +209,12 @@ const ConsultaCNPJ = () => {
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
-        const cnpjsParaConsulta = jsonData.map((row) => ({
-          CNPJ: String(row.CNPJ),
-        }));
-        const requestBody = {
-          cnpjs: cnpjsParaConsulta,
-          origem: "planilha",
-        };
+        const cnpjsParaConsulta = jsonData.map((row) => ({ CNPJ: String(row.CNPJ) }));
+        const requestBody = { cnpjs: cnpjsParaConsulta, origem: "planilha" };
 
         setMassConsultaMessage("Enviando CNPJs para processamento em massa...");
 
-        const response = await ConsultaService.processarPlanilhaCNPJ(
-          requestBody
-        );
+        const response = await ConsultaService.processarPlanilhaCNPJ(requestBody);
         const blob = response;
         const url = window.URL.createObjectURL(new Blob([blob]));
         const link = document.createElement("a");
@@ -239,21 +223,15 @@ const ConsultaCNPJ = () => {
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
-        setMassConsultaMessage(
-          "Processamento concluído! O download da planilha de resultados iniciou."
-        );
+        setMassConsultaMessage("Processamento concluído! O download da planilha de resultados iniciou.");
       } catch (err) {
         console.error("Erro na comunicação ou processamento do arquivo:", err);
         const errorMessage =
-          err.response?.data?.message ||
-          err.message ||
-          "Erro inesperado: Verifique sua conexão e o formato do arquivo.";
+          err.response?.data?.message || err.message || "Erro inesperado: Verifique sua conexão e o formato do arquivo.";
         setMassConsultaMessage(`Erro ao processar a planilha: ${errorMessage}`);
       } finally {
         setLoading(false);
-        if (event.target) {
-          event.target.value = null;
-        }
+        if (event.target) event.target.value = null;
       }
     };
 
@@ -278,9 +256,7 @@ const ConsultaCNPJ = () => {
     } catch (err) {
       console.error("Erro ao baixar modelo:", err);
       const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        "Erro na comunicação com o servidor para baixar o modelo.";
+        err.response?.data?.message || err.message || "Erro na comunicação com o servidor para baixar o modelo.";
       setMassConsultaMessage(`Erro ao baixar modelo: ${errorMessage}`);
     } finally {
       setLoading(false);
@@ -335,11 +311,7 @@ const ConsultaCNPJ = () => {
           onClick={() => resetStateOnTab("chaves")}
         >
           <div className="icon-container">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="white"
-              viewBox="0 0 16 16"
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 16 16">
               <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5z" />
               <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5zM10 8a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0zm-6 4a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0zm4-3a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1" />
             </svg>
@@ -371,11 +343,7 @@ const ConsultaCNPJ = () => {
             required
             disabled={loading}
           />
-          <button
-            type="submit"
-            disabled={loading}
-            className={`consulta-btn ${loading ? "loading" : ""}`}
-          >
+          <button type="submit" disabled={loading} className={`consulta-btn ${loading ? "loading" : ""}`}>
             {loading ? "Consultando..." : "Consultar"}
           </button>
 
@@ -421,29 +389,20 @@ const ConsultaCNPJ = () => {
             onChange={handleMassFileUpload}
             disabled={loading}
           />
-          <button
-            type="button"
-            onClick={() => document.getElementById("input-massa").click()}
-            disabled={loading}
-          >
+          <button type="button" onClick={() => document.getElementById("input-massa").click()} disabled={loading}>
             Importar Planilha de CNPJs
           </button>
-          <button
-            type="button"
-            onClick={handleDownloadModel}
-            disabled={loading}
-          >
+          <button type="button" onClick={handleDownloadModel} disabled={loading}>
             Baixar Planilha Modelo
           </button>
 
           {loading && <p>Carregando...</p>}
-          {massConsultaMessage && (
-            <p className="message">{massConsultaMessage}</p>
-          )}
+          {massConsultaMessage && <p className="message">{massConsultaMessage}</p>}
           {error && <p className="error-message">{error}</p>}
         </div>
       )}
 
+      {/* Resultado: CNPJ direto */}
       {activeForm === "cnpj" && cnpjData && (
         <div className="card-resultado">
           <h4>Resultado da busca realizada</h4>
@@ -455,128 +414,133 @@ const ConsultaCNPJ = () => {
           <input type="text" value={cnpjData.cnpj || "N/A"} disabled />
 
           <label>Atividade Principal:</label>
-          <input
-            type="text"
-            value={cnpjData.cnae_fiscal_descricao || "N/A"}
-            disabled
-          />
+          <input type="text" value={cnpjData.cnae_fiscal_descricao || "N/A"} disabled />
 
           <label>Telefone:</label>
-          <input
-            type="text"
-            value={cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"}
-            disabled
-          />
+          <input type="text" value={cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"} disabled />
 
           <label>UF (Sede):</label>
           <input type="text" value={cnpjData.uf || "N/A"} disabled />
 
           <label>Bairro</label>
-          <input
-            type="text"
-            value={cnpjData.bairro || "Não informada"}
-            disabled
-          />
+          <input type="text" value={cnpjData.bairro || "Não informada"} disabled />
 
           <label>Rua</label>
           <input
             type="text"
             value={
               cnpjData.descricao_tipo_de_logradouro && cnpjData.logradouro
-                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro}${cnpjData.numero ? `, ${cnpjData.numero}` : ""}`
-                : cnpjData.descricao_tipo_de_logradouro ||
-                cnpjData.logradouro ||
-                "Não informada"
+                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro}${
+                    cnpjData.numero ? `, ${cnpjData.numero}` : ""
+                  }`
+                : cnpjData.descricao_tipo_de_logradouro || cnpjData.logradouro || "Não informada"
             }
             disabled
           />
 
           <label>Complemento</label>
-          <input
-            type="text"
-            value={cnpjData.complemento || "Não informada"}
-            disabled
-          />
+          <input type="text" value={cnpjData.complemento || "Não informada"} disabled />
 
           <label>Município</label>
-          <input
-            type="text"
-            value={cnpjData.municipio || "Não informada"}
-            disabled
-          />
+          <input type="text" value={cnpjData.municipio || "Não informada"} disabled />
         </div>
       )}
 
-      {activeForm === "chaves" &&
-        Array.isArray(resultList) &&
-        resultList.length > 0 && (
-          <div className="card-resultado">
-            <h4>Resultados encontrados</h4>
-            <table className="historico-table">
-              <thead>
-                <tr>
-                  <th>Razão Social</th>
-                  <th>CNPJ</th>
-                  <th>UF</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {resultList.map((item, idx) => {
-                  const BD = item.BasicData ?? item.basicData ?? flatToBasicData(item) ?? {};
-                  const AD = BD.Address ?? {};
-                  const CT = BD.Contact ?? {};
+      {/* Resultado: chaves alternativas */}
+      {activeForm === "chaves" && Array.isArray(resultList) && resultList.length > 0 && (
+        <div className="card-resultado">
+          <h4>Resultados encontrados</h4>
+          <table className="historico-table">
+            <thead>
+              <tr>
+                <th>Razão Social</th>
+                <th>CNPJ</th>
+                <th>UF</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {resultList.map((item, idx) => {
+                const BD = item.BasicData ?? item.basicData ?? flatToBasicData(item) ?? {};
+                const AD = BD.Address ?? {};
+                const CT = BD.Contact ?? {};
 
-                  return (
-                    <React.Fragment key={idx}>
-                      <tr
-                        className={selectedResultIndex === idx ? "active-row" : ""}
-                        onClick={() => handleExpandResult(idx)}
-                        style={{ cursor: "pointer" }}
-                      >
-                        <td>{BD?.OfficialName || "N/A"}</td>
-                        <td>{BD?.TaxIdNumber || "N/A"}</td>
-                        <td>{BD?.HeadquarterState || "N/A"}</td>
-                        <td className="expand-icon">
-                          <i
-                            className={`bi ${selectedResultIndex === idx ? "bi-chevron-up" : "bi-chevron-down"}`}
-                          ></i>
+                return (
+                  <React.Fragment key={idx}>
+                    <tr
+                      className={selectedResultIndex === idx ? "active-row" : ""}
+                      onClick={() => handleExpandResult(idx)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <td>{BD?.OfficialName || "N/A"}</td>
+                      <td>{BD?.TaxIdNumber || "N/A"}</td>
+                      <td>{BD?.HeadquarterState || "N/A"}</td>
+                      <td className="expand-icon">
+                        <i className={`bi ${selectedResultIndex === idx ? "bi-chevron-up" : "bi-chevron-down"}`}></i>
+                      </td>
+                    </tr>
+                    {selectedResultIndex === idx && (
+                      <tr>
+                        <td colSpan="4">
+                          <div className="detalhes-historico-panel">
+                            <p>
+                              <strong>Razão Social:</strong> {BD?.OfficialName || "Não localizado"}
+                            </p>
+                            <p>
+                              <strong>Nome Fantasia:</strong> {BD?.TradeName || "Não localizado"}
+                            </p>
+                            <p>
+                              <strong>CNPJ:</strong> {BD?.TaxIdNumber || "Não localizado"}
+                            </p>
+                            <p>
+                              <strong>Situação Cadastral:</strong> {BD?.TaxIdStatus || "Não localizado"}
+                            </p>
+                            <p>
+                              <strong>Telefone:</strong> {CT?.Phone1 || CT?.Phone2 || "N/A"}
+                            </p>
+                            <p>
+                              <strong>Email:</strong> {CT?.Email || "Não localizado"}
+                            </p>
+                            <p>
+                              <strong>CEP:</strong> {AD?.ZipCode || "Não localizado"}
+                            </p>
+                            <p>
+                              <strong>Endereço:</strong>{" "}
+                              {AD?.StreetType || AD?.Street || AD?.Number || AD?.Complement
+                                ? `${AD?.StreetType ?? ""} ${AD?.Street ?? ""}${
+                                    AD?.Number ? `, ${AD?.Number}` : ""
+                                  }${AD?.Complement ? ` - ${AD?.Complement}` : ""}`
+                                    .replace(/\s+/g, " ")
+                                    .trim()
+                                : "N/A"}
+                            </p>
+                            <p>
+                              <strong>Bairro:</strong> {AD?.Neighborhood || "Não localizado"}
+                            </p>
+                            <p>
+                              <strong>Município:</strong> {AD?.City || "Não localizado"}
+                            </p>
+                            <p>
+                              <strong>UF:</strong> {BD?.HeadquarterState || "Não localizado"}
+                            </p>
+                          </div>
                         </td>
                       </tr>
-                      {selectedResultIndex === idx && (
-                        <tr>
-                          <td colSpan="4">
-                            <div className="detalhes-historico-panel">
-                              <p><strong>Razão Social:</strong> {BD?.OfficialName || "Não localizado"}</p>
-                              <p><strong>Nome Fantasia:</strong> {BD?.TradeName || "Não localizado"}</p>
-                              <p><strong>CNPJ:</strong> {BD?.TaxIdNumber || "Não localizado"}</p>
-                              <p><strong>Situação Cadastral:</strong> {BD?.TaxIdStatus || "Não localizado"}</p>
-                              <p><strong>Telefone:</strong> {CT?.Phone1 || CT?.Phone2 || "N/A"}</p>
-                              <p><strong>Email:</strong> {CT?.Email || "Não localizado"}</p>
-                              <p><strong>CEP:</strong> {AD?.ZipCode || "Não localizado"}</p>
-                              <p>
-                                <strong>Endereço:</strong>{" "}
-                                {AD?.StreetType || AD?.Street || AD?.Number || AD?.Complement
-                                  ? `${AD?.StreetType ?? ""} ${AD?.Street ?? ""}${AD?.Number ? `, ${AD?.Number}` : ""}${AD?.Complement ? ` - ${AD?.Complement}` : ""}`
-                                  : "N/A"}
-                              </p>
-                              <p><strong>Bairro:</strong> {AD?.Neighborhood || "Não localizado"}</p>
-                              <p><strong>Município:</strong> {AD?.City || "Não localizado"}</p>
-                              <p><strong>UF:</strong> {BD?.HeadquarterState || "Não localizado"}</p>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
+      {/* Alerta só quando a busca terminou e está de fato vazia */}
       {activeForm === "chaves" &&
+        !loading &&
+        !error &&
         hasQueried &&
+        resultado &&
         Array.isArray(resultList) &&
         resultList.length === 0 && (
           <div className="no-results-message">
