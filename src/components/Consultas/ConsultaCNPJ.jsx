@@ -4,6 +4,58 @@ import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FileSpreadsheet } from "lucide-react";
 
+function isValidCNPJ(raw) {
+  const cnpj = String(raw).replace(/\D/g, "");
+  if (cnpj.length !== 14) return false;
+  if (/^(\d)\1{13}$/.test(cnpj)) return false; 
+  const calcDV = (base) => {
+    let soma = 0;
+    const pesos =
+      base.length === 12
+        ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+        : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    for (let i = 0; i < pesos.length; i++) {
+      soma += Number(base[i]) * pesos[i];
+    }
+    const resto = soma % 11;
+    return resto < 2 ? 0 : 11 - resto;
+  };
+
+  const dv1 = calcDV(cnpj.slice(0, 12));
+  const dv2 = calcDV(cnpj.slice(0, 12) + dv1);
+  return cnpj.endsWith(`${dv1}${dv2}`);
+}
+
+function getFriendlyError(err, context = {}) {
+  const status = err?.response?.status;
+  const data = err?.response?.data;
+  const serverMsg =
+    data?.detail || data?.message || data?.mensagem || data?.error || data?.erro;
+
+  if (!err?.response) {
+    if (err?.code === "ECONNABORTED")
+      return "Tempo de resposta excedido. Tente novamente em instantes.";
+    return "Não foi possível conectar ao serviço. Verifique sua conexão e tente novamente.";
+  }
+
+  if (status === 404) {
+    if (context?.tipo_consulta === "cnpj")
+      return "CNPJ não encontrado. Confira os dígitos e tente novamente.";
+    return serverMsg || "Nenhum resultado encontrado para os filtros informados.";
+  }
+  if (status === 400 || status === 422) {
+    if (context?.tipo_consulta === "cnpj") {
+      return "CNPJ inválido ou em formato incorreto. Use apenas números (14 dígitos).";
+    }
+    return "Parâmetros inválidos na consulta. Ajuste os filtros e tente novamente.";
+  }
+  if (status === 429) return "Muitas consultas em sequência. Aguarde e tente novamente.";
+  if (status === 401 || status === 403) return "Acesso não autorizado. Verifique suas credenciais.";
+  if (status >= 500) return "Serviço do provedor indisponível no momento. Tente novamente em instantes.";
+
+  return serverMsg || `Erro inesperado (${status}). Tente novamente.`;
+}
+
 const ConsultaCNPJ = () => {
   const [cnpj, setCnpj] = useState("");
   const [activeForm, setActiveForm] = useState("");
@@ -23,7 +75,7 @@ const ConsultaCNPJ = () => {
   const [selectedResultIndex, setSelectedResultIndex] = useState(null);
 
   const handleCnpjChange = (e) => {
-    const rawCnpj = e.target.value.replace(/\D/g, "");
+    const rawCnpj = e.target.value.replace(/\D/g, "").slice(0, 14);
     setCnpj(rawCnpj);
   };
 
@@ -35,7 +87,6 @@ const ConsultaCNPJ = () => {
     }));
   };
 
-  // ---- Normalização de shapes ----
   const flatToBasicData = (flat) => {
     if (!flat) return null;
 
@@ -130,6 +181,9 @@ const ConsultaCNPJ = () => {
       if (cnpj.length !== 14) {
         validationErrorMessage = "Por favor, insira um CNPJ válido com 14 dígitos.";
         isFormValid = false;
+      } else if (!isValidCNPJ(cnpj)) {
+        validationErrorMessage = "CNPJ inválido: os dígitos verificadores não conferem.";
+        isFormValid = false;
       } else {
         payload = { tipo_consulta: "cnpj", parametro_consulta: cnpj };
       }
@@ -175,16 +229,16 @@ const ConsultaCNPJ = () => {
       setResultado(response?.data ?? response);
       console.log("Resultado da consulta:", response);
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.detail ||
-        err.response?.data?.message ||
-        err.message ||
-        "Erro ao realizar consulta.";
-      setError(errorMessage);
-      console.error("Erro na consulta:", err.response?.data || err);
+      const friendly = getFriendlyError(err, payload);
+      setError(friendly);
+      console.error("Erro na consulta:", {
+        status: err?.response?.status,
+        data: err?.response?.data,
+        msg: friendly,
+      });
     } finally {
       setLoading(false);
-      setHasQueried(true); // marca a busca só após finalizar (evita flash)
+      setHasQueried(true); 
     }
   };
 
@@ -402,7 +456,6 @@ const ConsultaCNPJ = () => {
         </div>
       )}
 
-      {/* Resultado: CNPJ direto */}
       {activeForm === "cnpj" && cnpjData && (
         <div className="card-resultado">
           <h4>Resultado da busca realizada</h4>
@@ -446,7 +499,6 @@ const ConsultaCNPJ = () => {
         </div>
       )}
 
-      {/* Resultado: chaves alternativas */}
       {activeForm === "chaves" && Array.isArray(resultList) && resultList.length > 0 && (
         <div className="card-resultado">
           <h4>Resultados encontrados</h4>
@@ -535,7 +587,6 @@ const ConsultaCNPJ = () => {
         </div>
       )}
 
-      {/* Alerta só quando a busca terminou e está de fato vazia */}
       {activeForm === "chaves" &&
         !loading &&
         !error &&
