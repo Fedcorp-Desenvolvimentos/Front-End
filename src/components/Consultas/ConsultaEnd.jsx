@@ -9,6 +9,8 @@ const ConsultaEnd = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resultado, setResultado] = useState(null);
+  const [hasQueried, setHasQueried] = useState(false);
+
   const [formData, setFormData] = useState({
     cep: "",
     rua: "",
@@ -18,6 +20,45 @@ const ConsultaEnd = () => {
   });
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
   const [selectedResultIndex, setSelectedResultIndex] = useState(null);
+
+  const isValidCEP = (raw) => {
+    const cep = String(raw || "").replace(/\D/g, "");
+    if (cep.length !== 8) return false;
+    if (cep === "00000000") return false;
+    return true;
+  };
+
+  const getFriendlyError = (err, context = {}) => {
+    const status = err?.response?.status;
+    const data = err?.response?.data;
+    const serverMsg =
+      data?.detail || data?.message || data?.mensagem || data?.error || data?.erro;
+
+    if (!err?.response) {
+      if (err?.code === "ECONNABORTED") return "Tempo de resposta excedido. Tente novamente em instantes.";
+      return "Não foi possível conectar ao serviço. Verifique sua conexão e tente novamente.";
+    }
+
+    if (status === 404) {
+      if (context?.tipo_consulta === "endereco")
+        return "CEP não encontrado. Confira os dígitos e tente novamente.";
+      if (context?.tipo_consulta === "cep_rua_cidade")
+        return "Nenhum endereço encontrado para os filtros informados.";
+      return serverMsg || "Recurso não encontrado.";
+    }
+    if (status === 400 || status === 422) {
+      if (context?.tipo_consulta === "endereco")
+        return "CEP inválido ou em formato incorreto. Use apenas números (8 dígitos).";
+      if (context?.tipo_consulta === "cep_rua_cidade")
+        return "Parâmetros inválidos na consulta. Revise UF, Cidade e Rua.";
+      return "Requisição inválida. Ajuste os campos e tente novamente.";
+    }
+    if (status === 429) return "Muitas consultas em sequência. Aguarde e tente novamente.";
+    if (status === 401 || status === 403) return "Acesso não autorizado. Verifique suas credenciais.";
+    if (status >= 500) return "Serviço do provedor indisponível no momento. Tente novamente em instantes.";
+
+    return serverMsg || `Erro inesperado (${status}). Tente novamente.`;
+  };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -45,15 +86,15 @@ const ConsultaEnd = () => {
     setError(null);
     setResultado(null);
     setMassConsultaMessage("");
+    setSelectedResultIndex(null);
 
     let payload = {};
     let isFormValid = true;
     let validationErrorMessage = "";
 
     if (activeForm === "cep") {
-      if (formData.cep.length !== 8) {
-        validationErrorMessage =
-          "Por favor, insira um CEP válido com 8 dígitos.";
+      if (!isValidCEP(formData.cep)) {
+        validationErrorMessage = "Por favor, insira um CEP válido com 8 dígitos.";
         isFormValid = false;
       } else {
         payload = {
@@ -65,7 +106,7 @@ const ConsultaEnd = () => {
     } else if (activeForm === "chaves") {
       const obrigatorios = [formData.uf.trim(), formData.cidade.trim(), formData.rua.trim()];
       const filled = obrigatorios.filter(Boolean).length;
-    
+
       if (filled === 0) {
         validationErrorMessage = "Preencha os campos obrigatórios para buscar.";
         isFormValid = false;
@@ -73,16 +114,23 @@ const ConsultaEnd = () => {
         validationErrorMessage = "Por favor, preencha TODOS os campos obrigatórios: UF, Cidade e Rua.";
         isFormValid = false;
       } else {
-        payload = {
-          tipo_consulta: "cep_rua_cidade",
-          parametro_consulta: JSON.stringify({
-            estado: formData.uf,
-            cidade: formData.cidade,
-            logradouro: formData.rua,
-          }),
-          origem: "manual",
-        };
-      }   
+
+        if (!/^[A-Z]{2}$/.test(formData.uf.trim().toUpperCase())) {
+          validationErrorMessage = "UF inválida. Use 2 letras (ex: RJ).";
+          isFormValid = false;
+        } else {
+          payload = {
+            tipo_consulta: "cep_rua_cidade",
+            parametro_consulta: JSON.stringify({
+              estado: formData.uf,
+              cidade: formData.cidade,
+              logradouro: formData.rua,
+              ...(formData.bairro.trim() ? { bairro: formData.bairro.trim() } : {}),
+            }),
+            origem: "manual",
+          };
+        }
+      }
     } else {
       setLoading(false);
       return;
@@ -91,38 +139,39 @@ const ConsultaEnd = () => {
     if (!isFormValid) {
       setError(validationErrorMessage);
       setLoading(false);
+      setHasQueried(false);
       return;
     }
 
     try {
-      const response = await ConsultaService.realizarConsulta(payload);
+      const resp = await ConsultaService.realizarConsulta(payload);
+      const response = resp?.data ?? resp;
 
       if (
-        response.mensagem === "Consulta realizada com sucesso." &&
-        response.resultado_api
+        response?.mensagem === "Consulta realizada com sucesso." &&
+        response?.resultado_api
       ) {
         setResultado(response);
         console.log(response);
+      } else if (response?.resultado_api) {
+        setResultado(response);
       } else {
         setError(
-          response.mensagem ||
+          response?.mensagem ||
           "Resposta inesperada da API. Endereço não encontrado ou inválido."
         );
         setResultado(null);
       }
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.detail ||
-        err.response?.data?.message ||
-        err.message ||
-        "Erro ao realizar consulta de endereço.";
-      setError(errorMessage);
+      const friendly = getFriendlyError(err, payload);
+      setError(friendly);
       console.error(
         "Erro na consulta de endereço individual:",
-        err.response?.data || err
+        err?.response?.data || err
       );
     } finally {
       setLoading(false);
+      setHasQueried(true);
     }
   };
 
@@ -153,7 +202,7 @@ const ConsultaEnd = () => {
         }));
 
         const cepsValidos = cepsParaConsulta.filter(
-          (item) => item.CEP && item.CEP.length === 8
+          (item) => isValidCEP(item.CEP)
         );
 
         if (cepsValidos.length === 0) {
@@ -162,6 +211,7 @@ const ConsultaEnd = () => {
           );
 
           setLoading(false);
+          if (event.target) event.target.value = null;
           return;
         }
 
@@ -186,13 +236,8 @@ const ConsultaEnd = () => {
         );
       } catch (err) {
         console.error("Erro na comunicação ou processamento do arquivo:", err);
-        const errorMessage =
-          err.response?.data?.detail ||
-          err.response?.data?.message ||
-          (err.response?.data ? JSON.stringify(err.response.data) : null) ||
-          err.message ||
-          "Erro inesperado: Verifique sua conexão e o formato do arquivo.";
-        setMassConsultaMessage(`Erro ao processar a planilha: ${errorMessage}`);
+        const friendly = getFriendlyError(err, { tipo_consulta: "massa_cep" });
+        setMassConsultaMessage(`Erro ao processar a planilha: ${friendly}`);
       } finally {
         setLoading(false);
         if (event.target) {
@@ -219,13 +264,8 @@ const ConsultaEnd = () => {
       setMassConsultaMessage("Download do modelo concluído.");
     } catch (err) {
       console.error("Erro ao baixar modelo:", err);
-      const errorMessage =
-        err.response?.data?.detail ||
-        err.response?.data?.message ||
-        (err.response?.data ? JSON.stringify(err.response.data) : null) ||
-        err.message ||
-        "Erro na comunicação com o servidor para baixar o modelo.";
-      setMassConsultaMessage(`Erro ao baixar modelo: ${errorMessage}`);
+      const friendly = getFriendlyError(err, { tipo_consulta: "modelo_cep" });
+      setMassConsultaMessage(`Erro ao baixar modelo: ${friendly}`);
     } finally {
       setLoading(false);
     }
@@ -240,6 +280,8 @@ const ConsultaEnd = () => {
     setError(null);
     setResultado(null);
     setMassConsultaMessage("");
+    setSelectedResultIndex(null);
+    setHasQueried(false);
   };
 
   function isBuscaChaveSemResultado(resultado) {
@@ -247,7 +289,6 @@ const ConsultaEnd = () => {
     const arr = resultado.resultado_api.resultados_viacep;
     return resultado.tipo_consulta === "cep_rua_cidade" && (!Array.isArray(arr) || arr.length === 0);
   }
-
 
   return (
     <div className="consulta-container03">
@@ -400,7 +441,7 @@ const ConsultaEnd = () => {
           <button
             type="submit"
             disabled={
-              loading 
+              loading
             }
           >
             {loading ? "Consultando..." : "Consultar"}
@@ -444,61 +485,24 @@ const ConsultaEnd = () => {
           {error && <p className="error-message">{error}</p>}
         </div>
       )}
-      {activeForm !== "massa" && resultado?.resultado_api && (
-        <div className="card-resultado">
-          {resultado.historico_salvo.tipo_consulta === "endereco" && (
-            <>
-              <label>CEP:</label>
-              <input
-                type="text"
-                value={resultado.resultado_api.cep || "N/A"}
-                disabled
-              />
-              <label>Logradouro:</label>
-              <input
-                type="text"
-                value={resultado.resultado_api.street || "N/A"}
-                disabled
-              />
-              <label>Bairro:</label>
-              <input
-                type="text"
-                value={resultado.resultado_api.neighborhood || "N/A"}
-                disabled
-              />
-              <label>Cidade:</label>
-              <input
-                type="text"
-                value={resultado.resultado_api.city || "N/A"}
-                disabled
-              />
-              <label>UF:</label>
-              <input
-                type="text"
-                value={resultado.resultado_api.state || "N/A"}
-                disabled
-              />
-              
-            </>
-          )}
+      {/* Resultado: CEP único (apenas quando a consulta é por CEP) */}
+      {activeForm !== "massa" &&
+        resultado?.resultado_api &&
+        ((resultado?.historico_salvo?.tipo_consulta || resultado?.tipo_consulta) === "endereco") && (
+          <div className="card-resultado">
+            <label>CEP:</label>
+            <input type="text" value={resultado.resultado_api.cep || "N/A"} disabled />
+            <label>Logradouro:</label>
+            <input type="text" value={resultado.resultado_api.street || "N/A"} disabled />
+            <label>Bairro:</label>
+            <input type="text" value={resultado.resultado_api.neighborhood || "N/A"} disabled />
+            <label>Cidade:</label>
+            <input type="text" value={resultado.resultado_api.city || "N/A"} disabled />
+            <label>UF:</label>
+            <input type="text" value={resultado.resultado_api.state || "N/A"} disabled />
+          </div>
+        )}
 
-          {resultado.historico_salvo.tipo_consulta === "cep_rua_cidade" &&
-            Array.isArray(resultado.resultado_api.resultados_viacep) &&
-            resultado.resultado_api.resultados_viacep.length > 0 ? (
-            <>
-            </>
-          ) : (
-            resultado.tipo_consulta === "cep_rua_cidade" &&
-            resultado.resultado_api &&
-            (!Array.isArray(resultado.resultado_api.resultados_viacep) ||
-              resultado.resultado_api.resultados_viacep.length === 0) && (
-              <p className="no-results-message">
-                Nenhum endereço encontrado para os parâmetros fornecidos.
-              </p>
-            )
-          )}
-        </div>
-      )}
       {activeForm === "chaves" && resultado?.resultado_api?.resultados_viacep && resultado.resultado_api.resultados_viacep.length > 0 && (
         <div className="card-resultado">
           <h4>Resultados encontrados</h4>
@@ -546,8 +550,7 @@ const ConsultaEnd = () => {
               ))}
             </tbody>
           </table>
-
-          {activeForm === "chaves" && isBuscaChaveSemResultado(resultado) && (
+          {activeForm === "chaves" && isBuscaChaveSemResultado(resultado) && hasQueried && !loading && !error && (
             <div className="no-results-message">
               Nenhum endereço encontrado para os parâmetros fornecidos.
             </div>
