@@ -28,6 +28,7 @@ const ConsultaPF = () => {
   });
 
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
+
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     let formattedValue = value;
@@ -92,7 +93,7 @@ const ConsultaPF = () => {
 
     try {
       const response = await ConsultaService.realizarConsulta(payload);
-      setResultado(response);
+      setResultado(response?.data ?? response);
       console.log("Resultado da consulta PF:", response);
     } catch (err) {
       const errorMessage =
@@ -106,6 +107,7 @@ const ConsultaPF = () => {
       setLoading(false);
     }
   };
+
   const handleMassFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) {
@@ -184,6 +186,7 @@ const ConsultaPF = () => {
     };
     reader.readAsArrayBuffer(file);
   };
+
   const handleDownloadModel = async () => {
     setLoading(true);
     setError(null);
@@ -226,8 +229,7 @@ const ConsultaPF = () => {
 
       <div className="card-options-wrapper">
         <div
-          className={`card card-option ${activeForm === "cpf" ? "active" : ""
-            }`}
+          className={`card card-option ${activeForm === "cpf" ? "active" : ""}`}
           onClick={() => {
             setActiveForm("cpf");
             setFormData({ ...formData, cpf: "" });
@@ -255,8 +257,7 @@ const ConsultaPF = () => {
         </div>
 
         <div
-          className={`card card-option ${activeForm === "chaves" ? "active" : ""
-            }`}
+          className={`card card-option ${activeForm === "chaves" ? "active" : ""}`}
           onClick={() => {
             setActiveForm("chaves");
             setFormData({
@@ -285,8 +286,7 @@ const ConsultaPF = () => {
         </div>
 
         <div
-          className={`card card-option ${activeForm === "massa" ? "active" : ""
-            }`}
+          className={`card card-option ${activeForm === "massa" ? "active" : ""}`}
           onClick={() => {
             setActiveForm("massa");
             setError(null);
@@ -301,6 +301,7 @@ const ConsultaPF = () => {
         </div>
       </div>
 
+      {/* FORM CPF - sempre visível ao selecionar a aba */}
       {activeForm === "cpf" && (
         <form className="form-container" onSubmit={handleSubmit}>
           <label htmlFor="cpf-input">Digite o documento</label>
@@ -322,61 +323,70 @@ const ConsultaPF = () => {
             {loading ? "Consultando..." : "Consultar"}
           </button>
 
-
           {error && <p className="error-message">{error}</p>}
         </form>
       )}
 
-      {activeForm === "cpf" && resultado?.resultado_api?.Result && resultado.resultado_api.Result.length > 0 && (
-        <div className="card-resultado">
-          <h4>Resultado da busca realizada</h4>
-          {(() => {
-            const resultItem = resultado.resultado_api.Result[0];
-            const basicData = resultItem?.BasicData || {};
-            return (
-              <>
-                <label>Nome Completo:</label>
-                <input type="text" value={basicData.Name || "N/A"} disabled />
-                <label>CPF:</label>
-                <input type="text" value={basicData.TaxIdNumber || "N/A"} disabled />
-                <label>Situação Cadastral:</label>
-                <input type="text" value={basicData.TaxIdStatus || "N/A"} disabled />
-                <label>Data de Nascimento:</label>
-                <input
-                  type="text"
-                  value={
-                    formatDateBR(basicData.BirthDate)
-                  }
-                  disabled
-                />
-                <label>Idade:</label>
-                <input type="text" value={basicData.Age || "N/A"} disabled />
-                <label>Nome da Mãe:</label>
-                <input type="text" value={basicData.MotherName || "N/A"} disabled />
-                <label>Nome do Pai:</label>
-                <input type="text" value={basicData.FatherName || "N/A"} disabled />
-                <label>Gênero:</label>
-                <input type="text" value={basicData.Gender || "N/A"} disabled />
-                <label>Nome Comum (Alias):</label>
-                <input type="text" value={basicData.Aliases?.CommonName || "N/A"} disabled />
-                <label>Indicação de Óbito:</label>
-                <input
-                  type="text"
-                  value={
-                    basicData.HasObitIndication !== undefined
-                      ? basicData.HasObitIndication
-                        ? "Sim"
-                        : "Não"
-                      : "N/A"
-                  }
-                  disabled
-                />
-              </>
-            );
-          })()}
-        </div>
-      )}
+      {/* CPF - mensagem de não encontrado */}
+      {activeForm === "cpf" &&
+        !loading &&
+        !error &&
+        resultado &&
+        Array.isArray(resultado?.resultado_api?.Result) &&
+        resultado.resultado_api.Result.length === 0 && (
+          <div className="no-results-message">
+            Nenhum resultado encontrado para os filtros informados.
+          </div>
+        )}
 
+      {/* CPF - card com resultado único */}
+      {activeForm === "cpf" &&
+        resultado?.resultado_api?.Result &&
+        resultado.resultado_api.Result.length > 0 && (
+          <div className="card-resultado">
+            <h4>Resultado da busca realizada</h4>
+            {(() => {
+              const resultItem = resultado.resultado_api.Result[0];
+              const basicData = resultItem?.BasicData || {};
+              return (
+                <>
+                  <label>Nome Completo:</label>
+                  <input type="text" value={basicData.Name || "N/A"} disabled />
+                  <label>CPF:</label>
+                  <input type="text" value={basicData.TaxIdNumber || "N/A"} disabled />
+                  <label>Situação Cadastral:</label>
+                  <input type="text" value={basicData.TaxIdStatus || "N/A"} disabled />
+                  <label>Data de Nascimento:</label>
+                  <input type="text" value={formatDateBR(basicData.BirthDate)} disabled />
+                  <label>Idade:</label>
+                  <input type="text" value={basicData.Age || "N/A"} disabled />
+                  <label>Nome da Mãe:</label>
+                  <input type="text" value={basicData.MotherName || "N/A"} disabled />
+                  <label>Nome do Pai:</label>
+                  <input type="text" value={basicData.FatherName || "N/A"} disabled />
+                  <label>Gênero:</label>
+                  <input type="text" value={basicData.Gender || "N/A"} disabled />
+                  <label>Nome Comum (Alias):</label>
+                  <input type="text" value={basicData.Aliases?.CommonName || "N/A"} disabled />
+                  <label>Indicação de Óbito:</label>
+                  <input
+                    type="text"
+                    value={
+                      basicData.HasObitIndication !== undefined
+                        ? basicData.HasObitIndication
+                          ? "Sim"
+                          : "Não"
+                        : "N/A"
+                    }
+                    disabled
+                  />
+                </>
+              );
+            })()}
+          </div>
+        )}
+
+      {/* FORM CHAVES */}
       {activeForm === "chaves" && (
         <form className="form-container" onSubmit={handleSubmit}>
           <label htmlFor="nome">
@@ -444,7 +454,9 @@ const ConsultaPF = () => {
             placeholder="Digite o nome do pai"
             disabled={loading}
           />
-          <button type="submit" disabled={loading || !formData.nome.trim()}
+          <button
+            type="submit"
+            disabled={loading || !formData.nome.trim()}
             className={`consulta-btn ${loading ? "loading" : ""}`}
           >
             {loading ? "Consultando..." : "Consultar"}
@@ -453,97 +465,67 @@ const ConsultaPF = () => {
           {error && <p className="error-message">{error}</p>}
         </form>
       )}
-      {activeForm === "massa" && (
-        <div className="form-massa-container">
-          <input
-            type="file"
-            id="input-massa"
-            accept=".xlsx, .xls"
-            style={{ display: "none" }}
-            onChange={handleMassFileUpload}
-            disabled={loading}
-          />
-          <button
-            type="button"
-            onClick={() => document.getElementById("input-massa").click()}
-            disabled={loading}
-          >
-            Importar Planilha de CPFs
-          </button>
-          <button
-            type="button"
-            onClick={handleDownloadModel}
-            disabled={loading}
-          >
-            Baixar Planilha Modelo
-          </button>
 
-          {loading && (
-            <div className="loading-indicator">
-              <div className="spinner"></div>{" "}
-              <p>{massConsultaMessage || "Processando..."}</p>{" "}
-            </div>
-          )}
-
-          {!loading && massConsultaMessage && (
-            <p className="message">{massConsultaMessage}</p>
-          )}
-          {error && <p className="error-message">{error}</p>}
-        </div>
-      )}
-
-      {activeForm === "chaves" && resultado?.resultado_api?.Result && resultado.resultado_api.Result.length > 0 && (
-        <div className="card-resultado">
-          <h4>Resultados encontrados</h4>
-          <table className="historico-table">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>CPF</th>
-                <th>Data de Nascimento</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {resultado.resultado_api.Result.map((item, idx) => (
-                <React.Fragment key={idx}>
-                  <tr
-                    className={selectedResultIndex === idx ? 'active-row' : ''}
-                    onClick={() => handleExpandResult(idx)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <td>{item.BasicData?.Name || 'N/A'}</td>
-                    <td>{item.BasicData?.TaxIdNumber || 'N/A'}</td>
-                    <td>{formatDateBR(item.BasicData?.BirthDate)}</td>
-                    <td className="expand-icon">
-                      <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
-                    </td>
-                  </tr>
-                  {selectedResultIndex === idx && (
-                    <tr>
-                      <td colSpan="4">
-                        <div className="detalhes-historico-panel">
-                          <p><strong>Nome:</strong> {item.BasicData?.Name || 'N/A'}</p>
-                          <p><strong>CPF:</strong> {item.BasicData?.TaxIdNumber || 'N/A'}</p>
-                          <p><strong>Situação Cadastral:</strong> {item.BasicData?.TaxIdStatus || 'N/A'}</p>
-                          <p><strong>Data de Nascimento:</strong> {formatDateBR(item.BasicData?.BirthDate)}</p>
-                          <p><strong>Nome da Mãe:</strong> {item.BasicData?.MotherName || 'N/A'}</p>
-                          <p><strong>Nome do Pai:</strong> {item.BasicData?.FatherName || 'N/A'}</p>
-                          <p><strong>Gênero:</strong> {item.BasicData?.Gender || 'N/A'}</p>
-                          <p><strong>Alias:</strong> {item.BasicData?.Aliases?.CommonName || 'N/A'}</p>
-                          <p><strong>Indicação de Óbito:</strong> {item.BasicData?.HasObitIndication !== undefined ? (item.BasicData.HasObitIndication ? 'Sim' : 'Não') : 'N/A'}</p>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* CHAVES - resultados em lista */}
       {activeForm === "chaves" &&
         resultado?.resultado_api?.Result &&
+        resultado.resultado_api.Result.length > 0 && (
+          <div className="card-resultado">
+            <h4>Resultados encontrados</h4>
+            <table className="historico-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>Data de Nascimento</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {resultado.resultado_api.Result.map((item, idx) => (
+                  <React.Fragment key={idx}>
+                    <tr
+                      className={selectedResultIndex === idx ? 'active-row' : ''}
+                      onClick={() => handleExpandResult(idx)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <td>{item.BasicData?.Name || 'N/A'}</td>
+                      <td>{item.BasicData?.TaxIdNumber || 'N/A'}</td>
+                      <td>{formatDateBR(item.BasicData?.BirthDate)}</td>
+                      <td className="expand-icon">
+                        <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
+                      </td>
+                    </tr>
+                    {selectedResultIndex === idx && (
+                      <tr>
+                        <td colSpan="4">
+                          <div className="detalhes-historico-panel">
+                            <p><strong>Nome:</strong> {item.BasicData?.Name || 'N/A'}</p>
+                            <p><strong>CPF:</strong> {item.BasicData?.TaxIdNumber || 'N/A'}</p>
+                            <p><strong>Situação Cadastral:</strong> {item.BasicData?.TaxIdStatus || 'N/A'}</p>
+                            <p><strong>Data de Nascimento:</strong> {formatDateBR(item.BasicData?.BirthDate)}</p>
+                            <p><strong>Nome da Mãe:</strong> {item.BasicData?.MotherName || 'N/A'}</p>
+                            <p><strong>Nome do Pai:</strong> {item.BasicData?.FatherName || 'N/A'}</p>
+                            <p><strong>Gênero:</strong> {item.BasicData?.Gender || 'N/A'}</p>
+                            <p><strong>Alias:</strong> {item.BasicData?.Aliases?.CommonName || 'N/A'}</p>
+                            <p><strong>Indicação de Óbito:</strong> {item.BasicData?.HasObitIndication !== undefined ? (item.BasicData.HasObitIndication ? 'Sim' : 'Não') : 'N/A'}</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+      {/* CHAVES - mensagem de não encontrado */}
+      {activeForm === "chaves" &&
+        !loading &&
+        !error &&
+        resultado &&
+        Array.isArray(resultado?.resultado_api?.Result) &&
         resultado.resultado_api.Result.length === 0 && (
           <div className="no-results-message">
             Nenhum resultado encontrado para os filtros informados. Adicione mais informações.
