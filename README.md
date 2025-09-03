@@ -1,4 +1,4 @@
-📊 BigCorp- Sistema de Consulta de Dados | Grupo FedCorp
+📊 Fed Connect- Sistema de Consulta de Dados | Grupo FedCorp
 
 **BigCorp** é uma plataforma interna desenvolvida para facilitar a consulta de informações de pessoas físicas, jurídicas e endereços em uma interface moderna, rápida e intuitiva. O sistema é voltado para uso corporativo com foco em seguradoras, empresas de serviços e outras instituições que necessitam de validação e análise de dados cadastrais.
 
