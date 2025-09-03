@@ -1,10 +1,10 @@
-📊 Fed Connect- Sistema de Consulta de Dados | Grupo FedCorp
+📊 Fed Connect - Sistema de Consulta de Dados | Grupo FedCorp
 
-**BigCorp** é uma plataforma interna desenvolvida para facilitar a consulta de informações de pessoas físicas, jurídicas e endereços em uma interface moderna, rápida e intuitiva. O sistema é voltado para uso corporativo com foco em seguradoras, empresas de serviços e outras instituições que necessitam de validação e análise de dados cadastrais.
+**Fed Connect** é uma plataforma interna desenvolvida para facilitar a consulta de informações de pessoas físicas, jurídicas e endereços em uma interface moderna, rápida e intuitiva. O sistema é voltado para uso corporativo com foco em seguradoras, empresas de serviços e outras instituições que necessitam de validação e análise de dados cadastrais.
 
 🧩 Visão Geral
 
-O BigCorp foi pensado para agilizar o acesso a informações de clientes por pessoas físicas, empresas e endereços, com foco na integração em plataformas internas da corporação.
+O Fed Connect foi pensado para agilizar o acesso a informações de clientes por pessoas físicas, empresas e endereços, com foco na integração em plataformas internas da corporação.
 Capacita consultores e administradores a buscar dados específicos ou em massa (por eventual importação de planilhas), com segurança, performance e usabilidade.
 
 🎯 Funcionalidades Principais
