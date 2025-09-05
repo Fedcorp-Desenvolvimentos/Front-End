@@ -8,7 +8,7 @@ const consultas = [
         key: "pf",
         icon: <i className="bi bi-person-fill" />,
         title: "Dados Pessoais",
-        desc: "Informações sobre pessoas registradas, incluindo CPF, nome, filiação e data de nascimento.",
+        desc: "Informações sobre pessoas registradas na Receita Federal, incluindo CPF, nome, filiação e data de nascimento.",
         to: "/consulta-pf",
         niveis: ["admin", "usuario", "comercial"],
     },

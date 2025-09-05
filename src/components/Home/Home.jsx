@@ -21,18 +21,13 @@ const Home = () => {
 
   return (
     <div className={`home-container${withSidebar ? " with-sidebar" : ""}`}>
-      <h1 className="home-title">Bem-vindos à Plataforma Bigcorp!</h1>
-      <p className="home-desc">
-        A plataforma Bigcorp foi criada para simplificar a rotina da empresa e centralizar as soluções.<br />
-        Seja bem-vindo(a) à evolução digital da FedCorp!
-      </p>
-
       <div className="carousel-container">
         <img
           src={imagensCarrossel[index]}
           alt={`Banner ${index + 1}`}
           className="carousel-image"
         />
+        {/* Navegação dos banners */}
         <div className="carousel-indicators">
           {imagensCarrossel.map((_, i) => (
             <button
