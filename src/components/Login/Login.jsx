@@ -49,7 +49,7 @@ const Login = () => {
                             className="logoImg"
                         />
 
-                        <h2 className="titlePortal">BigCorp</h2>
+                        <h2 className="titlePortal">FedConnect</h2>
                         <p className="pPortal">Insira seus dados para acessar a plataforma</p>
 
                         <form onSubmit={handleSubmit}>

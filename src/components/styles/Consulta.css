@@ -1,8 +1,8 @@
 .consulta-container03,
 .consulta-container04 {
   padding: 30px 16px 24px 16px;
-  max-width: 980px;
-  margin-left: 45vh;
+  max-width: 880px;
+  margin-left: 22vw;
   border-radius: 16px;
   box-sizing: border-box;
 }
@@ -88,13 +88,14 @@
 .form-container, .form-massa-container {
   width: 98%;
   max-width: 490px;
-  padding: 26px 18px 22px 18px;
+  padding: 26px 25px 22px 18px;
   border-radius: 18px;
   background: #fff;
   border: 1.5px solid #e4e8ee;
   box-shadow: 0 2px 10px rgba(36,99,235,0.07);
   text-align: start;
-  margin: 20px auto 22px auto;
+  margin: 15px auto 22px auto;
+  margin-left: 14rem;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -159,7 +160,7 @@
 .form-massa-container button {
   width: 100%;
   padding: 13px 0;
-  font-size: 1.06rem;
+  font-size: 1rem;
   font-weight: 700;
   border: none;
   border-radius: 7px;
@@ -315,7 +316,6 @@
   opacity: 1;
 }
 
-/* Card do resultado */
 .card-resultado {
   display: flex;
   flex-direction: column;
@@ -363,7 +363,6 @@
   width: 100%;
 }
 
-/* Lista de segurados */
 .lista-segurados {
   list-style: none;
   padding: 0;
@@ -456,7 +455,6 @@
   color: #2463eb;
 }
 
-/* Botões de paginação */
 .pagination-controls {
   display: flex;
   align-items: center;
@@ -553,20 +551,28 @@
     gap: 1rem;
     margin-left: 0;
   }
-  .card-options-wrapper01 { margin-left: 0; }
+  .card-options-wrapper01 { 
+    margin-left: 0; 
+  }
+
+  .form-container {
+    margin-left: 20vw !important;
+  }
 }
+
 
 @media (max-width: 700px) {
   .consulta-container03,
   .consulta-container04 {
     padding: 14px 2vw 14px 2vw;
     max-width: 99vw;
-    margin-left: 0;
+    margin-left: 0.2rem;
   }
 
   .titulo-pagina {
     font-size: 1.17rem !important;
     margin-bottom: 1.15rem;
+  
   }
 
   .card-options-wrapper,
@@ -574,7 +580,7 @@
     grid-template-columns: 1fr;
     gap: 0.9rem;
     padding: 0 10px;
-    margin-left: 1.7rem;
+    margin-left: 1rem;
     margin-right: 0 !important;
   }
 
@@ -594,11 +600,10 @@
     width: 80vw !important;
     max-width: 90vw !important;
     min-width: 0 !important;
-    margin-left: 3rem;
+    margin-left: 4rem !important;
     box-sizing: border-box;
   }
 
-  /* Inputs, selects, botões: 100% largura, sem scroll lateral */
   .form-container input,
   .form-massa-container input[type="text"],
   .form-massa-container input[type="email"],
@@ -619,14 +624,18 @@
     box-sizing: border-box;
   }
 
-  /* Ajuste para label do form */
   .form-container label,
   .form-massa-container label {
     font-size: 0.99rem;
     padding-left: 2px;
   }
 
-  /* Detalhes do resultado e segurado mais compactos */
-  .seg-titulo { padding: 12px 7px; font-size: 1rem; }
-  .seg-detalhes { padding: 8px 5px 9px 7px; }
+  .seg-titulo { 
+    padding: 12px 7px; 
+    font-size: 1rem; 
+  }
+
+  .seg-detalhes { 
+    padding: 8px 5px 9px 7px; 
+  }
 }
