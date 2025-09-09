@@ -47,12 +47,24 @@ const ConsultaFatura = () => {
     };
 
     const formatarData = (dataString) => {
-        if (!dataString) return '-';
-        const data = new Date(dataString);
-        return isNaN(data.getTime()) ? '-' : data.toLocaleDateString();
-    };
+    if (!dataString) return '-';
+    let datePart;
+    if (dataString.includes('T')) {
+        [datePart] = dataString.split('T');
+    } else {
+        datePart = dataString;
+    }
+    const [year, month, day] = datePart.split('-');
+    if (!year || !month || !day) {
+        return '-';
+    }
+    const localDate = new Date(year, month - 1, day);
+    if (isNaN(localDate.getTime())) {
+        return '-';
+    }
 
-    console.log('Resultado:', resultado);
+    return localDate.toLocaleDateString('pt-BR');
+};
 
     return (
         <div className="consulta-fatura-container">
