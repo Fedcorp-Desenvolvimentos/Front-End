@@ -64,25 +64,29 @@ const ConsultaPF = () => {
           parametro_consulta: formData.cpf,
         };
       }
-    } else if (activeForm === "chaves") {
-      if (!formData.nome.trim()) {
-        validationErrorMessage = "Por favor, preencha o campo Nome.";
-        isFormValid = false;
-      } else {
-        const formattedBirthDate = formData.dataNascimento
-          ? new Date(formData.dataNascimento).toLocaleDateString("pt-BR")
-          : "";
-
-        payload = {
-          tipo_consulta: "cpf_alternativa",
-          parametro_consulta: JSON.stringify({
-            Datasets: "basic_data",
-            q: `name{${formData.nome}}, birthdate{${formattedBirthDate}},dateformat{dd/MM/yyyy}, mothername{${formData.motherName}}, fathername{${formData.fatherName}}`,
-            Limit: 5,
-          }),
-        };
-      }
+    }else if (activeForm === "chaves") {
+  if (!formData.nome.trim()) {
+    validationErrorMessage = "Por favor, preencha o campo Nome.";
+    isFormValid = false;
+  } else {
+    let formattedBirthDate = "";
+    if (formData.dataNascimento) {
+      const [year, month, day] = formData.dataNascimento.split('-');
+      const localDate = new Date(year, month - 1, day);
+      formattedBirthDate = localDate.toLocaleDateString("pt-BR");
     }
+    
+    
+    payload = {
+      tipo_consulta: "cpf_alternativa",
+      parametro_consulta: JSON.stringify({
+        Datasets: "basic_data",
+        q: `name{${formData.nome}}, birthdate{${formattedBirthDate}},dateformat{dd/MM/yyyy}, mothername{${formData.motherName}}, fathername{${formData.fatherName}}`,
+        Limit: 5,
+      }),
+    };
+  }
+}
 
     if (!isFormValid) {
       setError(validationErrorMessage);
