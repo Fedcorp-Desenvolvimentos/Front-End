@@ -3,9 +3,30 @@ import { useOutletContext } from "react-router-dom";
 import "../styles/Home.css";
 
 const imagensCarrossel = [
-  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
+  {
+    src: "/imagens/Banner-01-1200x675.png",
+    alt: "Manual do Usuário",
+    link: "/arquivos/manual-do-usuario.pdf",
+    download: true,
+  },
+  {
+    src: "/imagens/Banner-02-1200x675.png",
+    alt: "Ir para Consulta",
+    link: "/consultas",
+    download: false,
+  },
+  {
+    src: "/imagens/Banner-03-1200x675.png",
+    alt: "Ir para Ferramentas",
+    link: "/ferramentas",
+    download: false,
+  },
+  {
+    src: "/imagens/Banner-04-1200x675.png",
+    alt: "Banner 4",
+    link: "#",
+    download: false,
+  }
 ];
 
 const Home = () => {
@@ -15,19 +36,38 @@ const Home = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex(prev => (prev + 1) % imagensCarrossel.length);
-    }, 5000);
+    }, 7000);
     return () => clearInterval(timer);
   }, []);
+
+  const bannerAtual = imagensCarrossel[index];
 
   return (
     <div className={`home-container${withSidebar ? " with-sidebar" : ""}`}>
       <div className="carousel-container">
-        <img
-          src={imagensCarrossel[index]}
-          alt={`Banner ${index + 1}`}
-          className="carousel-image"
-        />
-        {/* Navegação dos banners */}
+        {bannerAtual.link ? (
+          <a
+            href={bannerAtual.link}
+            className="carousel-link"
+            {...(bannerAtual.download ? { download: true } : {})}
+            target={bannerAtual.link.startsWith("http") ? "_blank" : undefined}
+            rel="noopener noreferrer"
+            tabIndex={-1}
+          >
+            <img
+              src={bannerAtual.src}
+              alt={bannerAtual.alt || `Banner ${index + 1}`}
+              className="carousel-image"
+              draggable="false"
+            />
+          </a>
+        ) : (
+          <img
+            src={bannerAtual.src}
+            alt={bannerAtual.alt || `Banner ${index + 1}`}
+            className="carousel-image"
+          />
+        )}
         <div className="carousel-indicators">
           {imagensCarrossel.map((_, i) => (
             <button

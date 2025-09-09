@@ -19,6 +19,18 @@ const ConsultaSegurado = () => {
 
     const [expandedIndex, setExpandedIndex] = useState(null);
 
+    // Ref para scroll automático do resultado
+    const resultadoRef = useRef(null);
+
+    // SCROLL AUTOMÁTICO NO RESULTADO
+    useEffect(() => {
+        if (resultado && Array.isArray(resultado) && resultado.length > 0) {
+            setTimeout(() => {
+                resultadoRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 180);
+        }
+    }, [resultado]);
+
     const initialFormData = {
         cpf: "",
         nome: "",
@@ -248,19 +260,63 @@ const ConsultaSegurado = () => {
         }
     };
 
+    // Utilitário para formatar data ISO/americana como pt-BR
     function formatarDataBR(data) {
-        if (!data || !/^\d{4}-\d{2}-\d{2}$/.test(data)) return data;
-        const [ano, mes, dia] = data.split("-");
-        return `${dia}/${mes}/${ano}`;
+        if (!data) return data;
+        // pega apenas a data se vier no formato YYYY-MM-DDTHH:mm:ss
+        const match = String(data).match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (match) {
+            return `${match[3]}/${match[2]}/${match[1]}`;
+        }
+        return data;
     }
 
+    // Utilitário para formatar valores como Real
+    function formatarReal(valor) {
+        if (valor === null || valor === undefined || valor === "") return <i>não informado</i>;
+        // tenta limpar separador errado
+        const num = Number(String(valor).replace(",", ".").replace(/[^0-9.-]+/g,""));
+        if (isNaN(num)) return valor;
+        return num.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+    // Detecta campos que são valores monetários
+    function isCampoValor(chave) {
+        return [
+            "premio",
+            "prêmio",
+            "inc_predio",
+            "inc prédio",
+            "inc conteudo",
+            "inc_conteudo",
+            "aluguel",
+            "inc predio",
+            "inc. predio",
+            "inc. conteudo"
+        ].some(v => chave.toLowerCase().includes(v));
+    }
+
+    // Detecta campos que são datas
+    function isCampoData(chave) {
+        return [
+            "inicio vig",
+            "final vig",
+            "nascimento",
+            "data",
+            "vigencia",
+            "vigência",
+            "inicio",
+            "final"
+        ].some(v => chave.toLowerCase().includes(v));
+    }
+
+    // Formata o nome do campo bonitinho
     function formataChave(texto) {
         return texto
             .toLowerCase()
             .replace(/_/g, ' ')
             .replace(/\b\w/g, (l) => l.toUpperCase());
     }
-
 
     function SeguradoItem({ segurado }) {
         const isExpanded = expandedIndex === segurado.MATRICULA;
@@ -303,9 +359,13 @@ const ConsultaSegurado = () => {
                                     : (
                                         <li key={chave}>
                                             <strong>{formataChave(chave)}:</strong>{" "}
-                                            {chave === "NASCIMENTO"
+                                            {isCampoData(chave)
                                                 ? formatarDataBR(valor)
-                                                : valor ? valor : <i>não informado</i>
+                                                : isCampoValor(chave)
+                                                    ? formatarReal(valor)
+                                                    : valor !== undefined && valor !== null && valor !== ""
+                                                        ? valor
+                                                        : <i>não informado</i>
                                             }
                                         </li>
                                     )
@@ -577,13 +637,19 @@ const ConsultaSegurado = () => {
             </form>
 
             {resultado && Array.isArray(resultado) && (
-                <div className="card-resultado mt-4">
+                <div className="card-resultado mt-4" ref={resultadoRef}>
                     <h4>Resultado da Consulta</h4>
-                    <ul className="lista-segurados">
-                        {resultado.map((seg, idx) => (
-                            <SeguradoItem key={idx} segurado={seg} />
-                        ))}
-                    </ul>
+                    {resultado.length === 0 ? (
+                        <div className="no-results-message">
+                            Nenhum segurado localizado para os filtros informados.
+                        </div>
+                    ) : (
+                        <ul className="lista-segurados">
+                            {resultado.map((seg, idx) => (
+                                <SeguradoItem key={idx} segurado={seg} />
+                            ))}
+                        </ul>
+                    )}
                 </div>
             )}
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect  } from "react";
 import * as XLSX from "xlsx";
 import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
@@ -218,6 +218,20 @@ const ConsultaPF = () => {
     setSelectedResultIndex(selectedResultIndex === idx ? null : idx);
   };
 
+  const resultadoRef = useRef(null);
+
+  useEffect(() => {
+  if (
+    (activeForm === "cpf" && resultado?.resultado_api?.Result?.length > 0) ||
+    (activeForm === "chaves" && resultado?.resultado_api?.Result?.length > 0)
+  ) {
+    setTimeout(() => {
+      resultadoRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 180);
+  }
+}, [resultado, activeForm]);
+
+
   return (
     <div className="consulta-container03">
       <h1 className="consultas-title">
@@ -301,36 +315,36 @@ const ConsultaPF = () => {
         </div>
       </div>
 
-      {activeForm === "cpf" && 
-      (
-        
-        <form className="form-container" onSubmit={handleSubmit}>
-          <label htmlFor="cpf-input">Digite o documento</label>
-          <input
-            type="text"
-            id="cpf-input"
-            name="cpf"
-            value={formData.cpf}
-            onChange={handleFormChange}
-            placeholder="Digite o CPF (apenas números)"
-            required
-            disabled={loading}
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className={`consulta-btn ${loading ? "loading" : ""}`}
-          >
-            {loading ? "Consultando..." : "Consultar"}
-          </button>
+      {activeForm === "cpf" &&
+        (
+
+          <form className="form-container" onSubmit={handleSubmit}>
+            <label htmlFor="cpf-input">Digite o documento</label>
+            <input
+              type="text"
+              id="cpf-input"
+              name="cpf"
+              value={formData.cpf}
+              onChange={handleFormChange}
+              placeholder="Digite o CPF (apenas números)"
+              required
+              disabled={loading}
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className={`consulta-btn ${loading ? "loading" : ""}`}
+            >
+              {loading ? "Consultando..." : "Consultar"}
+            </button>
 
 
-          {error && <p className="error-message">{error}</p>}
-        </form>
-      )}
+            {error && <p className="error-message">{error}</p>}
+          </form>
+        )}
 
       {activeForm === "cpf" && resultado?.resultado_api?.Result && resultado.resultado_api.Result.length > 0 && (
-        <div className="card-resultado">
+        <div className="card-resultado" ref={resultadoRef}>
           <h4>Resultado da busca realizada</h4>
           {(() => {
             const resultItem = resultado.resultado_api.Result[0];
@@ -380,7 +394,7 @@ const ConsultaPF = () => {
       )}
 
       {activeForm === "chaves" && (
-        <form className="form-container" onSubmit={handleSubmit}>
+        <form className="form-container" ref={resultadoRef} onSubmit={handleSubmit}>
           <label htmlFor="nome">
             Nome <span className="obrigatorio" title="Campo obrigatório para busca por chaves alternativas">*</span>
           </label>
@@ -488,8 +502,15 @@ const ConsultaPF = () => {
           )}
 
           {!loading && massConsultaMessage && (
-            <p className="message">{massConsultaMessage}</p>
+            <div className={
+              massConsultaMessage.toLowerCase().includes("erro") || massConsultaMessage.toLowerCase().includes("falha")
+                ? "error-message"
+                : "success-message"
+            }>
+              {massConsultaMessage}
+            </div>
           )}
+
           {error && <p className="error-message">{error}</p>}
         </div>
       )}

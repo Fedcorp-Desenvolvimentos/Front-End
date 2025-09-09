@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import * as XLSX from "xlsx";
 import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
@@ -7,7 +7,7 @@ import { FileSpreadsheet } from "lucide-react";
 function isValidCNPJ(raw) {
   const cnpj = String(raw).replace(/\D/g, "");
   if (cnpj.length !== 14) return false;
-  if (/^(\d)\1{13}$/.test(cnpj)) return false; 
+  if (/^(\d)\1{13}$/.test(cnpj)) return false;
   const calcDV = (base) => {
     let soma = 0;
     const pesos =
@@ -71,22 +71,12 @@ const ConsultaCNPJ = () => {
     telefone: "",
   });
 
+  const resultadoRef = useRef(null);
+
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
   const [selectedResultIndex, setSelectedResultIndex] = useState(null);
 
-  const handleCnpjChange = (e) => {
-    const rawCnpj = e.target.value.replace(/\D/g, "").slice(0, 14);
-    setCnpj(rawCnpj);
-  };
-
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
+  // Funções auxiliares
   const flatToBasicData = (flat) => {
     if (!flat) return null;
 
@@ -166,6 +156,36 @@ const ConsultaCNPJ = () => {
     return list?.[0]?.BasicData ?? null;
   };
 
+  // ESSA PARTE É FUNDAMENTAL!
+  const cnpjData = getCnpjData(resultado);
+  const resultList = getResultList(resultado);
+
+  // EFEITO DO SCROLL AUTOMÁTICO
+  useEffect(() => {
+    if (
+      (activeForm === "cnpj" && cnpjData) ||
+      (activeForm === "chaves" && Array.isArray(resultList) && resultList.length > 0)
+    ) {
+      setTimeout(() => {
+        resultadoRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 180);
+    }
+  }, [activeForm, cnpjData, resultList]);
+
+  // Restante das funções
+  const handleCnpjChange = (e) => {
+    const rawCnpj = e.target.value.replace(/\D/g, "").slice(0, 14);
+    setCnpj(rawCnpj);
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -200,6 +220,7 @@ const ConsultaCNPJ = () => {
       } else {
         const qParams = [];
         if (formData.razaoSocial.trim()) qParams.push(`name{${formData.razaoSocial.trim()}}`);
+        // Adicione outros parâmetros aqui se quiser expandir a busca
 
         if (qParams.length === 0) {
           validationErrorMessage = "Nenhum parâmetro de busca válido para chaves alternativas.";
@@ -227,18 +248,12 @@ const ConsultaCNPJ = () => {
     try {
       const response = await ConsultaService.realizarConsulta(payload);
       setResultado(response?.data ?? response);
-      console.log("Resultado da consulta:", response);
     } catch (err) {
       const friendly = getFriendlyError(err, payload);
       setError(friendly);
-      console.error("Erro na consulta:", {
-        status: err?.response?.status,
-        data: err?.response?.data,
-        msg: friendly,
-      });
     } finally {
       setLoading(false);
-      setHasQueried(true); 
+      setHasQueried(true);
     }
   };
 
@@ -279,7 +294,6 @@ const ConsultaCNPJ = () => {
         link.parentNode.removeChild(link);
         setMassConsultaMessage("Processamento concluído! O download da planilha de resultados iniciou.");
       } catch (err) {
-        console.error("Erro na comunicação ou processamento do arquivo:", err);
         const errorMessage =
           err.response?.data?.message || err.message || "Erro inesperado: Verifique sua conexão e o formato do arquivo.";
         setMassConsultaMessage(`Erro ao processar a planilha: ${errorMessage}`);
@@ -308,7 +322,6 @@ const ConsultaCNPJ = () => {
       link.parentNode.removeChild(link);
       setMassConsultaMessage("Download do modelo concluído.");
     } catch (err) {
-      console.error("Erro ao baixar modelo:", err);
       const errorMessage =
         err.response?.data?.message || err.message || "Erro na comunicação com o servidor para baixar o modelo.";
       setMassConsultaMessage(`Erro ao baixar modelo: ${errorMessage}`);
@@ -316,9 +329,6 @@ const ConsultaCNPJ = () => {
       setLoading(false);
     }
   };
-
-  const cnpjData = getCnpjData(resultado);
-  const resultList = getResultList(resultado);
 
   const handleExpandResult = (idx) => {
     setSelectedResultIndex(selectedResultIndex === idx ? null : idx);
@@ -357,7 +367,7 @@ const ConsultaCNPJ = () => {
               <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3z" />
             </svg>
           </div>
-          
+          <h5>Consulta por CNPJ</h5>
         </div>
 
         <div
@@ -400,7 +410,6 @@ const ConsultaCNPJ = () => {
           <button type="submit" disabled={loading} className={`consulta-btn ${loading ? "loading" : ""}`}>
             {loading ? "Consultando..." : "Consultar"}
           </button>
-
           {error && <p className="error-message">{error}</p>}
         </form>
       )}
@@ -450,14 +459,30 @@ const ConsultaCNPJ = () => {
             Baixar Planilha Modelo
           </button>
 
-          {loading && <p>Carregando...</p>}
-          {massConsultaMessage && <p className="message">{massConsultaMessage}</p>}
+          {loading && (
+            <div className="loading-indicator">
+              <div className="spinner"></div>
+              <p>{massConsultaMessage || "Processando..."}</p>
+            </div>
+          )}
+
+          {!loading && massConsultaMessage && (
+            <div className={
+              massConsultaMessage.toLowerCase().includes("erro") ||
+                massConsultaMessage.toLowerCase().includes("falha")
+                ? "error-message"
+                : "success-message"
+            }>
+              {massConsultaMessage}
+            </div>
+          )}
+
           {error && <p className="error-message">{error}</p>}
         </div>
       )}
 
       {activeForm === "cnpj" && cnpjData && (
-        <div className="card-resultado">
+        <div className="card-resultado" ref={resultadoRef}>
           <h4>Resultado da busca realizada</h4>
 
           <label>Razão Social:</label>
@@ -483,9 +508,8 @@ const ConsultaCNPJ = () => {
             type="text"
             value={
               cnpjData.descricao_tipo_de_logradouro && cnpjData.logradouro
-                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro}${
-                    cnpjData.numero ? `, ${cnpjData.numero}` : ""
-                  }`
+                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro}${cnpjData.numero ? `, ${cnpjData.numero}` : ""
+                }`
                 : cnpjData.descricao_tipo_de_logradouro || cnpjData.logradouro || "Não informada"
             }
             disabled
@@ -500,7 +524,7 @@ const ConsultaCNPJ = () => {
       )}
 
       {activeForm === "chaves" && Array.isArray(resultList) && resultList.length > 0 && (
-        <div className="card-resultado">
+        <div className="card-resultado" ref={resultadoRef}>
           <h4>Resultados encontrados</h4>
           <table className="historico-table">
             <thead>
@@ -559,11 +583,10 @@ const ConsultaCNPJ = () => {
                             <p>
                               <strong>Endereço:</strong>{" "}
                               {AD?.StreetType || AD?.Street || AD?.Number || AD?.Complement
-                                ? `${AD?.StreetType ?? ""} ${AD?.Street ?? ""}${
-                                    AD?.Number ? `, ${AD?.Number}` : ""
+                                ? `${AD?.StreetType ?? ""} ${AD?.Street ?? ""}${AD?.Number ? `, ${AD?.Number}` : ""
                                   }${AD?.Complement ? ` - ${AD?.Complement}` : ""}`
-                                    .replace(/\s+/g, " ")
-                                    .trim()
+                                  .replace(/\s+/g, " ")
+                                  .trim()
                                 : "N/A"}
                             </p>
                             <p>
