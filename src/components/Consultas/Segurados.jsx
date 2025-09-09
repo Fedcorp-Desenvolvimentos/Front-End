@@ -19,6 +19,9 @@ const ConsultaSegurado = () => {
 
     const [expandedIndex, setExpandedIndex] = useState(null);
 
+    // Ref para scroll automático do resultado
+    const resultadoRef = useRef(null);
+
     const initialFormData = {
         cpf: "",
         nome: "",
@@ -212,7 +215,7 @@ const ConsultaSegurado = () => {
         try {
             const response = await ConsultaService.consultarSegurados(payload);
             setResultado(response.resultado_api);
-
+            // O scroll será realizado pelo useEffect abaixo
             if (response.total_pages) {
                 setTotalPages(response.total_pages);
                 setCurrentPage(response.current_page || page);
@@ -261,7 +264,6 @@ const ConsultaSegurado = () => {
             .replace(/\b\w/g, (l) => l.toUpperCase());
     }
 
-    // Função para traduzir o status
     function traduzirStatus(status) {
         switch (status) {
             case "R":
@@ -275,18 +277,29 @@ const ConsultaSegurado = () => {
         }
     }
 
+    // Nova função para formatar moeda (com parse robusto)
+    function formatarMoedaBR(valor) {
+        if (valor == null || valor === "") return <i>não informado</i>;
+        let numero = valor;
+        if (typeof valor === "string") {
+            // Remove tudo exceto números, ponto e vírgula
+            numero = valor.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".");
+        }
+        numero = Number(numero);
+        if (isNaN(numero)) return valor;
+        return numero.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
 
     function SeguradoItem({ segurado }) {
         const isExpanded = expandedIndex === segurado.MATRICULA;
 
-        // Chaves que não devem ser exibidas ou que serão tratadas de forma diferente
         const ignoreKeys = [
             "NOME_SEGURADO", "NOME", "CPF_CNPJ", "FUNCAO",
             "ADMINISTRADORA", "ADMINISTRADORA_NOME", "STATUS", "STATUS_SEG"
         ];
-        
-        // Define as chaves de data que precisam de formatação
         const dateKeys = ["NASCIMENTO", "INICIO_VIG", "FINAL_VIG"];
+        // Exiba como moeda:
+        const camposMoeda = ["PREMIO", "PREMIO_LIQ", "INC_PREDIO", "INC_CONTEUDO", "ALUGUEL"];
 
         return (
             <li className={`item-segurado${isExpanded ? " expanded" : ""}`}>
@@ -325,7 +338,6 @@ const ConsultaSegurado = () => {
                                     {segurado.ADMINISTRADORA_NOME || segurado.ADMINISTRADORA}
                                 </li>
                             )}
-                            
                             {/* Exibe o Status de forma padronizada */}
                             {(segurado.STATUS || segurado.STATUS_SEG) && (
                                 <li>
@@ -333,18 +345,19 @@ const ConsultaSegurado = () => {
                                     {traduzirStatus(segurado.STATUS_SEG || segurado.STATUS)}
                                 </li>
                             )}
-
                             {Object.entries(segurado).map(([chave, valor]) => {
                                 if (ignoreKeys.includes(chave)) {
-                                    return null; // Ignora as chaves indesejadas
+                                    return null;
                                 }
-
+                                const isMoeda = camposMoeda.includes(chave);
                                 return (
                                     <li key={chave}>
                                         <strong>{formataChave(chave)}:</strong>{" "}
                                         {dateKeys.includes(chave)
                                             ? formatarDataBR(valor)
-                                            : valor ? valor : <i>não informado</i>
+                                            : isMoeda
+                                                ? formatarMoedaBR(valor)
+                                                : valor || <i>não informado</i>
                                         }
                                     </li>
                                 );
@@ -355,6 +368,16 @@ const ConsultaSegurado = () => {
             </li>
         );
     }
+
+    // Scroll automático para o resultado ao atualizar resultado
+    useEffect(() => {
+        if (resultado && resultadoRef.current) {
+            resultadoRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+    }, [resultado]);
 
     return (
         <div className="consulta-container04">
@@ -474,13 +497,11 @@ const ConsultaSegurado = () => {
                     </>
                 )}
 
-                {activeForm === "imoveis" && (
+                              {activeForm === "imoveis" && (
                     <>
-
                         <label htmlFor="CPF/CNPJ">
                             CPF / CNPJ
                         </label>
-
                         <input
                             type="text"
                             name="cnpj"
@@ -494,7 +515,6 @@ const ConsultaSegurado = () => {
                         <label htmlFor="nome">
                             Nome
                         </label>
-
                         <input
                             type="text"
                             name="nome"
@@ -508,7 +528,6 @@ const ConsultaSegurado = () => {
                         <label htmlFor="endereco">
                             Endereço
                         </label>
-
                         <input
                             type="text"
                             name="endereco"
@@ -522,7 +541,6 @@ const ConsultaSegurado = () => {
                         <label htmlFor="certificado">
                             Certificado
                         </label>
-
                         <input
                             type="text"
                             name="certificado"
@@ -534,9 +552,8 @@ const ConsultaSegurado = () => {
                         />
 
                         <label htmlFor="fatura">
-                            fatura
+                            Fatura
                         </label>
-
                         <input
                             type="text"
                             name="fatura"
@@ -550,7 +567,6 @@ const ConsultaSegurado = () => {
                         <label htmlFor="administradora">
                             Administradora
                         </label>
-
                         <div
                             className="autocomplete-wrapper"
                             ref={suggestionsRef}
@@ -600,7 +616,7 @@ const ConsultaSegurado = () => {
             </form>
 
             {resultado && Array.isArray(resultado) && (
-                <div className="card-resultado mt-4">
+                <div className="card-resultado mt-4" ref={resultadoRef}>
                     <h4>Resultado da Consulta</h4>
                     <ul className="lista-segurados">
                         {resultado.map((seg, idx) => (
