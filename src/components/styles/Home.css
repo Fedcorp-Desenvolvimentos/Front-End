@@ -1,5 +1,5 @@
 .home-container {
-  margin-top: 5.5rem !important;
+  margin-top: 4rem !important;
   max-width: 1200px;
   margin: 36px auto 0 auto;
   padding: 1px 18px 0 18px;
@@ -12,7 +12,7 @@
 
 .carousel-link {
   display: block;
-  width: 100%;
+  width: 93%;
   height: 100%;
 }
 
@@ -40,7 +40,7 @@
 .carousel-image {
   width: 100%;
   min-height: 180px;
-  max-height: 460px;
+  max-height: 500px;
   aspect-ratio: 16/9;
   object-fit: cover;
   display: block;
