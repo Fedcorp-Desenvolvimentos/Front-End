@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "../styles/Comercial.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FaBriefcase, FaFileExcel, FaSearch } from "react-icons/fa";
@@ -9,6 +9,8 @@ import * as XLSX from "xlsx";
 const ConsultaComercial = () => {
   const [activeCard, setActiveCard] = useState(null);
   const [accordionOpen, setAccordionOpen] = useState(null);
+
+  const resultadoRef = useRef(null);
 
   const [form, setForm] = useState({ cnpj: "" });
   const [result, setResult] = useState(null);
@@ -26,6 +28,16 @@ const ConsultaComercial = () => {
   const [massLoading, setMassLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  // ----------- SCROLL AUTOMÁTICO NO RESULTADO ----------
+  useEffect(() => {
+    if (result && resultadoRef.current) {
+      setTimeout(() => {
+        resultadoRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 220);
+    }
+  }, [result]);
+  // -----------------------------------------------------
 
   const handleCardClick = (option) => {
     setActiveCard(option);
@@ -341,76 +353,75 @@ const ConsultaComercial = () => {
         </div>
       )}
 
-   {activeCard === "massa" && (
-  <div className="form-massa-container">
-    <label className="form-label">Consulta em massa:</label>
-    <input
-      type="file"
-      id="input-massa-cnpj"
-      accept=".xlsx, .xls"
-      style={{ display: "none" }}
-      onChange={handleImportFile}
-      disabled={massLoading}
-    />
-    <button
-      className="btn-primary"
-      type="button"
-      onClick={() => document.getElementById("input-massa-cnpj").click()}
-      disabled={loading}
-    >
-      Importar Planilha de CNPJs
-    </button>
-    <button
-      className="btn-primary mt-2"
-      type="button"
-      onClick={handleDownloadModel}
-      disabled={loading}
-    >
-      Baixar Planilha Modelo
-    </button>
+      {activeCard === "massa" && (
+        <div className="form-massa-container">
+          <label className="form-label">Consulta em massa:</label>
+          <input
+            type="file"
+            id="input-massa-cnpj"
+            accept=".xlsx, .xls"
+            style={{ display: "none" }}
+            onChange={handleImportFile}
+            disabled={massLoading}
+          />
+          <button
+            className="btn-primary"
+            type="button"
+            onClick={() => document.getElementById("input-massa-cnpj").click()}
+            disabled={loading}
+          >
+            Importar Planilha de CNPJs
+          </button>
+          <button
+            className="btn-primary mt-2"
+            type="button"
+            onClick={handleDownloadModel}
+            disabled={loading}
+          >
+            Baixar Planilha Modelo
+          </button>
 
-    {/* Spinner de carregamento padronizado */}
-    {massLoading && (
-      <div className="loading-indicator">
-        <div className="spinner"></div>
-        <p>{massConsultaMessage || "Processando..."}</p>
-      </div>
-    )}
+          {/* Spinner de carregamento padronizado */}
+          {massLoading && (
+            <div className="loading-indicator">
+              <div className="spinner"></div>
+              <p>{massConsultaMessage || "Processando..."}</p>
+            </div>
+          )}
 
-    {/* Mensagem de sucesso/erro padronizada */}
-    {!massLoading && massConsultaMessage && (
-      <div className={
-        massConsultaMessage.toLowerCase().includes("erro") ||
-        massConsultaMessage.toLowerCase().includes("falha")
-          ? "error-message"
-          : "success-message"
-      }>
-        {massConsultaMessage}
-      </div>
-    )}
+          {/* Mensagem de sucesso/erro padronizada */}
+          {!massLoading && massConsultaMessage && (
+            <div className={
+              massConsultaMessage.toLowerCase().includes("erro") ||
+              massConsultaMessage.toLowerCase().includes("falha")
+                ? "error-message"
+                : "success-message"
+            }>
+              {massConsultaMessage}
+            </div>
+          )}
 
-    {bulkResults.length > 0 && (
-      <div className="bulk-results mt-3">
-        <h5>Resultados:</h5>
-        <ul>
-          {bulkResults.map((item, idx) => (
-            <li
-              key={idx}
-              className={
-                item.erro
-                  ? "bulk-result-error"
-                  : "bulk-result-success"
-              }
-            >
-              <strong>{item.cnpj}:</strong> {item.erro ? "Erro ao consultar" : `Empresa ${item.empresa ? "encontrada" : "não encontrada"}`}
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
-  </div>
-)}
-
+          {bulkResults.length > 0 && (
+            <div className="bulk-results mt-3">
+              <h5>Resultados:</h5>
+              <ul>
+                {bulkResults.map((item, idx) => (
+                  <li
+                    key={idx}
+                    className={
+                      item.erro
+                        ? "bulk-result-error"
+                        : "bulk-result-success"
+                    }
+                  >
+                    <strong>{item.cnpj}:</strong> {item.erro ? "Erro ao consultar" : `Empresa ${item.empresa ? "encontrada" : "não encontrada"}`}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       {activeCard === "conteudo" && (
         <div className="form-container">
@@ -421,7 +432,7 @@ const ConsultaComercial = () => {
       )}
 
       {result && (
-        <div className="form-card mt-4">
+        <div className="form-card mt-4" ref={resultadoRef}>
           <div className="card-body">
             {renderFilteredRelationships(
               result.Relationships.CurrentRelationships,
