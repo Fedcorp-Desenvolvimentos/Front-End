@@ -27,7 +27,7 @@ const ConsultaSegurado = () => {
         endereco: "",
         cnpj: "",
         certificado: "",
-        endosso: "",
+        fatura: "",
     };
 
     const [formData, setFormData] = useState(initialFormData);
@@ -183,13 +183,13 @@ const ConsultaSegurado = () => {
                 ...(formData.endereco && { endereco: formData.endereco.toUpperCase() }),
                 ...(formData.certificado && { certificado: formData.certificado }),
                 ...(formData.administradora && { administradora_nome: formData.administradora.toUpperCase() }),
-                ...(formData.endosso && { endosso: formData.endosso.replace(/\D/g, "") }),
+                ...(formData.fatura && { fatura: formData.fatura.replace(/\D/g, "") }),
             };
 
-            const imoveisFields = ['cpf', 'cnpj', 'nome', 'endereco', 'certificado', 'administradora', 'endosso'];
+            const imoveisFields = ['cpf', 'cnpj', 'nome', 'endereco', 'certificado', 'administradora', 'fatura'];
             const isImoveisFormEmpty = imoveisFields.every(field => !formData[field]);
             if (isImoveisFormEmpty) {
-                throw new Error("Pelo menos um dos campos (CPF, CNPJ, Nome, Endereço, Certificado, Endosso ou Administradora) é obrigatório para Consulta Imóveis.");
+                throw new Error("Pelo menos um dos campos (CPF, CNPJ, Nome, Endereço, Certificado, fatura ou Administradora) é obrigatório para Consulta Imóveis.");
             }
         }
 
@@ -249,7 +249,7 @@ const ConsultaSegurado = () => {
     };
 
     function formatarDataBR(data) {
-        if (!data || !/^\d{4}-\d{2}-\d{2}$/.test(data)) return data;
+        if (!data || typeof data !== 'string' || !/^\d{4}-\d{2}-\d{2}/.test(data)) return data;
         const [ano, mes, dia] = data.split("-");
         return `${dia}/${mes}/${ano}`;
     }
@@ -261,9 +261,33 @@ const ConsultaSegurado = () => {
             .replace(/\b\w/g, (l) => l.toUpperCase());
     }
 
+    // Função para traduzir o status
+    function traduzirStatus(status) {
+        switch (status) {
+            case "R":
+                return "Renovado";
+            case "C":
+                return "Cancelado";
+            case "A":
+                return "Ativo";
+            default:
+                return status;
+        }
+    }
+
 
     function SeguradoItem({ segurado }) {
         const isExpanded = expandedIndex === segurado.MATRICULA;
+
+        // Chaves que não devem ser exibidas ou que serão tratadas de forma diferente
+        const ignoreKeys = [
+            "NOME_SEGURADO", "NOME", "CPF_CNPJ", "FUNCAO",
+            "ADMINISTRADORA", "ADMINISTRADORA_NOME", "STATUS", "STATUS_SEG"
+        ];
+        
+        // Define as chaves de data que precisam de formatação
+        const dateKeys = ["NASCIMENTO", "INICIO_VIG", "FINAL_VIG"];
+
         return (
             <li className={`item-segurado${isExpanded ? " expanded" : ""}`}>
                 <button
@@ -294,22 +318,37 @@ const ConsultaSegurado = () => {
                 {isExpanded && (
                     <div className="seg-detalhes">
                         <ul>
-                            {Object.entries(segurado).map(([chave, valor]) =>
-                                chave === "NOME_SEGURADO" ||
-                                    chave === "NOME" ||
-                                    chave === "CPF_CNPJ" ||
-                                    chave === "FUNCAO"
-                                    ? null
-                                    : (
-                                        <li key={chave}>
-                                            <strong>{formataChave(chave)}:</strong>{" "}
-                                            {chave === "NASCIMENTO"
-                                                ? formatarDataBR(valor)
-                                                : valor ? valor : <i>não informado</i>
-                                            }
-                                        </li>
-                                    )
+                            {/* Exibe a Administradora de forma padronizada */}
+                            {(segurado.ADMINISTRADORA || segurado.ADMINISTRADORA_NOME) && (
+                                <li>
+                                    <strong>Administradora:</strong>{" "}
+                                    {segurado.ADMINISTRADORA_NOME || segurado.ADMINISTRADORA}
+                                </li>
                             )}
+                            
+                            {/* Exibe o Status de forma padronizada */}
+                            {(segurado.STATUS || segurado.STATUS_SEG) && (
+                                <li>
+                                    <strong>Status:</strong>{" "}
+                                    {traduzirStatus(segurado.STATUS_SEG || segurado.STATUS)}
+                                </li>
+                            )}
+
+                            {Object.entries(segurado).map(([chave, valor]) => {
+                                if (ignoreKeys.includes(chave)) {
+                                    return null; // Ignora as chaves indesejadas
+                                }
+
+                                return (
+                                    <li key={chave}>
+                                        <strong>{formataChave(chave)}:</strong>{" "}
+                                        {dateKeys.includes(chave)
+                                            ? formatarDataBR(valor)
+                                            : valor ? valor : <i>não informado</i>
+                                        }
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </div>
                 )}
@@ -392,7 +431,6 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-                        {/* Campo Administradora com Autocomplete */}
                         <label htmlFor="administradora">Administradora</label>
                         <div
                             className="autocomplete-wrapper"
@@ -438,32 +476,18 @@ const ConsultaSegurado = () => {
 
                 {activeForm === "imoveis" && (
                     <>
-                        <label htmlFor="cpf">
-                            CPF
+
+                        <label htmlFor="CPF/CNPJ">
+                            CPF / CNPJ
                         </label>
 
                         <input
                             type="text"
-                            name="cpf"
-                            id="cpf"
-                            value={formData.cpf}
-                            onChange={handleFormChange}
-                            placeholder="Digite o CPF"
-                            disabled={loading}
-                            maxLength="14"
-                        />
-
-                        <label htmlFor="CNPJ">
-                            CNPJ
-                        </label>
-
-                        <input
-                            type="text"
-                            name="cnpj"
-                            id="cnpj"
+                            name="cpf/cnpj"
+                            id="cpf/cnpj"
                             value={formData.cnpj}
                             onChange={handleFormChange}
-                            placeholder="Digite o CNPJ"
+                            placeholder="Digite o CPF / CNPJ"
                             disabled={loading}
                             maxLength="18"
                         />
@@ -510,17 +534,17 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-                        <label htmlFor="endosso">
-                            Endosso
+                        <label htmlFor="fatura">
+                            fatura
                         </label>
 
                         <input
                             type="text"
-                            name="endosso"
-                            id="endosso"
-                            value={formData.endosso}
+                            name="fatura"
+                            id="fatura"
+                            value={formData.fatura}
                             onChange={handleFormChange}
-                            placeholder="Digite o endosso"
+                            placeholder="Digite o fatura"
                             disabled={loading}
                         />
 
