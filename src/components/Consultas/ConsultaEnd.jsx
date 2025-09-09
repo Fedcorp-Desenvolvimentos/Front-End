@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import * as XLSX from "xlsx";
 import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FileSpreadsheet } from "lucide-react";
 
 const ConsultaEnd = () => {
-  const [activeForm, setActiveForm] = useState("cep");
+  const [activeForm, setActiveForm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resultado, setResultado] = useState(null);
@@ -290,6 +290,31 @@ const ConsultaEnd = () => {
     return resultado.tipo_consulta === "cep_rua_cidade" && (!Array.isArray(arr) || arr.length === 0);
   }
 
+  const resultadoRef = useRef(null);
+
+useEffect(() => {
+  
+  if (
+    activeForm === "cep" &&
+    resultado?.resultado_api &&
+    (resultado?.historico_salvo?.tipo_consulta === "endereco" || resultado?.tipo_consulta === "endereco")
+  ) {
+    setTimeout(() => {
+      resultadoRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
+  }
+  
+  if (
+    activeForm === "chaves" &&
+    resultado?.resultado_api?.resultados_viacep &&
+    resultado.resultado_api.resultados_viacep.length > 0
+  ) {
+    setTimeout(() => {
+      resultadoRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
+  }
+}, [resultado, activeForm]);
+
   return (
     <div className="consulta-container03">
       <h1 className="consultas-title">
@@ -473,15 +498,24 @@ const ConsultaEnd = () => {
             onChange={handleMassFileUpload}
             disabled={loading}
           />
-          {loading && <p>Processando planilha...</p>}
-          {massConsultaMessage && (
-            <p
-              className={`message ${massConsultaMessage.includes("Erro") ? "error" : ""
-                }`}
-            >
-              {massConsultaMessage}
-            </p>
+          {loading && (
+            <div className="loading-indicator">
+              <div className="spinner"></div>
+              <p>{massConsultaMessage || "Processando..."}</p>
+            </div>
           )}
+
+          {!loading && massConsultaMessage && (
+            <div className={
+              massConsultaMessage.toLowerCase().includes("erro") ||
+                massConsultaMessage.toLowerCase().includes("falha")
+                ? "error-message"
+                : "success-message"
+            }>
+              {massConsultaMessage}
+            </div>
+          )}
+
           {error && <p className="error-message">{error}</p>}
         </div>
       )}
@@ -489,7 +523,7 @@ const ConsultaEnd = () => {
       {activeForm !== "massa" &&
         resultado?.resultado_api &&
         ((resultado?.historico_salvo?.tipo_consulta || resultado?.tipo_consulta) === "endereco") && (
-          <div className="card-resultado">
+          <div className="card-resultado"  ref={resultadoRef}>
             <label>CEP:</label>
             <input type="text" value={resultado.resultado_api.cep || "N/A"} disabled />
             <label>Logradouro:</label>
@@ -504,7 +538,7 @@ const ConsultaEnd = () => {
         )}
 
       {activeForm === "chaves" && resultado?.resultado_api?.resultados_viacep && resultado.resultado_api.resultados_viacep.length > 0 && (
-        <div className="card-resultado">
+        <div className="card-resultado"  ref={resultadoRef}>
           <h4>Resultados encontrados</h4>
           <table className="historico-table">
             <thead>

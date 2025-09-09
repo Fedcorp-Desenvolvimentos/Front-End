@@ -140,7 +140,7 @@
 @media (max-width: 700px) {
   .home-container02 {
     padding: 16px 4vw 8vw 4vw !important;
-    padding-left: 0 !important;
+    padding-left: 4rem !important;
     width: 100vw !important;
     max-width: 100vw !important;
     min-width: 0 !important;
