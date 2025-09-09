@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "../styles/ComercialRegiao.css";
 import * as XLSX from "xlsx";
 
@@ -8,21 +8,18 @@ const mockResults = [
     tipo: "Administradora de Condomínios",
     endereco: "Rua das Palmeiras, 123 - Centro, Rio de Janeiro - RJ",
     telefone: "(21) 99999-0001",
-
   },
   {
     nome: "Imobiliária B",
     tipo: "Imobiliária",
     endereco: "Rua da Quitanda, 23 -  Centro, Rio de Janeiro - RJ",
     telefone: " (21) 3333-1234",
-
   },
   {
     nome: "Administradora C",
     tipo: "Administradora de Condomínios",
     endereco: "Av. Rio Branco, 109 -  Centro, Rio de Janeiro - RJ",
     telefone: "(21) 4002-8922",
-
   }
 ];
 
@@ -36,6 +33,18 @@ const ComercialRegiao = () => {
   const [erro, setErro] = useState(null);
   const [resultados, setResultados] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
+
+  // Ref para scroll automático
+  const resultadosRef = useRef(null);
+
+  // Scroll automático após resultados carregarem
+  useEffect(() => {
+    if (resultados.length > 0 && resultadosRef.current) {
+      setTimeout(() => {
+        resultadosRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 180);
+    }
+  }, [resultados]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,7 +83,6 @@ const ComercialRegiao = () => {
       Tipo: item.tipo,
       Endereço: item.endereco,
       Telefone: item.telefone,
-
     }));
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -107,10 +115,9 @@ const ComercialRegiao = () => {
         {erro && <p className="error-message">{erro}</p>}
       </form>
 
-      <div className="resultados-regiao">
+      <div className="resultados-regiao" ref={resultadosRef}>
         {resultados.length > 0 && (
           <>
-            
             <h3 className="result-title">Empresas encontradas:</h3>
             <ul className="regiao-list">
               {resultados.map((item, i) => (
@@ -124,7 +131,6 @@ const ComercialRegiao = () => {
                     <a href={`tel:${item.telefone.replace(/\D/g, "")}`} className="mock-phone">
                       📞 {item.telefone}
                     </a>
-
                   </div>
                   <div className="mock-tipo">{item.tipo}</div>
                 </li>

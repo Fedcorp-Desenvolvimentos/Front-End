@@ -6,7 +6,8 @@ const CotacaoConteudo = () => {
   const [incendio, setIncendio] = useState("");
   const [aluguel, setAluguel] = useState("");
   const [premio, setPremio] = useState("");
-  const [comissao, setComissao] = useState("");
+  const [repasse, setRepasse] = useState(""); // agora repasse
+  const [showResultado, setShowResultado] = useState(false);
 
   const desformatarMoeda = (valor) => {
     return Number(valor.replace(/\D/g, "")) / 100;
@@ -20,14 +21,32 @@ const CotacaoConteudo = () => {
     });
   };
 
-  const handleChange = (setter) => (e) => {
-    const valor = e.target.value;
-    setter(formatarMoeda(valor));
+  // Para %: mantém só números, e limita a 2 dígitos decimais
+  const formatarPorcentagem = (valor) => {
+    let num = valor.replace(/[^0-9.,]/g, "").replace(",", ".");
+    if (num === "") return "";
+    num = parseFloat(num);
+    if (isNaN(num)) return "";
+    return num.toString().replace(".", ",") + "%";
   };
 
+  const handleChange = (setter, type = "money") => (e) => {
+    const valor = e.target.value;
+    if (type === "percent") {
+      setter(formatarPorcentagem(valor));
+    } else {
+      setter(formatarMoeda(valor));
+    }
+    setShowResultado(false);
+  };
+
+  // Valor monetário dos campos
   const isTotal = desformatarMoeda(incendio || "0") + desformatarMoeda(aluguel || "0");
-  const valorComissao =
-    (desformatarMoeda(premio || "0") * desformatarMoeda(comissao || "0")) / 100;
+  const premioValor = desformatarMoeda(premio || "0");
+  const repassePercent = Number(repasse.replace("%", "").replace(",", ".") || 0);
+  const valorRepasse = (premioValor * repassePercent) / 100;
+  const valorFedcorp = premioValor - valorRepasse;
+  const comissaoFedcorp = 100 - repassePercent;
 
   return (
     <div className="cotacao-container">
@@ -59,11 +78,15 @@ const CotacaoConteudo = () => {
 
         <div className="campo readonly">
           <label>IS Total (R$)</label>
-          <input type="text" value={isTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} readOnly />
+          <input
+            type="text"
+            value={isTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+            readOnly
+          />
         </div>
 
         <div className="campo">
-          <label>Prêmio Líquido (R$)</label>
+          <label>Prêmio Bruto (R$)</label>
           <input
             type="text"
             value={premio}
@@ -73,20 +96,21 @@ const CotacaoConteudo = () => {
         </div>
 
         <div className="campo">
-          <label>Comissão (%)</label>
+          <label>Repasse (%)</label>
           <input
             type="text"
-            value={comissao}
-            onChange={handleChange(setComissao)}
+            value={repasse}
+            onChange={handleChange(setRepasse, "percent")}
             placeholder="Ex: 20%"
+            maxLength={6}
           />
         </div>
 
         <div className="campo readonly">
-          <label>Comissão em R$</label>
+          <label>Repasse Administradora</label>
           <input
             type="text"
-            value={valorComissao.toLocaleString("pt-BR", {
+            value={valorRepasse.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
             })}
@@ -94,6 +118,51 @@ const CotacaoConteudo = () => {
           />
         </div>
       </div>
+
+      <button
+        className="btn-resultado"
+        style={{ marginTop: 24, padding: "10px 36px" }}
+        onClick={() => setShowResultado(true)}
+      >
+        Gerar Resultado
+      </button>
+
+      {showResultado && (
+        <div
+          className="resultado-fedcorp-linha"
+          style={{
+            marginTop: 28,
+            display: "flex",
+            gap: 24,
+            flexWrap: "wrap",
+            justifyContent: "center"
+          }}
+        >
+          <div className="campo readonly" style={{ minWidth: 200 }}>
+            <label>Resultado Fedcorp</label>
+            <input
+              type="text"
+              value={valorFedcorp.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+              readOnly
+            />
+          </div>
+          <div className="campo readonly" style={{ minWidth: 200 }}>
+            <label>Comissão Fedcorp (%)</label>
+            <input
+              type="text"
+              value={
+                premioValor
+                  ? comissaoFedcorp.toFixed(2).replace(".", ",") + "%"
+                  : "0%"
+              }
+              readOnly
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

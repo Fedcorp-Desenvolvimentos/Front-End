@@ -3,9 +3,9 @@
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  background: #fff; 
+  background: #fff;
   box-sizing: border-box;
-   padding: 2rem 2rem 2rem 240px; 
+  padding: 2rem 2rem 2rem 240px;
 }
 
 .comercial-page.with-sidebar {
@@ -17,11 +17,11 @@
   background: #fff;
   border: 1px solid #dee2e6;
   border-radius: 1rem;
-  box-shadow: 0 0.4rem 1rem rgba(0,0,0,0.05);
+  box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.05);
   padding: 0.9rem 1rem;
   max-width: 460px;
   width: 100%;
-  margin: 1rem auto 0 auto;
+  margin: 1rem 13rem auto 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -78,7 +78,7 @@
   background: #fff;
   padding: 2rem;
   border-radius: 1rem;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
   text-align: center;
   margin: 2rem auto;
 }
@@ -110,7 +110,7 @@
   justify-content: center;
   gap: 0.5rem;
   margin-top: 0.2rem;
-  padding: 1rem 2rem 2rem 0;
+  padding: 1rem 2rem 0.1rem 0;
   width: 100%;
   text-align: center;
 }
@@ -318,21 +318,23 @@
   background: #fff;
   border: 1px solid #dee2e6;
   border-radius: 1rem;
-  box-shadow: 0 0.4rem 1rem rgba(0,0,0,0.05);
+  box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.05);
   padding: 1.5rem 1rem;
   max-width: 460px;
   width: 100%;
-  margin: 1rem 14rem 0 auto;
+  margin: 1rem auto 0 auto !important;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .form-massa-container label {
   font-weight: 600;
   color: #1c3263;
   margin-bottom: 1rem;
   align-self: flex-start;
 }
+
 .form-massa-container .btn-primary {
   width: 100%;
   padding: 0.75rem;
@@ -346,17 +348,21 @@
   transition: background-color 0.3s;
   cursor: pointer;
 }
+
 .form-massa-container .btn-primary:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
+
 .form-massa-container .btn-primary:hover:not(:disabled) {
   background-color: #084cdf;
 }
 
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .modal-actions {
@@ -398,7 +404,7 @@
 .card-options-accordion {
   width: 100%;
   max-width: 520px;
-  margin: 40px auto 38px auto;
+  margin: 10px auto 38px auto;
   display: flex;
   flex-direction: column;
   gap: 26px;
@@ -407,12 +413,12 @@
 .accordion-card {
   background: #fff;
   border-radius: 1rem;
-  box-shadow: 0 3px 14px rgba(13,110,253,0.09);
+  box-shadow: 0 3px 14px rgba(13, 110, 253, 0.09);
   transition: box-shadow 0.16s;
 }
 
 .accordion-card:has(.accordion-body) {
-  box-shadow: 0 6px 20px rgba(13,110,253,0.14);
+  box-shadow: 0 6px 20px rgba(13, 110, 253, 0.14);
 }
 
 .accordion-header {
@@ -460,8 +466,15 @@
 }
 
 @keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-12px);}
-  to { opacity: 1; transform: none;}
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .subcard-option {
@@ -476,7 +489,7 @@
   color: #2463eb;
   font-weight: 600;
   border: 1.5px solid #e0eaf3;
-  box-shadow: 0 1px 6px 0 rgba(13,110,253,0.04);
+  box-shadow: 0 1px 6px 0 rgba(13, 110, 253, 0.04);
   transition: background 0.12s, color 0.14s, box-shadow 0.13s, border 0.13s;
 }
 
@@ -484,7 +497,7 @@
 .subcard-option:focus {
   background: #e0edff;
   color: #0d3b66;
-  box-shadow: 0 3px 14px 0 rgba(13,110,253,0.10);
+  box-shadow: 0 3px 14px 0 rgba(13, 110, 253, 0.10);
   border: 1.5px solid #b1c7ea;
 }
 
@@ -527,12 +540,14 @@
 
 
 @media (max-width: 1200px) {
+
   .comercial-page,
   .comercial-page.with-sidebar {
     padding-left: 70px;
     padding-right: 20px;
     align-items: center;
   }
+
   .form-card,
   .card-opcoes,
   .accordion-card {
@@ -541,26 +556,30 @@
     margin-left: auto;
     margin-right: auto;
   }
+
   .form-card-container {
     justify-content: center;
     flex-direction: column;
     align-items: center;
     max-width: 95vw;
-    
+
   }
 }
 
 @media (max-width: 900px) {
+
   .comercial-page,
   .comercial-page.with-sidebar {
     padding-left: 16px;
     padding-right: 16px;
     align-items: center;
   }
+
   .form-card-container {
     gap: 1.1rem;
     max-width: 97vw;
   }
+
   .form-card {
     flex: 1 1 100%;
     max-width: 97vw;
@@ -569,6 +588,7 @@
 
 
 @media (max-width: 700px) {
+
   .comercial-page,
   .comercial-page.with-sidebar {
     padding: 1rem 2vw 1rem 2vw !important;
@@ -579,6 +599,7 @@
     overflow-x: hidden !important;
     align-items: flex-start !important;
   }
+
   .comercial-title {
     font-size: 1.45rem;
     margin-bottom: 16px;
@@ -588,15 +609,17 @@
     margin-left: 1rem;
     padding: 1rem 0 1.2rem 0;
   }
+
   .card-opcoes {
     max-width: 99vw !important;
     width: 100vw !important;
     padding: 1rem 0.5rem !important;
     margin: 0.9rem auto 1.2rem auto;
     box-sizing: border-box !important;
-    
+
   }
-    .form-card-container {
+
+  .form-card-container {
     flex-direction: column !important;
     gap: 1.1rem !important;
     max-width: 92vw !important;
@@ -604,6 +627,7 @@
     margin: 0 auto 1.2rem auto !important;
     box-sizing: border-box !important;
   }
+
   .form-card {
     display: flex !important;
     flex-direction: column !important;
@@ -614,6 +638,7 @@
     margin: 0 auto;
     box-sizing: border-box !important;
   }
+
   .card-body {
     width: 100% !important;
     padding: 0.6rem 0.3rem !important;
@@ -623,14 +648,16 @@
     align-items: center !important;
     justify-content: flex-start !important;
   }
+
   .card-options-accordion {
     width: 100vw !important;
     max-width: 100vw !important;
     margin: 14px 0 22px 0 !important;
     padding: 0 0.3rem !important;
     box-sizing: border-box !important;
-    
+
   }
+
   .accordion-card {
     width: 100vw !important;
     max-width: 100vw !important;
@@ -640,17 +667,17 @@
     overflow: visible !important;
   }
 
-   .card-opcoes,
+  .card-opcoes,
   .form-card,
   .card-options-accordion,
   .accordion-card {
-    max-width: 90vw !important;  
+    max-width: 90vw !important;
     width: 80vw !important;
     box-sizing: border-box !important;
     margin-left: 1.5rem !important;
   }
 
-    .form-massa-container {
+  .form-massa-container {
     padding: 1rem 3vw !important;
     max-width: 95vw !important;
     width: 80vw !important;
@@ -661,7 +688,3 @@
     background: #fff;
   }
 }
-
-
-
-

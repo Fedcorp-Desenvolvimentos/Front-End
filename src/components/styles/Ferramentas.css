@@ -110,6 +110,16 @@
     align-self: flex-end;
   }
   
+  .ferramenta-logo {
+  width: 80px !important;
+  height: 65px !important;
+  object-fit: contain;
+  border-radius: 1.1rem;
+  background: #f8fafc;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 8px rgba(24,88,214,0.09);
+}
+
   @media (max-width: 700px) {
     .ferramentas-grid {
       grid-template-columns: 1fr;
