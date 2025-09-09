@@ -483,13 +483,12 @@ const ConsultaSegurado = () => {
 
                         <input
                             type="text"
-                            name="cpf/cnpj"
-                            id="cpf/cnpj"
+                            name="cnpj"
+                            id="cnpj"
                             value={formData.cnpj}
                             onChange={handleFormChange}
                             placeholder="Digite o CPF / CNPJ"
                             disabled={loading}
-                            maxLength="18"
                         />
 
                         <label htmlFor="nome">
