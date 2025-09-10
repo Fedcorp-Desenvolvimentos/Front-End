@@ -57,6 +57,7 @@ const ConsultaSegurado = () => {
         setActiveIndex(-1);
         setCurrentPage(1);
         setTotalPages(1);
+        setExpandedIndex(null); // Fecha qualquer accordion aberto
         if (debounceTimeout.current) {
             clearTimeout(debounceTimeout.current);
         }
@@ -252,10 +253,22 @@ const ConsultaSegurado = () => {
     };
 
     function formatarDataBR(data) {
-        if (!data || typeof data !== 'string' || !/^\d{4}-\d{2}-\d{2}/.test(data)) return data;
-        const [ano, mes, dia] = data.split("-");
-        return `${dia}/${mes}/${ano}`;
+        if (!data || typeof data !== 'string') return data;
+        // Evita reformatar se já estiver DD/MM/AAAA
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(data)) return data;
+        // Aceita YYYY-MM-DD, YYYY/MM/DD ou com hora no final
+        const match = data.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})/);
+        if (match) {
+            const [_, ano, mes, dia] = match;
+            return `${dia}/${mes}/${ano}`;
+        }
+        // Também aceita datas compactas (YYYYMMDD)
+        if (/^\d{8}$/.test(data)) {
+            return `${data.substr(6, 2)}/${data.substr(4, 2)}/${data.substr(0, 4)}`;
+        }
+        return data;
     }
+
 
     function formataChave(texto) {
         return texto
@@ -277,12 +290,10 @@ const ConsultaSegurado = () => {
         }
     }
 
-    // Nova função para formatar moeda (com parse robusto)
     function formatarMoedaBR(valor) {
         if (valor == null || valor === "") return <i>não informado</i>;
         let numero = valor;
         if (typeof valor === "string") {
-            // Remove tudo exceto números, ponto e vírgula
             numero = valor.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".");
         }
         numero = Number(numero);
@@ -290,22 +301,28 @@ const ConsultaSegurado = () => {
         return numero.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     }
 
-    function SeguradoItem({ segurado }) {
-        const isExpanded = expandedIndex === segurado.MATRICULA;
+    function SeguradoItem({ segurado, idx }) {
+
+        const uniqueId = segurado.MATRICULA || idx;
+        const isExpanded = expandedIndex === uniqueId;
 
         const ignoreKeys = [
             "NOME_SEGURADO", "NOME", "CPF_CNPJ", "FUNCAO",
             "ADMINISTRADORA", "ADMINISTRADORA_NOME", "STATUS", "STATUS_SEG"
         ];
-        const dateKeys = ["NASCIMENTO", "INICIO_VIG", "FINAL_VIG"];
-        // Exiba como moeda:
+
+        const dateKeys = [
+            "NASCIMENTO", "INICIO_VIG", "FINAL_VIG",
+            "DT_INCLUSAO", "DT_CANCEL"
+        ];
+
         const camposMoeda = ["PREMIO", "PREMIO_LIQ", "INC_PREDIO", "INC_CONTEUDO", "ALUGUEL"];
 
         return (
             <li className={`item-segurado${isExpanded ? " expanded" : ""}`}>
                 <button
                     className="seg-titulo"
-                    onClick={() => setExpandedIndex(isExpanded ? null : segurado.MATRICULA)}
+                    onClick={() => setExpandedIndex(isExpanded ? null : uniqueId)}
                     aria-expanded={isExpanded}
                     type="button"
                 >
@@ -331,14 +348,12 @@ const ConsultaSegurado = () => {
                 {isExpanded && (
                     <div className="seg-detalhes">
                         <ul>
-                            {/* Exibe a Administradora de forma padronizada */}
                             {(segurado.ADMINISTRADORA || segurado.ADMINISTRADORA_NOME) && (
                                 <li>
                                     <strong>Administradora:</strong>{" "}
                                     {segurado.ADMINISTRADORA_NOME || segurado.ADMINISTRADORA}
                                 </li>
                             )}
-                            {/* Exibe o Status de forma padronizada */}
                             {(segurado.STATUS || segurado.STATUS_SEG) && (
                                 <li>
                                     <strong>Status:</strong>{" "}
@@ -369,7 +384,6 @@ const ConsultaSegurado = () => {
         );
     }
 
-    // Scroll automático para o resultado ao atualizar resultado
     useEffect(() => {
         if (resultado && resultadoRef.current) {
             resultadoRef.current.scrollIntoView({
@@ -497,11 +511,9 @@ const ConsultaSegurado = () => {
                     </>
                 )}
 
-                              {activeForm === "imoveis" && (
+                {activeForm === "imoveis" && (
                     <>
-                        <label htmlFor="CPF/CNPJ">
-                            CPF / CNPJ
-                        </label>
+                        <label htmlFor="CPF/CNPJ">CPF / CNPJ</label>
                         <input
                             type="text"
                             name="cnpj"
@@ -512,9 +524,7 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-                        <label htmlFor="nome">
-                            Nome
-                        </label>
+                        <label htmlFor="nome">Nome</label>
                         <input
                             type="text"
                             name="nome"
@@ -525,9 +535,7 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-                        <label htmlFor="endereco">
-                            Endereço
-                        </label>
+                        <label htmlFor="endereco">Endereço</label>
                         <input
                             type="text"
                             name="endereco"
@@ -538,9 +546,7 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-                        <label htmlFor="certificado">
-                            Certificado
-                        </label>
+                        <label htmlFor="certificado">Certificado</label>
                         <input
                             type="text"
                             name="certificado"
@@ -551,9 +557,7 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-                        <label htmlFor="fatura">
-                            Fatura
-                        </label>
+                        <label htmlFor="fatura">Fatura</label>
                         <input
                             type="text"
                             name="fatura"
@@ -564,9 +568,7 @@ const ConsultaSegurado = () => {
                             disabled={loading}
                         />
 
-                        <label htmlFor="administradora">
-                            Administradora
-                        </label>
+                        <label htmlFor="administradora">Administradora</label>
                         <div
                             className="autocomplete-wrapper"
                             ref={suggestionsRef}
@@ -620,7 +622,7 @@ const ConsultaSegurado = () => {
                     <h4>Resultado da Consulta</h4>
                     <ul className="lista-segurados">
                         {resultado.map((seg, idx) => (
-                            <SeguradoItem key={idx} segurado={seg} />
+                            <SeguradoItem key={seg.MATRICULA || idx} segurado={seg} idx={idx} />
                         ))}
                     </ul>
                 </div>

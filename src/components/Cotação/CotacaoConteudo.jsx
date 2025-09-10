@@ -46,7 +46,6 @@ const CotacaoConteudo = () => {
   const repassePercent = Number(repasse.replace("%", "").replace(",", ".") || 0);
   const valorRepasse = (premioValor * repassePercent) / 100;
   const valorFedcorp = premioValor - valorRepasse;
-  const comissaoFedcorp = 100 - repassePercent;
 
   return (
     <div className="cotacao-container">
@@ -128,41 +127,27 @@ const CotacaoConteudo = () => {
       </button>
 
       {showResultado && (
-        <div
-          className="resultado-fedcorp-linha"
-          style={{
-            marginTop: 28,
-            display: "flex",
-            gap: 24,
-            flexWrap: "wrap",
-            justifyContent: "center"
-          }}
-        >
-          <div className="campo readonly" style={{ minWidth: 200 }}>
-            <label>Resultado Fedcorp</label>
-            <input
-              type="text"
-              value={valorFedcorp.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-              readOnly
-            />
-          </div>
-          <div className="campo readonly" style={{ minWidth: 200 }}>
-            <label>Comissão Fedcorp (%)</label>
-            <input
-              type="text"
-              value={
-                premioValor
-                  ? comissaoFedcorp.toFixed(2).replace(".", ",") + "%"
-                  : "0%"
-              }
-              readOnly
-            />
-          </div>
-        </div>
-      )}
+  <div className="resultado-fedcorp-linha">
+    <div className="campo readonly">
+      <label>Resultado Fedcorp</label>
+      <input
+        type="text"
+        value={valorFedcorp.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        })}
+        readOnly
+      />
+    </div>
+    <div className="campo readonly">
+      <label>Repasse Fedcorp (%)</label>
+      <span className="ferramenta-em-breve">
+        Em Produção
+      </span>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
