@@ -12,6 +12,10 @@ const ConsultaComercial = () => {
 
   const resultadoRef = useRef(null);
 
+  const formCnpjRef = useRef(null);
+  const formMassaRef = useRef(null);
+
+
   const [form, setForm] = useState({ cnpj: "" });
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -29,7 +33,27 @@ const ConsultaComercial = () => {
 
   const navigate = useNavigate();
 
-  // ----------- SCROLL AUTOMÁTICO NO RESULTADO ----------
+  useEffect(() => {
+  
+  if (activeCard === "cnpj" && formCnpjRef.current) {
+    setTimeout(() => {
+      formCnpjRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 200);
+  }
+  if (activeCard === "massa" && formMassaRef.current) {
+    setTimeout(() => {
+      formMassaRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 200);
+  }
+  if (activeCard === "conteudo" && formConteudoRef.current) {
+    setTimeout(() => {
+      formConteudoRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 200);
+  }
+}, [activeCard]);
+
+
+  
   useEffect(() => {
     if (result && resultadoRef.current) {
       setTimeout(() => {
@@ -37,7 +61,7 @@ const ConsultaComercial = () => {
       }, 220);
     }
   }, [result]);
-  // -----------------------------------------------------
+  
 
   const handleCardClick = (option) => {
     setActiveCard(option);
@@ -333,7 +357,7 @@ const ConsultaComercial = () => {
 
       {/* Formulários conforme card ativo */}
       {activeCard === "cnpj" && (
-        <div className="form-container">
+        <div className="form-container" ref={formCnpjRef}>
           <label>Digite o CNPJ:</label>
           <input
             type="text"
@@ -354,7 +378,7 @@ const ConsultaComercial = () => {
       )}
 
       {activeCard === "massa" && (
-        <div className="form-massa-container">
+        <div className="form-massa-container" ref={formMassaRef}>
           <label className="form-label">Consulta em massa:</label>
           <input
             type="file"
@@ -447,7 +471,7 @@ const ConsultaComercial = () => {
         </div>
       )}
 
-         {showModal && (
+      {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
             <button className="btn-icon modal-close" onClick={() => setShowModal(false)} title="Fechar">×</button>
@@ -472,7 +496,7 @@ const ConsultaComercial = () => {
                     <strong>Gênero:</strong> {modalPersonData.BasicData?.Gender || "N/A"}
                   </p>
                   <p>
-                    <strong>Data de Nascimento:</strong> 
+                    <strong>Data de Nascimento:</strong>
                     {modalPersonData.BasicData?.BirthDate
                       ? new Date(modalPersonData.BasicData.BirthDate).toLocaleDateString()
                       : "N/A"}
