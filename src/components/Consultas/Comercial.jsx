@@ -393,7 +393,7 @@ const ConsultaComercial = () => {
           {!massLoading && massConsultaMessage && (
             <div className={
               massConsultaMessage.toLowerCase().includes("erro") ||
-              massConsultaMessage.toLowerCase().includes("falha")
+                massConsultaMessage.toLowerCase().includes("falha")
                 ? "error-message"
                 : "success-message"
             }>
@@ -447,78 +447,83 @@ const ConsultaComercial = () => {
         </div>
       )}
 
-      {showModal && (
+         {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Detalhes de Contato da Pessoa</h3>
             <button className="btn-icon modal-close" onClick={() => setShowModal(false)} title="Fechar">×</button>
-            <div>
-              {modalLoading && (
-                <div className="modal-loading">
-                  <div className="spinner"></div>
-                  <p>Buscando detalhes de contato...</p>
+            <h2 className="modal-titulo-central">Informações Básicas</h2>
+            {modalLoading && (
+              <div className="modal-loading">
+                <div className="spinner"></div>
+                <p>Buscando detalhes de contato...</p>
+              </div>
+            )}
+            {modalError && <div className="alert-erro">{modalError}</div>}
+            {modalPersonData && !modalLoading && !modalError && (
+              <div className="modal-dados-grid">
+                <div className="modal-coluna">
+                  <p>
+                    <strong>Nome:</strong> {modalPersonData.BasicData?.Name || "N/A"}
+                  </p>
+                  <p>
+                    <strong>CPF:</strong> {modalPersonData.BasicData?.TaxIdNumber || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Gênero:</strong> {modalPersonData.BasicData?.Gender || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Data de Nascimento:</strong> 
+                    {modalPersonData.BasicData?.BirthDate
+                      ? new Date(modalPersonData.BasicData.BirthDate).toLocaleDateString()
+                      : "N/A"}
+                  </p>
+                  <p>
+                    <strong>Nome da Mãe:</strong> {modalPersonData.BasicData?.MotherName || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Status do CPF:</strong> {modalPersonData.BasicData?.TaxIdStatus || "N/A"}
+                  </p>
                 </div>
-              )}
-              {modalError && <div className="alert-erro">{modalError}</div>}
-              {modalPersonData && !modalLoading && !modalError && (
-                <div>
-                  <h4 className="mt-3">Informações Básicas:</h4>
-                  <p className="mt-3"><strong>Nome:</strong> {modalPersonData.BasicData?.Name || "N/A"}</p>
-                  <p className="mt-3"><strong>CPF:</strong> {modalPersonData.BasicData?.TaxIdNumber || "N/A"}</p>
-                  <p className="mt-3"><strong>Gênero:</strong> {modalPersonData.BasicData?.Gender || "N/A"}</p>
-                  <p className="mt-3"><strong>Data de Nascimento:</strong> {modalPersonData.BasicData?.BirthDate ? new Date(modalPersonData.BasicData.BirthDate).toLocaleDateString() : "N/A"}</p>
-                  <p className="mt-3"><strong>Nome da Mãe:</strong> {modalPersonData.BasicData?.MotherName || "N/A"}</p>
-                  <p className="mt-3"><strong>Status do CPF:</strong> {modalPersonData.BasicData?.TaxIdStatus || "N/A"}</p>
-
-                  {modalPersonData.Emails && (
-                    <>
-                      <h4 className="mt-3">E-mails:</h4>
-                      {modalPersonData.Emails.Primary?.EmailAddress && (
-                        <p><strong>Principal:</strong> {modalPersonData.Emails.Primary.EmailAddress}</p>
-                      )}
-                      {modalPersonData.Emails.Secondary?.EmailAddress && (
-                        <p><strong>Secundário:</strong> {modalPersonData.Emails.Secondary.EmailAddress}</p>
-                      )}
-                      {!modalPersonData.Emails.Primary?.EmailAddress && !modalPersonData.Emails.Secondary?.EmailAddress && (
-                        <p>Nenhum e-mail disponível.</p>
-                      )}
-                    </>
-                  )}
-
-                  {modalPersonData.Addresses && (
-                    <>
-                      <h4 className="mt-3">Endereços:</h4>
-                      {modalPersonData.Addresses.Primary && (
-                        <p><strong>Principal:</strong> {modalPersonData.Addresses.Primary.AddressMain}, {modalPersonData.Addresses.Primary.Number}</p>
-                      )}
-                      {modalPersonData.Addresses.Secondary && (
-                        <p><strong>Secundário:</strong> {modalPersonData.Addresses.Secondary.AddressMain}, {modalPersonData.Addresses.Secondary.Number}</p>
-                      )}
-                      {!modalPersonData.Addresses.Primary && !modalPersonData.Addresses.Secondary && (
-                        <p>Nenhum endereço disponível.</p>
-                      )}
-                    </>
-                  )}
-
-                  {modalPersonData.Phones && (
-                    <>
-                      <h4 className="mt-3">Telefones:</h4>
-                      {modalPersonData.Phones.Primary?.PhoneNumber && (
-                        <p><strong>Principal:</strong> {modalPersonData.Phones.Primary.PhoneNumber}</p>
-                      )}
-                      {modalPersonData.Phones.Secondary?.PhoneNumber && (
-                        <p><strong>Secundário:</strong> {modalPersonData.Phones.Secondary.PhoneNumber}</p>
-                      )}
-                      {!modalPersonData.Phones.Primary?.PhoneNumber && !modalPersonData.Phones.Secondary?.PhoneNumber && (
-                        <p>Nenhum telefone disponível.</p>
-                      )}
-                    </>
-                  )}
+                <div className="modal-coluna">
+                  <p>
+                    <strong>E-mail Principal:</strong>{" "}
+                    <span style={{ wordBreak: "break-all" }}>
+                      {modalPersonData.Emails?.Primary?.EmailAddress || "N/A"}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>E-mail Secundário:</strong>{" "}
+                    <span style={{ wordBreak: "break-all" }}>
+                      {modalPersonData.Emails?.Secondary?.EmailAddress || "N/A"}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>Endereço Principal:</strong>{" "}
+                    {modalPersonData.Addresses?.Primary
+                      ? `${modalPersonData.Addresses.Primary.AddressMain}, ${modalPersonData.Addresses.Primary.Number}`
+                      : "N/A"}
+                  </p>
+                  <p>
+                    <strong>Endereço Secundário:</strong>{" "}
+                    {modalPersonData.Addresses?.Secondary
+                      ? `${modalPersonData.Addresses.Secondary.AddressMain}, ${modalPersonData.Addresses.Secondary.Number}`
+                      : "N/A"}
+                  </p>
+                  <p>
+                    <strong>Telefone Principal:</strong>{" "}
+                    {modalPersonData.Phones?.Primary?.PhoneNumber || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Telefone Secundário:</strong>{" "}
+                    {modalPersonData.Phones?.Secondary?.PhoneNumber || "N/A"}
+                  </p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
             <div className="modal-actions">
-              <button className="btn-primary" onClick={() => setShowModal(false)}>Fechar</button>
+              <button className="btn-primary" onClick={() => setShowModal(false)}>
+                Fechar
+              </button>
             </div>
           </div>
         </div>
