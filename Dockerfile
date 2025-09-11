@@ -1,32 +1,34 @@
 # --- Etapa 1: Build da Aplicação ---
-# Usa uma imagem oficial do Node.js para o ambiente de build.
-FROM node:18 AS build
+FROM node:18-alpine AS build
 
-# Define o diretório de trabalho no contêiner.
 WORKDIR /app
 
 # Copia os arquivos de dependência primeiro para aproveitar o cache do Docker.
 COPY package*.json ./
 
-# Instala todas as dependências do projeto.
-RUN npm install
+# Instala todas as dependências, incluindo as de desenvolvimento.
+RUN npm ci
 
 # Copia o restante do código da aplicação.
 COPY . .
 
-# Roda o comando de build do seu front-end.
-# Substitua 'npm run build' se você usar outro comando.
+# Roda o comando de build do front-end.
 RUN npm run build
 
-# --- Etapa 2: Servidor de Produção ---
-# Usa uma imagem leve para servir a aplicação, neste caso, o Nginx.
-FROM nginx:alpine
+# --- Etapa 2: Servir a Aplicação ---
+# Usa uma imagem Node.js leve, sem dependências de desenvolvimento.
+FROM node:18-alpine
 
-# Copia os arquivos da aplicação compilada da etapa de build.
-COPY --from=build /app/dist /usr/share/nginx/html
+WORKDIR /app
 
-# Expõe a porta que o Nginx usará.
-EXPOSE 80
+# Instala o 'serve' globalmente nesta nova imagem.
+RUN npm install -g serve
 
-# Comando padrão para iniciar o Nginx.
-CMD ["nginx", "-g", "daemon off;"]
+# Copia a pasta de build da etapa anterior para a nova imagem.
+COPY --from=build /app/dist ./build
+
+# Expõe a porta 8080.
+EXPOSE 8080
+
+# Comando para iniciar o 'serve'.
+CMD ["serve", "-s", "build", "-l", "8080"]
