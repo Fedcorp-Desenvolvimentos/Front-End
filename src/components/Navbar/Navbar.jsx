@@ -135,6 +135,17 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 </Link>
               </li>
             )}
+
+             {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
+              <li className={location.pathname === "/agenda" ? "active" : ""}>
+                <Link to="/agenda">
+                  <div className="sidebar-icon-tooltip">
+                    <i className="bi bi-calendar-event"></i>
+                    <span>Agenda</span>
+                  </div>
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
         <Dropdown sidebarOpen={sidebarOpen} />

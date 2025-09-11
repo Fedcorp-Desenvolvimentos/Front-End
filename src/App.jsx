@@ -20,6 +20,8 @@ import Ferramentas from './components/Views/Ferramentas';
 import EnvEmail from './components/Views/EnvEmail';
 import ConfigEmail from './components/Views/ConfigEmail';
 
+import AgendaSala from './components/Agenda/AgendaSala';
+
 import Conta from './components/Dropdown/dropItens/conta';
 import Config from './components/Dropdown/dropItens/Configuracoes';
 import Cadastro from './components/Dropdown/dropItens/Cadastro';
@@ -81,6 +83,7 @@ function AppRoutes() {
             <Route path="/metricas" element={<Metricas />} />
             <Route path="/envio-email" element={<EnvEmail />} />
             <Route path="/config-email" element={<ConfigEmail />} />
+            <Route path="/agenda" element={<AgendaSala />} />
           </Route>
         </Route>
       </Routes>
