@@ -34,26 +34,26 @@ const ConsultaComercial = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-  
-  if (activeCard === "cnpj" && formCnpjRef.current) {
-    setTimeout(() => {
-      formCnpjRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 200);
-  }
-  if (activeCard === "massa" && formMassaRef.current) {
-    setTimeout(() => {
-      formMassaRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 200);
-  }
-  if (activeCard === "conteudo" && formConteudoRef.current) {
-    setTimeout(() => {
-      formConteudoRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 200);
-  }
-}, [activeCard]);
+
+    if (activeCard === "cnpj" && formCnpjRef.current) {
+      setTimeout(() => {
+        formCnpjRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 200);
+    }
+    if (activeCard === "massa" && formMassaRef.current) {
+      setTimeout(() => {
+        formMassaRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 200);
+    }
+    if (activeCard === "conteudo" && formConteudoRef.current) {
+      setTimeout(() => {
+        formConteudoRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 200);
+    }
+  }, [activeCard]);
 
 
-  
+
   useEffect(() => {
     if (result && resultadoRef.current) {
       setTimeout(() => {
@@ -61,7 +61,7 @@ const ConsultaComercial = () => {
       }, 220);
     }
   }, [result]);
-  
+
 
   const handleCardClick = (option) => {
     setActiveCard(option);
@@ -89,6 +89,7 @@ const ConsultaComercial = () => {
     setLoading(true);
     try {
       const { resultado_api } = await ConsultaService.consultarComercial(form.cnpj);
+      console.log("Resposta completa da API:", resultado_api);
       const empresa = resultado_api?.Result?.[0] || null;
       if (empresa) {
         setResult(empresa);
@@ -108,6 +109,7 @@ const ConsultaComercial = () => {
     if (!cpf || person.RelatedEntityTaxIdType !== "CPF") {
       setModalError("CPF não disponível ou tipo de documento inválido.");
       setShowModal(true);
+      
       return;
     }
     setModalLoading(true);
@@ -115,6 +117,7 @@ const ConsultaComercial = () => {
     setModalPersonData(null);
     try {
       const { resultado_api } = await ConsultaService.consultarContatoComercial(cpf);
+      console.log("Resposta completa da API:", resultado_api);
       const regData = resultado_api?.Result?.[0]?.RegistrationData || null;
       if (regData) setModalPersonData(regData);
       else setModalError("Nenhum dado de contato encontrado para esta pessoa.");
@@ -291,7 +294,6 @@ const ConsultaComercial = () => {
       </h1>
 
       <div className="card-options-accordion">
-        {/* Relacionamentos */}
         <div className="accordion-card">
           <button
             className="accordion-header"
@@ -326,7 +328,7 @@ const ConsultaComercial = () => {
             </div>
           )}
         </div>
-        {/* Operacional */}
+
         <div className="accordion-card">
           <button
             className="accordion-header"
@@ -355,7 +357,6 @@ const ConsultaComercial = () => {
         </div>
       </div>
 
-      {/* Formulários conforme card ativo */}
       {activeCard === "cnpj" && (
         <div className="form-container" ref={formCnpjRef}>
           <label>Digite o CNPJ:</label>
@@ -405,7 +406,6 @@ const ConsultaComercial = () => {
             Baixar Planilha Modelo
           </button>
 
-          {/* Spinner de carregamento padronizado */}
           {massLoading && (
             <div className="loading-indicator">
               <div className="spinner"></div>
@@ -413,7 +413,6 @@ const ConsultaComercial = () => {
             </div>
           )}
 
-          {/* Mensagem de sucesso/erro padronizada */}
           {!massLoading && massConsultaMessage && (
             <div className={
               massConsultaMessage.toLowerCase().includes("erro") ||
@@ -535,11 +534,11 @@ const ConsultaComercial = () => {
                   </p>
                   <p>
                     <strong>Telefone Principal:</strong>{" "}
-                    {modalPersonData.Phones?.Primary?.PhoneNumber || "N/A"}
+                    {modalPersonData.Phones?.Primary?.AreaCode + " " + modalPersonData.Phones?.Primary?.Number|| "N/A"}
                   </p>
                   <p>
                     <strong>Telefone Secundário:</strong>{" "}
-                    {modalPersonData.Phones?.Secondary?.PhoneNumber || "N/A"}
+                   {modalPersonData.Phones?.Secondary?.AreaCode + " " + modalPersonData.Phones?.Secondary?.Number|| "N/A"}
                   </p>
                 </div>
               </div>
