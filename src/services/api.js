@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'back-fedconnect-ocrmr.ondigitalocean.app/',
+  baseURL: 'https://back-fedconnect-ocrmr.ondigitalocean.app/',
 });
 
 // Intercepta todas as requisições Axios
