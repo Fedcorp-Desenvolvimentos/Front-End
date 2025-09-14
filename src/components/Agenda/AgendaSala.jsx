@@ -12,6 +12,7 @@ import {
   isSameDay,
   startOfMonth,
   getDay,
+  parseISO,
 } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import DatePicker from "react-datepicker";
@@ -75,7 +76,6 @@ export default function AgendaSala() {
       const response = await AgendaService.getReservas();
 
       let data;
-      // Trata a resposta da API: pode ser um objeto paginado ou um array
       if (response && response.results) {
         data = response.results;
       } else if (Array.isArray(response)) {
@@ -85,18 +85,18 @@ export default function AgendaSala() {
           "Resposta da API de reservas não é um array ou objeto paginado válido.",
           response
         );
-        data = []; // Garante que 'data' seja um array para evitar o erro
+        data = [];
       }
 
       const formattedReservas = data.map((reserva) => ({
         ...reserva,
-        // Garante que a data é um objeto Date para ser manipulado no front-end
-        data: new Date(reserva.data),
+        // **CORREÇÃO AQUI:** Usa parseISO para lidar com a data da API corretamente
+        data: parseISO(reserva.data),
       }));
       setReservas(formattedReservas);
     } catch (error) {
       console.error("Erro ao carregar reservas:", error);
-      setReservas([]); // Define a lista como vazia em caso de erro
+      setReservas([]);
     }
   };
 
@@ -121,7 +121,8 @@ export default function AgendaSala() {
       const payload = {
         ...novaReserva,
         data: format(novaReserva.data, "yyyy-MM-dd"),
-        participantes: novaReserva.participantes,
+        participantes: novaReserva.participantes.join(", "),
+        criado_por: user.id,
       };
       await AgendaService.createReserva(payload);
       closeModal();
@@ -166,7 +167,10 @@ export default function AgendaSala() {
             {diasSemana.map((_, dIdx) => {
               const dia = addDays(startDate, dIdx);
               const reservasSlot = reservas.filter(
-                (r) => isSameDay(r.data, dia) && r.horario === hora
+                // **CORREÇÃO AQUI:** Garante que a comparação de datas seja consistente
+                (r) =>
+                  format(r.data, "yyyy-MM-dd") === format(dia, "yyyy-MM-dd") &&
+                  r.horario === hora
               );
 
               const isLivre = reservasSlot.length === 0;
@@ -177,7 +181,7 @@ export default function AgendaSala() {
                   className={`agenda-cell ${isLivre ? "livre" : "ocupado"}`}
                 >
                   {isLivre ? (
-                    userRole === "recepcionista" ? (
+                    ["recepcionista", "admin", "gestor"].includes(userRole) ? (
                       <button
                         className="agenda-slot-btn"
                         title="Reservar"
@@ -192,16 +196,22 @@ export default function AgendaSala() {
                     <button
                       className="agenda-reservado-pill"
                       title={
-                        userRole === "recepcionista"
+                        ["recepcionista", "admin", "gestor"].includes(userRole)
                           ? "Ver detalhes"
                           : "Indisponível"
                       }
                       onClick={() => {
-                        if (userRole === "recepcionista") {
+                        if (
+                          ["recepcionista", "admin", "gestor"].includes(
+                            userRole
+                          )
+                        ) {
                           setReservaSelecionada(reservasSlot[0]);
                         }
                       }}
-                      disabled={userRole !== "recepcionista"}
+                      disabled={
+                        !["recepcionista", "admin", "gestor"].includes(userRole)
+                      }
                     >
                       Reservado
                     </button>
@@ -243,7 +253,7 @@ export default function AgendaSala() {
         <button className="agenda-week-btn" onClick={() => handleWeekChange(1)}>
           <FaChevronRight />
         </button>
-        {userRole === "recepcionista" && (
+        {["recepcionista", "admin", "gestor"].includes(userRole) && (
           <button
             className="btn-primary agenda-nova-btn"
             onClick={() => handleNewReserva(null, null)}
@@ -274,13 +284,14 @@ export default function AgendaSala() {
         </div>
       )}
 
-      {reservaSelecionada && userRole === "recepcionista" && (
-        <AgendaDetalhe
-          reserva={reservaSelecionada}
-          onClose={() => setReservaSelecionada(null)}
-          onDelete={handleDeleteReserva}
-        />
-      )}
+      {reservaSelecionada &&
+        ["recepcionista", "admin", "gestor"].includes(userRole) && (
+          <AgendaDetalhe
+            reserva={reservaSelecionada}
+            onClose={() => setReservaSelecionada(null)}
+            onDelete={handleDeleteReserva}
+          />
+        )}
     </div>
   );
 }
