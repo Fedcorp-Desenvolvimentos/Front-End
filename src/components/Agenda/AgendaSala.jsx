@@ -19,10 +19,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import "../styles/AgendaSala.css";
 import AgendaReservaForm from "./AgendaReservaForm";
 import AgendaDetalhe from "./AgendaDetalhe";
-import { useAuth } from "../../context/AuthContext"; // Importa o contexto de autenticação
-import { AgendaService } from "../../services/agendaService"; // Importa o novo serviço de agenda
+import { useAuth } from "../../context/AuthContext";
+import { AgendaService } from "../../services/agendaService";
 
-// --- Funções de utilidade (não precisam ser alteradas) ---
+// --- Funções de utilidade ---
 function getFirstMondayOfMonth(date) {
   const firstDay = startOfMonth(date);
   const weekDay = getDay(firstDay);
@@ -67,27 +67,39 @@ export default function AgendaSala() {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [reservaSelecionada, setReservaSelecionada] = useState(null);
 
-  // Pega a role do usuário a partir do contexto de autenticação
   const { user } = useAuth();
   const userRole = String(user?.nivel_acesso || "").toLowerCase();
 
-  // Função para buscar as reservas no backend
   const fetchReservas = async () => {
     try {
       const response = await AgendaService.getReservas();
-      const data = response.results; // <-- Ajuste aqui
+
+      let data;
+      // Trata a resposta da API: pode ser um objeto paginado ou um array
+      if (response && response.results) {
+        data = response.results;
+      } else if (Array.isArray(response)) {
+        data = response;
+      } else {
+        console.warn(
+          "Resposta da API de reservas não é um array ou objeto paginado válido.",
+          response
+        );
+        data = []; // Garante que 'data' seja um array para evitar o erro
+      }
 
       const formattedReservas = data.map((reserva) => ({
         ...reserva,
+        // Garante que a data é um objeto Date para ser manipulado no front-end
         data: new Date(reserva.data),
       }));
       setReservas(formattedReservas);
     } catch (error) {
       console.error("Erro ao carregar reservas:", error);
+      setReservas([]); // Define a lista como vazia em caso de erro
     }
   };
 
-  // Carrega as reservas quando o componente monta e sempre que a semana muda
   useEffect(() => {
     fetchReservas();
   }, [startDate]);
@@ -104,39 +116,31 @@ export default function AgendaSala() {
     setSelectedSlot(null);
   };
 
-  // Função para salvar uma nova reserva no backend
   const handleSaveReserva = async (novaReserva) => {
     try {
-      // Prepara os dados para o formato que o backend espera
       const payload = {
         ...novaReserva,
-        // Converte o objeto Date para uma string 'yyyy-MM-dd'
         data: format(novaReserva.data, "yyyy-MM-dd"),
-        // Transforma o array de participantes em uma string separada por vírgula
-        participantes: novaReserva.participantes.join(", "),
+        participantes: novaReserva.participantes,
       };
       await AgendaService.createReserva(payload);
       closeModal();
-      fetchReservas(); // Atualiza a lista para mostrar a nova reserva
+      fetchReservas();
     } catch (error) {
       console.error("Erro ao salvar reserva:", error);
-      // Aqui você pode adicionar lógica para exibir uma mensagem de erro
     }
   };
 
-  // Função para excluir uma reserva no backend
   const handleDeleteReserva = async (reservaParaDeletar) => {
     try {
       await AgendaService.deleteReserva(reservaParaDeletar.id);
       setReservaSelecionada(null);
-      fetchReservas(); // Atualiza a lista após a exclusão
+      fetchReservas();
     } catch (error) {
       console.error("Erro ao excluir reserva:", error);
-      // Aqui você pode adicionar lógica para exibir uma mensagem de erro
     }
   };
 
-  // Renderiza a grade de horários
   const renderGrid = () => (
     <table className="agenda-grid">
       <thead>
