@@ -1,5 +1,10 @@
 import React, { useEffect, useState, forwardRef } from "react";
-import { FaPlus, FaChevronLeft, FaChevronRight, FaCalendarAlt } from "react-icons/fa";
+import {
+  FaPlus,
+  FaChevronLeft,
+  FaChevronRight,
+  FaCalendarAlt,
+} from "react-icons/fa";
 import {
   format,
   addDays,
@@ -14,62 +19,77 @@ import "react-datepicker/dist/react-datepicker.css";
 import "../styles/AgendaSala.css";
 import AgendaReservaForm from "./AgendaReservaForm";
 import AgendaDetalhe from "./AgendaDetalhe";
+import { useAuth } from "../../context/AuthContext"; // Importa o contexto de autenticação
+import { AgendaService } from "../../services/agendaService"; // Importa o novo serviço de agenda
 
-
+// --- Funções de utilidade (não precisam ser alteradas) ---
 function getFirstMondayOfMonth(date) {
   const firstDay = startOfMonth(date);
-  const weekDay = getDay(firstDay); 
+  const weekDay = getDay(firstDay);
   return weekDay === 1 ? firstDay : addDays(firstDay, (8 - weekDay) % 7);
 }
 
 const HORARIOS = [
-  "09:00", "10:00", "11:00", "12:00",
-  "13:00", "14:00", "15:00", "16:00", "17:00", "18:00",
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+  "18:00",
 ];
 
 const diasSemana = ["Seg", "Ter", "Qua", "Qui", "Sex"];
 
-const getUserRole = () => "recepcionista"; 
-
-function mockReservas(startDate) {
-  return [
-    {
-      id: 1,
-      tema: "Reunião Financeiro",
-      participantes: ["Ana", "Carlos"],
-      data: addDays(startDate, 0), 
-      horario: "10:00",
-      duracao: 60,
-    },
-    {
-      id: 2,
-      tema: "Projetos TI",
-      participantes: ["Lucas", "Paula"],
-      data: addDays(startDate, 2), 
-      horario: "15:00",
-      duracao: 30,
-    },
-  ];
-}
-
 const MonthButton = forwardRef(function MonthButton({ value, onClick }, ref) {
   return (
-    <button ref={ref} className="agenda-calendar-btn" title={value || "Escolher mês"} onClick={onClick}>
+    <button
+      ref={ref}
+      className="agenda-calendar-btn"
+      title={value || "Escolher mês"}
+      onClick={onClick}
+    >
       <FaCalendarAlt size={22} />
     </button>
   );
 });
 
+// --- Componente principal ---
 export default function AgendaSala() {
-  const [startDate, setStartDate] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const [startDate, setStartDate] = useState(
+    startOfWeek(new Date(), { weekStartsOn: 1 })
+  );
   const [reservas, setReservas] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [reservaSelecionada, setReservaSelecionada] = useState(null);
-  const userRole = getUserRole();
 
+  // Pega a role do usuário a partir do contexto de autenticação
+  const { user } = useAuth();
+  const userRole = String(user?.nivel_acesso || "").toLowerCase();
+
+  // Função para buscar as reservas no backend
+  const fetchReservas = async () => {
+    try {
+      const data = await AgendaService.getReservas();
+      // Converte a string de data do backend para um objeto Date
+      const formattedReservas = data.map((reserva) => ({
+        ...reserva,
+        data: new Date(reserva.data),
+      }));
+      setReservas(formattedReservas);
+    } catch (error) {
+      console.error("Erro ao carregar reservas:", error);
+      // Você pode adicionar um estado de erro para exibir uma mensagem na UI
+    }
+  };
+
+  // Carrega as reservas quando o componente monta e sempre que a semana muda
   useEffect(() => {
-    setReservas(mockReservas(startDate));
+    fetchReservas();
   }, [startDate]);
 
   const handleWeekChange = (inc) => setStartDate(addDays(startDate, inc * 7));
@@ -79,23 +99,44 @@ export default function AgendaSala() {
     setShowModal(true);
   };
 
-  const handleSaveReserva = (reserva) => {
-    setReservas((prev) => [
-      ...prev,
-      {
-        ...reserva,
-        id: Date.now(),
-      },
-    ]);
-    setShowModal(false);
-    setSelectedSlot(null);
-  };
-
   const closeModal = () => {
     setShowModal(false);
     setSelectedSlot(null);
   };
 
+  // Função para salvar uma nova reserva no backend
+  const handleSaveReserva = async (novaReserva) => {
+    try {
+      // Prepara os dados para o formato que o backend espera
+      const payload = {
+        ...novaReserva,
+        // Converte o objeto Date para uma string 'yyyy-MM-dd'
+        data: format(novaReserva.data, "yyyy-MM-dd"),
+        // Transforma o array de participantes em uma string separada por vírgula
+        participantes: novaReserva.participantes.join(", "),
+      };
+      await AgendaService.createReserva(payload);
+      closeModal();
+      fetchReservas(); // Atualiza a lista para mostrar a nova reserva
+    } catch (error) {
+      console.error("Erro ao salvar reserva:", error);
+      // Aqui você pode adicionar lógica para exibir uma mensagem de erro
+    }
+  };
+
+  // Função para excluir uma reserva no backend
+  const handleDeleteReserva = async (reservaParaDeletar) => {
+    try {
+      await AgendaService.deleteReserva(reservaParaDeletar.id);
+      setReservaSelecionada(null);
+      fetchReservas(); // Atualiza a lista após a exclusão
+    } catch (error) {
+      console.error("Erro ao excluir reserva:", error);
+      // Aqui você pode adicionar lógica para exibir uma mensagem de erro
+    }
+  };
+
+  // Renderiza a grade de horários
   const renderGrid = () => (
     <table className="agenda-grid">
       <thead>
@@ -105,7 +146,9 @@ export default function AgendaSala() {
             const dia = addDays(startDate, idx);
             return (
               <th key={idx}>
-                <span className="agenda-dia">{format(dia, "EEE", { locale: ptBR })}</span> {" "}
+                <span className="agenda-dia">
+                  {format(dia, "EEE", { locale: ptBR })}
+                </span>{" "}
                 <span className="agenda-data">{format(dia, "dd/MM")}</span>
               </th>
             );
@@ -125,7 +168,10 @@ export default function AgendaSala() {
               const isLivre = reservasSlot.length === 0;
 
               return (
-                <td key={dIdx} className={`agenda-cell ${isLivre ? "livre" : "ocupado"}`}>
+                <td
+                  key={dIdx}
+                  className={`agenda-cell ${isLivre ? "livre" : "ocupado"}`}
+                >
                   {isLivre ? (
                     userRole === "recepcionista" ? (
                       <button
@@ -139,10 +185,13 @@ export default function AgendaSala() {
                       <span className="agenda-livre">Livre</span>
                     )
                   ) : (
-               
                     <button
                       className="agenda-reservado-pill"
-                      title={userRole === "recepcionista" ? "Ver detalhes" : "Indisponível"}
+                      title={
+                        userRole === "recepcionista"
+                          ? "Ver detalhes"
+                          : "Indisponível"
+                      }
                       onClick={() => {
                         if (userRole === "recepcionista") {
                           setReservaSelecionada(reservasSlot[0]);
@@ -169,11 +218,15 @@ export default function AgendaSala() {
       </h1>
 
       <div className="agenda-toolbar">
-        <button className="agenda-week-btn" onClick={() => handleWeekChange(-1)}>
+        <button
+          className="agenda-week-btn"
+          onClick={() => handleWeekChange(-1)}
+        >
           <FaChevronLeft />
         </button>
         <span className="agenda-semana">
-          Semana de {format(startDate, "dd/MM/yyyy")} a {format(addDays(startDate, 4), "dd/MM/yyyy")}
+          Semana de {format(startDate, "dd/MM/yyyy")} a{" "}
+          {format(addDays(startDate, 4), "dd/MM/yyyy")}
         </span>
         <DatePicker
           selected={startDate}
@@ -187,7 +240,10 @@ export default function AgendaSala() {
           <FaChevronRight />
         </button>
         {userRole === "recepcionista" && (
-          <button className="btn-primary agenda-nova-btn" onClick={() => handleNewReserva(null, null)}>
+          <button
+            className="btn-primary agenda-nova-btn"
+            onClick={() => handleNewReserva(null, null)}
+          >
             <FaPlus className="agenda-plus-icon" /> Nova Reserva
           </button>
         )}
@@ -218,10 +274,7 @@ export default function AgendaSala() {
         <AgendaDetalhe
           reserva={reservaSelecionada}
           onClose={() => setReservaSelecionada(null)}
-          onDelete={(reserva) => {
-            setReservas((prev) => prev.filter((r) => r.id !== reserva.id));
-            setReservaSelecionada(null);
-          }}
+          onDelete={handleDeleteReserva}
         />
       )}
     </div>
