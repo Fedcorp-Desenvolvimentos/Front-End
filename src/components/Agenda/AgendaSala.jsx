@@ -74,8 +74,9 @@ export default function AgendaSala() {
   // Função para buscar as reservas no backend
   const fetchReservas = async () => {
     try {
-      const data = await AgendaService.getReservas();
-      // Converte a string de data do backend para um objeto Date
+      const response = await AgendaService.getReservas();
+      const data = response.results; // <-- Ajuste aqui
+
       const formattedReservas = data.map((reserva) => ({
         ...reserva,
         data: new Date(reserva.data),
@@ -83,7 +84,6 @@ export default function AgendaSala() {
       setReservas(formattedReservas);
     } catch (error) {
       console.error("Erro ao carregar reservas:", error);
-      // Você pode adicionar um estado de erro para exibir uma mensagem na UI
     }
   };
 
