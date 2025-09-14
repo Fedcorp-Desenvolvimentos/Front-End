@@ -84,7 +84,7 @@ const Config = () => {
     }
     try {
       await UserService.changePassword(userId, {
-        current_password: senhaAtual,
+        old_password: senhaAtual,
         new_password: novaSenha,
       });
       setSuccessMessage('Senha alterada com sucesso!');

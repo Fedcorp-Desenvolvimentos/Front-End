@@ -12,8 +12,8 @@ export const UserService = {
     // Você mencionou '/token/' anteriormente para simplejwt, mas aqui está '/login/'.
     // Use a rota que está configurada em seu urls.py do Django para o CustomTokenObtainPairView.
     // Ex: Se for a rota padrão de simplejwt, use '/token/'.
-    const response = await api.post("/login/", payload); 
-    
+    const response = await api.post("/login/", payload);
+
     // IMPORTANTE: Se o backend estiver configurado para não retornar o token no corpo da resposta
     // (apenas via cookie), `response.data` pode estar vazio ou conter outros dados.
     // Você não precisa mais acessar `response.data.access` aqui.
@@ -73,6 +73,10 @@ export const UserService = {
     return response.data;
   },
 
+  changePassword: async (payload) => {
+    const response = await api.post(`/users/password/`, payload);
+    return response.data;
+  },
   /**
    * Deleta um usuário por ID.
    * @param {number} userId - O ID do usuário a ser deletado.
