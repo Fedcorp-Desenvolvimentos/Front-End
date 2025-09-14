@@ -676,7 +676,8 @@ const ConsultaCNPJ = () => {
             <div
               className={
                 massConsultaMessage.toLowerCase().includes("erro") ||
-                massConsultaMessage.toLowerCase().includes("falha")
+                massConsultaMessage.toLowerCase().includes("falha") ||
+                massConsultaMessage.includes(LIMIT_MESSAGE_TEXT)
                   ? "error-message"
                   : "success-message"
               }
