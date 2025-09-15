@@ -1,14 +1,15 @@
 .agenda-sala-page {
-    padding: 2.2rem 2rem 1rem 240px;
+    padding: 2rem 1rem 1rem 240px;
     background: #f7fafc;
     min-height: 100vh;
+    
 }
 
 .agenda-titulo {
     font-size: 2rem;
     font-weight: 700;
     color: #2052d9;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -268,7 +269,7 @@
     background: #d5deef;
 }
 
-.agenda-detalhe-overlay {
+.modal-overlay, .agenda-detalhe-overlay {
     position: fixed;
     z-index: 1200;
     top: 0;
@@ -416,6 +417,51 @@
 .agenda-grid .agenda-cell {
     position: relative;
 }
+
+.agenda-detalhe-modal {
+    background: #fff;
+    border-radius: 1.2rem;
+    padding: 2.2rem 2rem 1.6rem 2rem;
+    max-width: 440px;
+    width: 98vw;
+    box-shadow: 0 6px 30px #22336824;
+    position: relative;
+}
+
+.agenda-toast {
+  position: fixed;
+  top: 48px;
+  right: 36px;
+  z-index: 2000;
+  background: #25bb68;
+  color: #fff;
+  padding: 1.05rem 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 16px #1858d63a;
+  font-size: 1.13rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  animation: toast-pop 0.22s cubic-bezier(.2,.8,.5,1.1);
+}
+
+@keyframes toast-pop {
+  from { transform: translateY(-38px) scale(0.94); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+@media (min-width: 1700px) {
+  .agenda-modal-content {
+    max-width: 600px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .modal-overlay {
+    justify-content: flex-start;
+    margin-left: 10vw;
+  }
+}
+
 
 
 @media (max-width: 900px) {

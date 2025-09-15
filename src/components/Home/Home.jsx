@@ -6,7 +6,7 @@ const imagensCarrossel = [
   {
     src: "/imagens/Banner-01-1200x675.png",
     alt: "Manual do Usuário",
-    link: "/public/manual-usuario.pdf",
+    link: "/manual-usuario.pdf",
     download: true,
   },
   {

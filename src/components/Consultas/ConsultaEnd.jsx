@@ -11,9 +11,6 @@ const ConsultaEnd = () => {
   const [resultado, setResultado] = useState(null);
   const [hasQueried, setHasQueried] = useState(false);
 
-  // Limite de itens para a consulta em massa
-  const MASS_QUERY_LIMIT = 250;
-
   const [formData, setFormData] = useState({
     cep: "",
     rua: "",
@@ -35,15 +32,10 @@ const ConsultaEnd = () => {
     const status = err?.response?.status;
     const data = err?.response?.data;
     const serverMsg =
-      data?.detail ||
-      data?.message ||
-      data?.mensagem ||
-      data?.error ||
-      data?.erro;
+      data?.detail || data?.message || data?.mensagem || data?.error || data?.erro;
 
     if (!err?.response) {
-      if (err?.code === "ECONNABORTED")
-        return "Tempo de resposta excedido. Tente novamente em instantes.";
+      if (err?.code === "ECONNABORTED") return "Tempo de resposta excedido. Tente novamente em instantes.";
       return "Não foi possível conectar ao serviço. Verifique sua conexão e tente novamente.";
     }
 
@@ -61,12 +53,9 @@ const ConsultaEnd = () => {
         return "Parâmetros inválidos na consulta. Revise UF, Cidade e Rua.";
       return "Requisição inválida. Ajuste os campos e tente novamente.";
     }
-    if (status === 429)
-      return "Muitas consultas em sequência. Aguarde e tente novamente.";
-    if (status === 401 || status === 403)
-      return "Acesso não autorizado. Verifique suas credenciais.";
-    if (status >= 500)
-      return "Serviço do provedor indisponível no momento. Tente novamente em instantes.";
+    if (status === 429) return "Muitas consultas em sequência. Aguarde e tente novamente.";
+    if (status === 401 || status === 403) return "Acesso não autorizado. Verifique suas credenciais.";
+    if (status >= 500) return "Serviço do provedor indisponível no momento. Tente novamente em instantes.";
 
     return serverMsg || `Erro inesperado (${status}). Tente novamente.`;
   };
@@ -105,8 +94,7 @@ const ConsultaEnd = () => {
 
     if (activeForm === "cep") {
       if (!isValidCEP(formData.cep)) {
-        validationErrorMessage =
-          "Por favor, insira um CEP válido com 8 dígitos.";
+        validationErrorMessage = "Por favor, insira um CEP válido com 8 dígitos.";
         isFormValid = false;
       } else {
         payload = {
@@ -116,21 +104,17 @@ const ConsultaEnd = () => {
         };
       }
     } else if (activeForm === "chaves") {
-      const obrigatorios = [
-        formData.uf.trim(),
-        formData.cidade.trim(),
-        formData.rua.trim(),
-      ];
+      const obrigatorios = [formData.uf.trim(), formData.cidade.trim(), formData.rua.trim()];
       const filled = obrigatorios.filter(Boolean).length;
 
       if (filled === 0) {
         validationErrorMessage = "Preencha os campos obrigatórios para buscar.";
         isFormValid = false;
       } else if (filled < 3) {
-        validationErrorMessage =
-          "Por favor, preencha TODOS os campos obrigatórios: UF, Cidade e Rua.";
+        validationErrorMessage = "Por favor, preencha TODOS os campos obrigatórios: UF, Cidade e Rua.";
         isFormValid = false;
       } else {
+
         if (!/^[A-Z]{2}$/.test(formData.uf.trim().toUpperCase())) {
           validationErrorMessage = "UF inválida. Use 2 letras (ex: RJ).";
           isFormValid = false;
@@ -141,9 +125,7 @@ const ConsultaEnd = () => {
               estado: formData.uf,
               cidade: formData.cidade,
               logradouro: formData.rua,
-              ...(formData.bairro.trim()
-                ? { bairro: formData.bairro.trim() }
-                : {}),
+              ...(formData.bairro.trim() ? { bairro: formData.bairro.trim() } : {}),
             }),
             origem: "manual",
           };
@@ -176,7 +158,7 @@ const ConsultaEnd = () => {
       } else {
         setError(
           response?.mensagem ||
-            "Resposta inesperada da API. Endereço não encontrado ou inválido."
+          "Resposta inesperada da API. Endereço não encontrado ou inválido."
         );
         setResultado(null);
       }
@@ -213,55 +195,28 @@ const ConsultaEnd = () => {
         const workbook = XLSX.read(data, { type: "array" });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-        // Converte a planilha para JSON. A opção 'raw: false' evita que o XLSX
-        // trate o CEP como número (removendo zeros à esquerda).
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-          header: 1,
-          raw: false,
-        });
-
-        // Encontra o índice da coluna do CEP, independentemente da capitalização
-        const headerRow = jsonData[0];
-        const cepColumnIndex = headerRow.findIndex(
-          (header) => header && String(header).toLowerCase() === "cep"
-        );
-
-        if (cepColumnIndex === -1) {
-          setMassConsultaMessage(
-            "Planilha inválida. O cabeçalho 'CEP' não foi encontrado. Por favor, baixe o modelo e use-o como base."
-          );
-          setLoading(false);
-          if (event.target) event.target.value = null;
-          return;
-        }
-
-        // Mapeia os dados para um array de objetos, usando o índice da coluna de CEP
-        const cepsParaConsulta = jsonData.slice(1).map((row) => ({
-          cep: String(row[cepColumnIndex] || "").replace(/\D/g, ""),
+        const cepsParaConsulta = jsonData.map((row) => ({
+          CEP: String(row.CEP || "").replace(/\D/g, ""),
         }));
 
-        const cepsValidos = cepsParaConsulta.filter((item) =>
-          isValidCEP(item.cep)
+        const cepsValidos = cepsParaConsulta.filter(
+          (item) => isValidCEP(item.CEP)
         );
 
         if (cepsValidos.length === 0) {
           setMassConsultaMessage(
             "Nenhum CEP válido encontrado na planilha. Verifique se a coluna de CEPs está preenchida corretamente e se o cabeçalho é 'CEP'."
           );
+
           setLoading(false);
           if (event.target) event.target.value = null;
           return;
         }
 
-        if (cepsValidos.length > MASS_QUERY_LIMIT) {
-          setMassConsultaMessage(
-            `Atenção: A planilha contém ${cepsValidos.length} CEPs válidos, mas o limite é de ${MASS_QUERY_LIMIT}. A consulta será limitada aos primeiros ${MASS_QUERY_LIMIT} CEPs.`
-          );
-        }
-
         const requestBody = {
-          ceps: cepsValidos.slice(0, MASS_QUERY_LIMIT), // Garante que o limite de 250 seja aplicado no envio
+          ceps: cepsValidos,
           origem: "planilha",
         };
 
@@ -332,42 +287,33 @@ const ConsultaEnd = () => {
   function isBuscaChaveSemResultado(resultado) {
     if (!resultado?.resultado_api) return false;
     const arr = resultado.resultado_api.resultados_viacep;
-    return (
-      resultado.tipo_consulta === "cep_rua_cidade" &&
-      (!Array.isArray(arr) || arr.length === 0)
-    );
+    return resultado.tipo_consulta === "cep_rua_cidade" && (!Array.isArray(arr) || arr.length === 0);
   }
 
   const resultadoRef = useRef(null);
 
-  useEffect(() => {
-    if (
-      activeForm === "cep" &&
-      resultado?.resultado_api &&
-      (resultado?.historico_salvo?.tipo_consulta === "endereco" ||
-        resultado?.tipo_consulta === "endereco")
-    ) {
-      setTimeout(() => {
-        resultadoRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 200);
-    }
-
-    if (
-      activeForm === "chaves" &&
-      resultado?.resultado_api?.resultados_viacep &&
-      resultado.resultado_api.resultados_viacep.length > 0
-    ) {
-      setTimeout(() => {
-        resultadoRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 200);
-    }
-  }, [resultado, activeForm]);
+useEffect(() => {
+  
+  if (
+    activeForm === "cep" &&
+    resultado?.resultado_api &&
+    (resultado?.historico_salvo?.tipo_consulta === "endereco" || resultado?.tipo_consulta === "endereco")
+  ) {
+    setTimeout(() => {
+      resultadoRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
+  }
+  
+  if (
+    activeForm === "chaves" &&
+    resultado?.resultado_api?.resultados_viacep &&
+    resultado.resultado_api.resultados_viacep.length > 0
+  ) {
+    setTimeout(() => {
+      resultadoRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
+  }
+}, [resultado, activeForm]);
 
   return (
     <div className="consulta-container03">
@@ -399,9 +345,8 @@ const ConsultaEnd = () => {
         </div>
 
         <div
-          className={`card card-option ${
-            activeForm === "chaves" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "chaves" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("chaves");
             resetFormState();
@@ -421,9 +366,8 @@ const ConsultaEnd = () => {
         </div>
 
         <div
-          className={`card card-option ${
-            activeForm === "massa" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "massa" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("massa");
             resetFormState();
@@ -466,13 +410,7 @@ const ConsultaEnd = () => {
         <form className="form-container" onSubmit={handleSubmit}>
           <p className="form-description"></p>
           <label htmlFor="uf">
-            UF:{" "}
-            <span
-              className="obrigatorio"
-              title="Campo obrigatório para busca por chaves alternativas"
-            >
-              *
-            </span>
+            UF: <span className="obrigatorio" title="Campo obrigatório para busca por chaves alternativas">*</span>
           </label>
           <input
             type="text"
@@ -487,13 +425,7 @@ const ConsultaEnd = () => {
           />
 
           <label htmlFor="cidade">
-            Cidade:{" "}
-            <span
-              className="obrigatorio"
-              title="Campo obrigatório para busca por chaves alternativas"
-            >
-              *
-            </span>
+            Cidade: <span className="obrigatorio" title="Campo obrigatório para busca por chaves alternativas">*</span>
           </label>
           <input
             type="text"
@@ -507,13 +439,7 @@ const ConsultaEnd = () => {
           />
 
           <label htmlFor="rua">
-            Rua:{" "}
-            <span
-              className="obrigatorio"
-              title="Campo obrigatório para busca por chaves alternativas"
-            >
-              *
-            </span>
+            Rua: <span className="obrigatorio" title="Campo obrigatório para busca por chaves alternativas">*</span>
           </label>
           <input
             type="text"
@@ -537,7 +463,12 @@ const ConsultaEnd = () => {
             disabled={loading}
           />
 
-          <button type="submit" disabled={loading}>
+          <button
+            type="submit"
+            disabled={
+              loading
+            }
+          >
             {loading ? "Consultando..." : "Consultar"}
           </button>
           {error && <p className="error-message">{error}</p>}
@@ -545,9 +476,6 @@ const ConsultaEnd = () => {
       )}
       {activeForm === "massa" && (
         <div className="form-massa-container">
-          <p className="limit-message">
-            Limite de CEPs por planilha: **{MASS_QUERY_LIMIT}**
-          </p>
           <button
             type="button"
             onClick={() => document.getElementById("input-massa-cep").click()}
@@ -578,15 +506,12 @@ const ConsultaEnd = () => {
           )}
 
           {!loading && massConsultaMessage && (
-            <div
-              className={
-                massConsultaMessage.toLowerCase().includes("erro") ||
-                massConsultaMessage.toLowerCase().includes("falha") ||
-                massConsultaMessage.toLowerCase().includes("250")
-                  ? "error-message"
-                  : "success-message"
-              }
-            >
+            <div className={
+              massConsultaMessage.toLowerCase().includes("erro") ||
+                massConsultaMessage.toLowerCase().includes("falha")
+                ? "error-message"
+                : "success-message"
+            }>
               {massConsultaMessage}
             </div>
           )}
@@ -594,128 +519,78 @@ const ConsultaEnd = () => {
           {error && <p className="error-message">{error}</p>}
         </div>
       )}
-      {/* Resultado: CEP único (apenas quando a consulta é por CEP) */}
       {activeForm !== "massa" &&
         resultado?.resultado_api &&
-        (resultado?.historico_salvo?.tipo_consulta ||
-          resultado?.tipo_consulta) === "endereco" && (
-          <div className="card-resultado" ref={resultadoRef}>
+        ((resultado?.historico_salvo?.tipo_consulta || resultado?.tipo_consulta) === "endereco") && (
+          <div className="card-resultado"  ref={resultadoRef}>
             <label>CEP:</label>
-            <input
-              type="text"
-              value={resultado.resultado_api.cep || "N/A"}
-              disabled
-            />
+            <input type="text" value={resultado.resultado_api.cep || "N/A"} disabled />
             <label>Logradouro:</label>
-            <input
-              type="text"
-              value={resultado.resultado_api.street || "N/A"}
-              disabled
-            />
+            <input type="text" value={resultado.resultado_api.street || "N/A"} disabled />
             <label>Bairro:</label>
-            <input
-              type="text"
-              value={resultado.resultado_api.neighborhood || "N/A"}
-              disabled
-            />
+            <input type="text" value={resultado.resultado_api.neighborhood || "N/A"} disabled />
             <label>Cidade:</label>
-            <input
-              type="text"
-              value={resultado.resultado_api.city || "N/A"}
-              disabled
-            />
+            <input type="text" value={resultado.resultado_api.city || "N/A"} disabled />
             <label>UF:</label>
-            <input
-              type="text"
-              value={resultado.resultado_api.state || "N/A"}
-              disabled
-            />
+            <input type="text" value={resultado.resultado_api.state || "N/A"} disabled />
           </div>
         )}
 
-      {activeForm === "chaves" &&
-        resultado?.resultado_api?.resultados_viacep &&
-        resultado.resultado_api.resultados_viacep.length > 0 && (
-          <div className="card-resultado" ref={resultadoRef}>
-            <h4>Resultados encontrados</h4>
-            <table className="historico-table">
-              <thead>
-                <tr>
-                  <th>CEP</th>
-                  <th>Logradouro</th>
-                  <th>Cidade</th>
-                  <th>UF</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {resultado.resultado_api.resultados_viacep.map((item, idx) => (
-                  <React.Fragment key={idx}>
-                    <tr
-                      className={
-                        selectedResultIndex === idx ? "active-row" : ""
-                      }
-                      onClick={() => handleExpandResult(idx)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <td>{item.cep || "N/A"}</td>
-                      <td>{item.logradouro || "N/A"}</td>
-                      <td>{item.localidade || "N/A"}</td>
-                      <td>{item.uf || "N/A"}</td>
-                      <td className="expand-icon">
-                        <i
-                          className={`bi ${
-                            selectedResultIndex === idx
-                              ? "bi-chevron-up"
-                              : "bi-chevron-down"
-                          }`}
-                        ></i>
+      {activeForm === "chaves" && resultado?.resultado_api?.resultados_viacep && resultado.resultado_api.resultados_viacep.length > 0 && (
+        <div className="card-resultado"  ref={resultadoRef}>
+          <h4>Resultados encontrados</h4>
+          <table className="historico-table">
+            <thead>
+              <tr>
+                <th>CEP</th>
+                <th>Logradouro</th>
+                <th>Cidade</th>
+                <th>UF</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {resultado.resultado_api.resultados_viacep.map((item, idx) => (
+                <React.Fragment key={idx}>
+                  <tr
+                    className={selectedResultIndex === idx ? 'active-row' : ''}
+                    onClick={() => handleExpandResult(idx)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>{item.cep || 'N/A'}</td>
+                    <td>{item.logradouro || 'N/A'}</td>
+                    <td>{item.localidade || 'N/A'}</td>
+                    <td>{item.uf || 'N/A'}</td>
+                    <td className="expand-icon">
+                      <i className={`bi ${selectedResultIndex === idx ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
+                    </td>
+                  </tr>
+                  {selectedResultIndex === idx && (
+                    <tr>
+                      <td colSpan="5">
+                        <div className="detalhes-historico-panel">
+                          <p><strong>CEP:</strong> {item.cep || 'N/A'}</p>
+                          <p><strong>Logradouro:</strong> {item.logradouro || 'N/A'}</p>
+                          <p><strong>Bairro:</strong> {item.bairro || 'N/A'}</p>
+                          <p><strong>Cidade:</strong> {item.localidade || 'N/A'}</p>
+                          <p><strong>UF:</strong> {item.uf || 'N/A'}</p>
+                          <p><strong>Complemento:</strong> {item.complemento || 'N/A'}</p>
+                        </div>
                       </td>
                     </tr>
-                    {selectedResultIndex === idx && (
-                      <tr>
-                        <td colSpan="5">
-                          <div className="detalhes-historico-panel">
-                            <p>
-                              <strong>CEP:</strong> {item.cep || "N/A"}
-                            </p>
-                            <p>
-                              <strong>Logradouro:</strong>{" "}
-                              {item.logradouro || "N/A"}
-                            </p>
-                            <p>
-                              <strong>Bairro:</strong> {item.bairro || "N/A"}
-                            </p>
-                            <p>
-                              <strong>Cidade:</strong>{" "}
-                              {item.localidade || "N/A"}
-                            </p>
-                            <p>
-                              <strong>UF:</strong> {item.uf || "N/A"}
-                            </p>
-                            <p>
-                              <strong>Complemento:</strong>{" "}
-                              {item.complemento || "N/A"}
-                            </p>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-            {activeForm === "chaves" &&
-              isBuscaChaveSemResultado(resultado) &&
-              hasQueried &&
-              !loading &&
-              !error && (
-                <div className="no-results-message">
-                  Nenhum endereço encontrado para os parâmetros fornecidos.
-                </div>
-              )}
-          </div>
-        )}
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+          {activeForm === "chaves" && isBuscaChaveSemResultado(resultado) && hasQueried && !loading && !error && (
+            <div className="no-results-message">
+              Nenhum endereço encontrado para os parâmetros fornecidos.
+            </div>
+          )}
+
+        </div>
+      )}
     </div>
   );
 };

@@ -741,3 +741,20 @@
     padding: 8px 5px 9px 7px;
   }
 }
+
+@media (min-width: 1200px) {
+  .consulta-container03,
+  .consulta-container04 {
+    margin-left: 20vw;
+    margin-right: auto;
+    max-width: 1440px; /* Pode ajustar para 1120px, 1300px, 1440px, etc */
+  }
+
+  /* Centraliza cards/forms dentro do container principal */
+  .form-container,
+  .card-resultado {
+    margin: 32px auto 0 auto !important; /* Centralizado no espaço útil */
+    /* Remove qualquer margin-left antigo */
+    /* NADA de margin-left: 14rem, 20vw, 240px, etc! */
+  }
+}

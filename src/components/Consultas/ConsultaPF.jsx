@@ -93,18 +93,27 @@ const ConsultaPF = () => {
       return;
     }
 
-    try {
-      const response = await ConsultaService.realizarConsulta(payload);
-      setResultado(response?.data ?? response);
-      console.log("Resultado da consulta PF:", response);
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.detail ||
-        err.response?.data?.message ||
-        err.message ||
-        "Erro ao realizar consulta.";
-      setError(errorMessage);
-      console.error("Erro na consulta PF:", err.response?.data || err);
+ try {
+  const response = await ConsultaService.realizarConsulta(payload);
+  setResultado(response?.data ?? response);
+  console.log("Resultado da consulta PF:", response);
+
+  
+  const apiStatus = response?.data?.resultado_api?.Status?.api
+    || response?.resultado_api?.Status?.api;
+
+  if (Array.isArray(apiStatus) && apiStatus[0]?.Code === -128) {
+        setError("Erro na base de consulta, tente novamente mais tarde");
+      } else {
+        const errorMessage =
+          apiError?.Message ||
+          err.response?.data?.detail ||
+          err.response?.data?.message ||
+          err.message ||
+          "Erro ao realizar consulta.";
+        setError(errorMessage);
+      }
+      console.error("Erro na consulta PF:", apiError || err);
     } finally {
       setLoading(false);
     }
@@ -234,9 +243,8 @@ const ConsultaPF = () => {
                 Gênero: "N/A",
                 "Nome Comum (Alias)": "N/A",
                 "Indicação de Óbito": "N/A",
-                Erro: `Falha na consulta. Motivo: ${
-                  result.reason?.message || "Erro de rede/servidor"
-                }`,
+                Erro: `Falha na consulta. Motivo: ${result.reason?.message || "Erro de rede/servidor"
+                  }`,
               });
             }
           });
@@ -369,9 +377,8 @@ const ConsultaPF = () => {
         </div>
 
         <div
-          className={`card card-option ${
-            activeForm === "chaves" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "chaves" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("chaves");
             setFormData({
@@ -400,9 +407,8 @@ const ConsultaPF = () => {
         </div>
 
         <div
-          className={`card card-option ${
-            activeForm === "massa" ? "active" : ""
-          }`}
+          className={`card card-option ${activeForm === "massa" ? "active" : ""
+            }`}
           onClick={() => {
             setActiveForm("massa");
             setError(null);
@@ -642,8 +648,8 @@ const ConsultaPF = () => {
             <div
               className={
                 massConsultaMessage.toLowerCase().includes("erro") ||
-                massConsultaMessage.toLowerCase().includes("falha") ||
-                massConsultaMessage.toLowerCase().includes("250")
+                  massConsultaMessage.toLowerCase().includes("falha") ||
+                  massConsultaMessage.toLowerCase().includes("250")
                   ? "error-message"
                   : "success-message"
               }
@@ -685,11 +691,10 @@ const ConsultaPF = () => {
                       <td>{formatDateBR(item.BasicData?.BirthDate)}</td>
                       <td className="expand-icon">
                         <i
-                          className={`bi ${
-                            selectedResultIndex === idx
+                          className={`bi ${selectedResultIndex === idx
                               ? "bi-chevron-up"
                               : "bi-chevron-down"
-                          }`}
+                            }`}
                         ></i>
                       </td>
                     </tr>
