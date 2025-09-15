@@ -27,8 +27,6 @@ export default function AgendaDetalhe({ reserva, onClose, onDelete }) {
       ? format(dataObj, "dd/MM/yyyy", { locale: ptBR })
       : "-";
 
-  // Lógica para tratar os participantes do back-end
-  // Se for uma string, divide em um array. Se já for um array, usa como está.
   const participantesArray = Array.isArray(reserva?.participantes)
     ? reserva.participantes
     : typeof reserva?.participantes === "string"
@@ -95,4 +93,4 @@ export default function AgendaDetalhe({ reserva, onClose, onDelete }) {
       </div>
     </div>
   );
-}
+}AgendaDetalhe

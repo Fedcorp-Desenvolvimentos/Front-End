@@ -294,6 +294,7 @@ const ConsultaComercial = () => {
       </h1>
 
       <div className="card-options-accordion">
+       
         <div className="accordion-card">
           <button
             className="accordion-header"
@@ -328,7 +329,7 @@ const ConsultaComercial = () => {
             </div>
           )}
         </div>
-
+      
         <div className="accordion-card">
           <button
             className="accordion-header"

@@ -9,7 +9,6 @@ import {
   format,
   addDays,
   startOfWeek,
-  isSameDay,
   startOfMonth,
   getDay,
   parseISO,
@@ -23,7 +22,6 @@ import AgendaDetalhe from "./AgendaDetalhe";
 import { useAuth } from "../../context/AuthContext";
 import { AgendaService } from "../../services/agendaService";
 
-// --- Funções de utilidade ---
 function getFirstMondayOfMonth(date) {
   const firstDay = startOfMonth(date);
   const weekDay = getDay(firstDay);
@@ -31,34 +29,20 @@ function getFirstMondayOfMonth(date) {
 }
 
 const HORARIOS = [
-  "09:00",
-  "10:00",
-  "11:00",
-  "12:00",
-  "13:00",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-  "18:00",
+  "09:00", "10:00", "11:00", "12:00", "13:00",
+  "14:00", "15:00", "16:00", "17:00", "18:00",
 ];
 
 const diasSemana = ["Seg", "Ter", "Qua", "Qui", "Sex"];
 
 const MonthButton = forwardRef(function MonthButton({ value, onClick }, ref) {
   return (
-    <button
-      ref={ref}
-      className="agenda-calendar-btn"
-      title={value || "Escolher mês"}
-      onClick={onClick}
-    >
+    <button ref={ref} className="agenda-calendar-btn" title={value || "Escolher mês"} onClick={onClick}>
       <FaCalendarAlt size={22} />
     </button>
   );
 });
 
-// --- Componente principal ---
 export default function AgendaSala() {
   const [startDate, setStartDate] = useState(
     startOfWeek(new Date(), { weekStartsOn: 1 })
@@ -67,6 +51,7 @@ export default function AgendaSala() {
   const [showModal, setShowModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [reservaSelecionada, setReservaSelecionada] = useState(null);
+  const [showDeletedPopup, setShowDeletedPopup] = useState(false);
 
   const { user } = useAuth();
   const userRole = String(user?.nivel_acesso || "").toLowerCase();
@@ -74,35 +59,25 @@ export default function AgendaSala() {
   const fetchReservas = async () => {
     try {
       const response = await AgendaService.getReservas();
-
       let data;
       if (response && response.results) {
         data = response.results;
       } else if (Array.isArray(response)) {
         data = response;
       } else {
-        console.warn(
-          "Resposta da API de reservas não é um array ou objeto paginado válido.",
-          response
-        );
         data = [];
       }
-
       const formattedReservas = data.map((reserva) => ({
         ...reserva,
-        // **CORREÇÃO AQUI:** Usa parseISO para lidar com a data da API corretamente
         data: parseISO(reserva.data),
       }));
       setReservas(formattedReservas);
     } catch (error) {
-      console.error("Erro ao carregar reservas:", error);
       setReservas([]);
     }
   };
 
-  useEffect(() => {
-    fetchReservas();
-  }, [startDate]);
+  useEffect(() => { fetchReservas(); }, [startDate]);
 
   const handleWeekChange = (inc) => setStartDate(addDays(startDate, inc * 7));
 
@@ -121,22 +96,25 @@ export default function AgendaSala() {
       const payload = {
         ...novaReserva,
         data: format(novaReserva.data, "yyyy-MM-dd"),
-        participantes: novaReserva.participantes.join(", "),
+        participantes: novaReserva.participantes?.join(", "),
         criado_por: user.id,
       };
       await AgendaService.createReserva(payload);
       closeModal();
       fetchReservas();
     } catch (error) {
-      console.error("Erro ao salvar reserva:", error);
+
     }
   };
+
 
   const handleDeleteReserva = async (reservaParaDeletar) => {
     try {
       await AgendaService.deleteReserva(reservaParaDeletar.id);
       setReservaSelecionada(null);
       fetchReservas();
+      setShowDeletedPopup(true);
+      setTimeout(() => setShowDeletedPopup(false), 2600);
     } catch (error) {
       console.error("Erro ao excluir reserva:", error);
     }
@@ -167,51 +145,26 @@ export default function AgendaSala() {
             {diasSemana.map((_, dIdx) => {
               const dia = addDays(startDate, dIdx);
               const reservasSlot = reservas.filter(
-                // **CORREÇÃO AQUI:** Garante que a comparação de datas seja consistente
                 (r) =>
                   format(r.data, "yyyy-MM-dd") === format(dia, "yyyy-MM-dd") &&
                   r.horario === hora
               );
-
               const isLivre = reservasSlot.length === 0;
-
               return (
-                <td
-                  key={dIdx}
-                  className={`agenda-cell ${isLivre ? "livre" : "ocupado"}`}
-                >
+                <td key={dIdx} className={`agenda-cell ${isLivre ? "livre" : "ocupado"}`}>
                   {isLivre ? (
-                    ["recepcionista", "admin", "gestor"].includes(userRole) ? (
-                      <button
-                        className="agenda-slot-btn"
-                        title="Reservar"
-                        onClick={() => handleNewReserva(dia, hora)}
-                      >
-                        <FaPlus size={15} />
-                      </button>
-                    ) : (
-                      <span className="agenda-livre">Livre</span>
-                    )
+                    <button
+                      className="agenda-slot-btn"
+                      title="Reservar"
+                      onClick={() => handleNewReserva(dia, hora)}
+                    >
+                      <FaPlus size={15} />
+                    </button>
                   ) : (
                     <button
                       className="agenda-reservado-pill"
-                      title={
-                        ["recepcionista", "admin", "gestor"].includes(userRole)
-                          ? "Ver detalhes"
-                          : "Indisponível"
-                      }
-                      onClick={() => {
-                        if (
-                          ["recepcionista", "admin", "gestor"].includes(
-                            userRole
-                          )
-                        ) {
-                          setReservaSelecionada(reservasSlot[0]);
-                        }
-                      }}
-                      disabled={
-                        !["recepcionista", "admin", "gestor"].includes(userRole)
-                      }
+                      title="Ver detalhes"
+                      onClick={() => setReservaSelecionada(reservasSlot[0])}
                     >
                       Reservado
                     </button>
@@ -230,12 +183,8 @@ export default function AgendaSala() {
       <h1 className="agenda-titulo">
         <i className="bi bi-calendar-event" /> Agenda da Sala de Reunião
       </h1>
-
       <div className="agenda-toolbar">
-        <button
-          className="agenda-week-btn"
-          onClick={() => handleWeekChange(-1)}
-        >
+        <button className="agenda-week-btn" onClick={() => handleWeekChange(-1)}>
           <FaChevronLeft />
         </button>
         <span className="agenda-semana">
@@ -253,14 +202,13 @@ export default function AgendaSala() {
         <button className="agenda-week-btn" onClick={() => handleWeekChange(1)}>
           <FaChevronRight />
         </button>
-        {["recepcionista", "admin", "gestor"].includes(userRole) && (
-          <button
-            className="btn-primary agenda-nova-btn"
-            onClick={() => handleNewReserva(null, null)}
-          >
-            <FaPlus className="agenda-plus-icon" /> Nova Reserva
-          </button>
-        )}
+
+        <button
+          className="btn-primary agenda-nova-btn"
+          onClick={() => handleNewReserva(null, null)}
+        >
+          <FaPlus className="agenda-plus-icon" /> Nova Reserva
+        </button>
       </div>
 
       <div className="agenda-grid-container">{renderGrid()}</div>
@@ -277,6 +225,7 @@ export default function AgendaSala() {
                 data: selectedSlot?.dia || startDate,
                 horario: selectedSlot?.hora || "09:00",
               }}
+              userRole={userRole}
               onSave={handleSaveReserva}
               onCancel={closeModal}
             />
@@ -284,14 +233,21 @@ export default function AgendaSala() {
         </div>
       )}
 
-      {reservaSelecionada &&
-        ["recepcionista", "admin", "gestor"].includes(userRole) && (
-          <AgendaDetalhe
-            reserva={reservaSelecionada}
-            onClose={() => setReservaSelecionada(null)}
-            onDelete={handleDeleteReserva}
-          />
-        )}
+      {reservaSelecionada && (
+        <AgendaDetalhe
+          reserva={reservaSelecionada}
+          userRole={userRole}
+          onClose={() => setReservaSelecionada(null)}
+          onDelete={handleDeleteReserva}
+        />
+      )}
+
+      {showDeletedPopup && (
+        <div className="agenda-toast agenda-toast-sucesso">
+          Reserva excluída com sucesso!
+        </div>
+      )}
+
     </div>
   );
 }
