@@ -4,13 +4,13 @@ import "../styles/Ferramentas.css";
 const ferramentas = [
   {
     nome: "Dashboard Peaga",
-    url: "https://app.powerbi.com/groups/me/reports/19d80058-2835-4beb-9c4b-274dec0b2ffc/a021e12de7053cc109a8?language=pt-BR&experience=power-bi",
+    url: "https://app.powerbi.com/view?r=eyJrIjoiY2FmMTk4ODQtMTc0Yi00YjQ0LTlkZjUtOWM2NjMyMWQyYjNkIiwidCI6IjhlODdmY2FjLTBhZTctNDBlYy1hMDVhLTZiMTRmZTE5ZDRiYiJ9",
     descricao: "Acompanhe as métricas da organização de forma única.",
     logo: "/imagens/Logo-Peaga.jpg",
   },
   {
     nome: "Dashboard FedCorp Adm",
-    url: "https://app.powerbi.com/groups/me/reports/68492fef-b732-41f5-89d2-d6d005cc2021/f203e3fa4180552dd902?language=pt-BR&experience=power-bi",
+    url: "https://app.powerbi.com/view?r=eyJrIjoiMzkxMjc2YTUtOTlkYS00ZGYzLWEyODYtZDI5ZmI3ZjUzMDFiIiwidCI6IjhlODdmY2FjLTBhZTctNDBlYy1hMDVhLTZiMTRmZTE5ZDRiYiJ9",
     descricao: "Acompanhe as métricas da organização de forma única.",
     logo: "/imagens/LOGO.png",
   },
