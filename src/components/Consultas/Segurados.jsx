@@ -2,6 +2,134 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 
+function SeguradoItem({ segurado, idx, expandedIndex, setExpandedIndex }) {
+    const uniqueId = `idx-${idx}`;
+
+    const isExpanded = expandedIndex === uniqueId;
+
+    const ignoreKeys = [
+        "NOME_SEGURADO", "NOME", "CPF_CNPJ", "FUNCAO",
+        "ADMINISTRADORA", "ADMINISTRADORA_NOME", "STATUS", "STATUS_SEG"
+    ];
+
+    const dateKeys = [
+        "NASCIMENTO", "INICIO_VIG", "FINAL_VIG",
+        "DT_INCLUSAO", "DT_CANCEL"
+    ];
+
+    const camposMoeda = ["PREMIO", "PREMIO_LIQ", "INC_PREDIO", "INC_CONTEUDO", "ALUGUEL"];
+
+    function formatarDataBR(data) {
+        if (!data || typeof data !== 'string') return data;
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(data)) return data;
+        const match = data.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})/);
+        if (match) {
+            const [_, ano, mes, dia] = match;
+            return `${dia}/${mes}/${ano}`;
+        }
+        if (/^\d{8}$/.test(data)) {
+            return `${data.substr(6, 2)}/${data.substr(4, 2)}/${data.substr(0, 4)}`;
+        }
+        return data;
+    }
+    function formatarMoedaBR(valor) {
+        if (valor == null || valor === "") return <i>não informado</i>;
+        let numero = valor;
+        if (typeof valor === "string") {
+            numero = valor.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".");
+        }
+        numero = Number(numero);
+        if (isNaN(numero)) return valor;
+        return numero.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+    function formataChave(texto) {
+        return texto
+            .toLowerCase()
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, (l) => l.toUpperCase());
+    }
+    function traduzirStatus(status) {
+        switch (status) {
+            case "R":
+                return "Renovado";
+            case "C":
+                return "Cancelado";
+            case "A":
+                return "Ativo";
+            default:
+                return status;
+        }
+    }
+
+    return (
+        <li className={`item-segurado${isExpanded ? " expanded" : ""}`}>
+            <button
+                className="seg-titulo"
+                onClick={() => setExpandedIndex(isExpanded ? null : uniqueId)}
+                aria-expanded={isExpanded}
+                type="button"
+            >
+                <span style={{ display: "flex", flexDirection: "column", textAlign: "start" }}>
+                    <b>
+                        {
+                            segurado.NOME_SEGURADO ||
+                            segurado.NOME ||
+                            segurado.Nome ||
+                            segurado.nome ||
+                            segurado.nome_segurado ||
+                            "Nome não informado"
+                        }
+                    </b>
+                    {segurado.CPF_CNPJ && (
+                        <span className="cpf-label">
+                            CPF/CNPJ: <span className="cpf">{segurado.CPF_CNPJ}</span>
+                        </span>
+                    )}
+                </span>
+                <span className="icon">{isExpanded ? "▲" : "▼"}</span>
+            </button>
+            {isExpanded && (
+                <div className="seg-detalhes">
+                    <ul>
+                        {(segurado.ADMINISTRADORA || segurado.ADMINISTRADORA_NOME) && (
+                            <li>
+                                <strong>Administradora:</strong>{" "}
+                                {segurado.ADMINISTRADORA_NOME || segurado.ADMINISTRADORA}
+                            </li>
+                        )}
+                        {(segurado.STATUS || segurado.STATUS_SEG) && (
+                            <li>
+                                <strong>Status:</strong>{" "}
+                                {traduzirStatus(segurado.STATUS_SEG || segurado.STATUS)}
+                            </li>
+                        )}
+                        {Object.entries(segurado).map(([chave, valor]) => {
+                            if (ignoreKeys.includes(chave)) {
+                                return null;
+                            }
+                            const isMoeda = camposMoeda.includes(chave);
+                            return (
+                                <li key={chave}>
+                                    <strong>{formataChave(chave)}:</strong>{" "}
+                                    {dateKeys.includes(chave)
+                                        ? formatarDataBR(valor)
+                                        : isMoeda
+                                            ? formatarMoedaBR(valor)
+                                            : valor || <i>não informado</i>
+                                    }
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </div>
+            )}
+        </li>
+    );
+}
+
+// ------------------------------------
+// COMPONENTE PRINCIPAL
+// ------------------------------------
 function traduzirErroApi(mensagem) {
     if (!mensagem) return "Erro inesperado. Por favor, tente novamente.";
 
@@ -80,7 +208,7 @@ const ConsultaSegurado = () => {
         setActiveIndex(-1);
         setCurrentPage(1);
         setTotalPages(1);
-        setExpandedIndex(null); 
+        setExpandedIndex(null);
         if (debounceTimeout.current) {
             clearTimeout(debounceTimeout.current);
         }
@@ -266,6 +394,13 @@ const ConsultaSegurado = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (activeForm === "imoveis") {
+            if (!formData.cnpj && !formData.cpf) {
+                setError("Preencha pelo menos o CPF ou o CNPJ.");
+                return;
+            }
+        }
         await performConsulta(1);
     };
 
@@ -278,136 +413,6 @@ const ConsultaSegurado = () => {
             performConsulta(newPage);
         }
     };
-
-    function formatarDataBR(data) {
-        if (!data || typeof data !== 'string') return data;
-
-        if (/^\d{2}\/\d{2}\/\d{4}$/.test(data)) return data;
-
-        const match = data.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})/);
-        if (match) {
-            const [_, ano, mes, dia] = match;
-            return `${dia}/${mes}/${ano}`;
-        }
-
-        if (/^\d{8}$/.test(data)) {
-            return `${data.substr(6, 2)}/${data.substr(4, 2)}/${data.substr(0, 4)}`;
-        }
-        return data;
-    }
-
-    function formataChave(texto) {
-        return texto
-            .toLowerCase()
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, (l) => l.toUpperCase());
-    }
-
-    function traduzirStatus(status) {
-        switch (status) {
-            case "R":
-                return "Renovado";
-            case "C":
-                return "Cancelado";
-            case "A":
-                return "Ativo";
-            default:
-                return status;
-        }
-    }
-
-    function formatarMoedaBR(valor) {
-        if (valor == null || valor === "") return <i>não informado</i>;
-        let numero = valor;
-        if (typeof valor === "string") {
-            numero = valor.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".");
-        }
-        numero = Number(numero);
-        if (isNaN(numero)) return valor;
-        return numero.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    }
-
-    function SeguradoItem({ segurado, idx }) {
-        const uniqueId = segurado.MATRICULA || idx;
-        const isExpanded = expandedIndex === uniqueId;
-
-        const ignoreKeys = [
-            "NOME_SEGURADO", "NOME", "CPF_CNPJ", "FUNCAO",
-            "ADMINISTRADORA", "ADMINISTRADORA_NOME", "STATUS", "STATUS_SEG"
-        ];
-
-        const dateKeys = [
-            "NASCIMENTO", "INICIO_VIG", "FINAL_VIG",
-            "DT_INCLUSAO", "DT_CANCEL"
-        ];
-
-        const camposMoeda = ["PREMIO", "PREMIO_LIQ", "INC_PREDIO", "INC_CONTEUDO", "ALUGUEL"];
-
-        return (
-            <li className={`item-segurado${isExpanded ? " expanded" : ""}`}>
-                <button
-                    className="seg-titulo"
-                    onClick={() => setExpandedIndex(isExpanded ? null : uniqueId)}
-                    aria-expanded={isExpanded}
-                    type="button"
-                >
-                    <span style={{ display: "flex", flexDirection: "column", textAlign: "start" }}>
-                        <b>
-                            {
-                                segurado.NOME_SEGURADO ||
-                                segurado.NOME ||
-                                segurado.Nome ||
-                                segurado.nome ||
-                                segurado.nome_segurado ||
-                                "Nome não informado"
-                            }
-                        </b>
-                        {segurado.CPF_CNPJ && (
-                            <span className="cpf-label">
-                                CPF/CNPJ: <span className="cpf">{segurado.CPF_CNPJ}</span>
-                            </span>
-                        )}
-                    </span>
-                    <span className="icon">{isExpanded ? "▲" : "▼"}</span>
-                </button>
-                {isExpanded && (
-                    <div className="seg-detalhes">
-                        <ul>
-                            {(segurado.ADMINISTRADORA || segurado.ADMINISTRADORA_NOME) && (
-                                <li>
-                                    <strong>Administradora:</strong>{" "}
-                                    {segurado.ADMINISTRADORA_NOME || segurado.ADMINISTRADORA}
-                                </li>
-                            )}
-                            {(segurado.STATUS || segurado.STATUS_SEG) && (
-                                <li>
-                                    <strong>Status:</strong>{" "}
-                                    {traduzirStatus(segurado.STATUS_SEG || segurado.STATUS)}
-                                </li>
-                            )}
-                            {Object.entries(segurado).map(([chave, valor]) => {
-                                if (ignoreKeys.includes(chave)) {
-                                    return null;
-                                }
-                                const isMoeda = camposMoeda.includes(chave);
-                                return (
-                                    <li key={chave}>
-                                        <strong>{formataChave(chave)}:</strong>{" "}
-                                        {dateKeys.includes(chave)
-                                            ? formatarDataBR(valor)
-                                            : isMoeda
-                                                ? formatarMoedaBR(valor)
-                                                : valor || <i>não informado</i>
-                                        }
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    </div>
-                )}
-            </li>
-        );
-    }
 
     useEffect(() => {
         if (resultado && resultadoRef.current) {
@@ -469,6 +474,7 @@ const ConsultaSegurado = () => {
                             placeholder="Digite o CPF"
                             disabled={loading}
                             maxLength="14"
+                            required
                         />
 
                         <label htmlFor="nome">Nome</label>
@@ -547,6 +553,7 @@ const ConsultaSegurado = () => {
                             onChange={handleFormChange}
                             placeholder="Digite o CPF / CNPJ"
                             disabled={loading}
+                            required
                         />
 
                         <label htmlFor="nome">Nome</label>
@@ -645,11 +652,23 @@ const ConsultaSegurado = () => {
             {resultado && Array.isArray(resultado) && (
                 <div className="card-resultado mt-4" ref={resultadoRef}>
                     <h4>Resultado da Consulta</h4>
-                    <ul className="lista-segurados">
-                        {resultado.map((seg, idx) => (
-                            <SeguradoItem key={seg.MATRICULA || idx} segurado={seg} idx={idx} />
-                        ))}
-                    </ul>
+                    {resultado.length === 0 ? (
+                        <div className="no-results-message">
+                            Não localizado em nossa base.
+                        </div>
+                    ) : (
+                        <ul className="lista-segurados">
+                            {resultado.map((seg, idx) => (
+                                <SeguradoItem
+                                    key={`segurado-idx-${idx}`}
+                                    segurado={seg}
+                                    idx={idx}
+                                    expandedIndex={expandedIndex}
+                                    setExpandedIndex={setExpandedIndex}
+                                />
+                            ))}
+                        </ul>
+                    )}
                 </div>
             )}
         </div>
