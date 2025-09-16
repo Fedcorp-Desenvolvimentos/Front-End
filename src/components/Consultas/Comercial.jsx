@@ -471,87 +471,128 @@ const ConsultaComercial = () => {
         </div>
       )}
 
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <button className="btn-icon modal-close" onClick={() => setShowModal(false)} title="Fechar">×</button>
-            <h2 className="modal-titulo-central">Informações Básicas</h2>
-            {modalLoading && (
-              <div className="modal-loading">
-                <div className="spinner"></div>
-                <p>Buscando detalhes de contato...</p>
-              </div>
-            )}
-            {modalError && <div className="alert-erro">{modalError}</div>}
-            {modalPersonData && !modalLoading && !modalError && (
-              <div className="modal-dados-grid">
-                <div className="modal-coluna">
-                  <p>
-                    <strong>Nome:</strong> {modalPersonData.BasicData?.Name || "N/A"}
-                  </p>
-                  <p>
-                    <strong>CPF:</strong> {modalPersonData.BasicData?.TaxIdNumber || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Gênero:</strong> {modalPersonData.BasicData?.Gender || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Data de Nascimento:</strong>
-                    {modalPersonData.BasicData?.BirthDate
-                      ? new Date(modalPersonData.BasicData.BirthDate).toLocaleDateString()
-                      : "N/A"}
-                  </p>
-                  <p>
-                    <strong>Nome da Mãe:</strong> {modalPersonData.BasicData?.MotherName || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Status do CPF:</strong> {modalPersonData.BasicData?.TaxIdStatus || "N/A"}
-                  </p>
-                </div>
-                <div className="modal-coluna">
-                  <p>
-                    <strong>E-mail Principal:</strong>{" "}
-                    <span style={{ wordBreak: "break-all" }}>
-                      {modalPersonData.Emails?.Primary?.EmailAddress || "N/A"}
-                    </span>
-                  </p>
-                  <p>
-                    <strong>E-mail Secundário:</strong>{" "}
-                    <span style={{ wordBreak: "break-all" }}>
-                      {modalPersonData.Emails?.Secondary?.EmailAddress || "N/A"}
-                    </span>
-                  </p>
-                  <p>
-                    <strong>Endereço Principal:</strong>{" "}
-                    {modalPersonData.Addresses?.Primary
-                      ? `${modalPersonData.Addresses.Primary.AddressMain}, ${modalPersonData.Addresses.Primary.Number}`
-                      : "N/A"}
-                  </p>
-                  <p>
-                    <strong>Endereço Secundário:</strong>{" "}
-                    {modalPersonData.Addresses?.Secondary
-                      ? `${modalPersonData.Addresses.Secondary.AddressMain}, ${modalPersonData.Addresses.Secondary.Number}`
-                      : "N/A"}
-                  </p>
-                  <p>
-                    <strong>Telefone Principal:</strong>{" "}
-                    {modalPersonData.Phones?.Primary?.AreaCode + " " + modalPersonData.Phones?.Primary?.Number|| "N/A"}
-                  </p>
-                  <p>
-                    <strong>Telefone Secundário:</strong>{" "}
-                   {modalPersonData.Phones?.Secondary?.AreaCode + " " + modalPersonData.Phones?.Secondary?.Number|| "N/A"}
-                  </p>
-                </div>
-              </div>
-            )}
-            <div className="modal-actions">
-              <button className="btn-primary" onClick={() => setShowModal(false)}>
-                Fechar
-              </button>
-            </div>
-          </div>
+   {showModal && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <button className="btn-icon modal-close" onClick={() => setShowModal(false)} title="Fechar">×</button>
+      <h2 className="modal-titulo-central">Informações Básicas</h2>
+      {modalLoading && (
+        <div className="modal-loading">
+          <div className="spinner"></div>
+          <p>Buscando detalhes de contato...</p>
         </div>
       )}
+      {modalError && <div className="alert-erro">{modalError}</div>}
+
+      
+      {(() => {
+        function exibirValor(valor, fallback = "Não localizado") {
+          if (
+            valor === undefined ||
+            valor === null ||
+            valor === "" ||
+            valor === "undefined" ||
+            valor === "null"
+          ) {
+            return fallback;
+          }
+          return valor;
+        }
+
+        return (
+          modalPersonData && !modalLoading && !modalError && (
+            <div className="modal-dados-grid">
+              <div className="modal-coluna">
+                <p>
+                  <strong>Nome:</strong> {exibirValor(modalPersonData.BasicData?.Name)}
+                </p>
+                <p>
+                  <strong>CPF:</strong> {exibirValor(modalPersonData.BasicData?.TaxIdNumber)}
+                </p>
+                <p>
+                  <strong>Gênero:</strong> {exibirValor(modalPersonData.BasicData?.Gender)}
+                </p>
+                <p>
+                  <strong>Data de Nascimento:</strong>{" "}
+                  {modalPersonData.BasicData?.BirthDate
+                    ? new Date(modalPersonData.BasicData.BirthDate).toLocaleDateString()
+                    : "Não localizado"}
+                </p>
+                <p>
+                  <strong>Nome da Mãe:</strong> {exibirValor(modalPersonData.BasicData?.MotherName)}
+                </p>
+                <p>
+                  <strong>Status do CPF:</strong> {exibirValor(modalPersonData.BasicData?.TaxIdStatus)}
+                </p>
+              </div>
+              <div className="modal-coluna">
+                <p>
+                  <strong>E-mail Principal:</strong>{" "}
+                  <span style={{ wordBreak: "break-all" }}>
+                    {exibirValor(modalPersonData.Emails?.Primary?.EmailAddress)}
+                  </span>
+                </p>
+                <p>
+                  <strong>E-mail Secundário:</strong>{" "}
+                  <span style={{ wordBreak: "break-all" }}>
+                    {exibirValor(modalPersonData.Emails?.Secondary?.EmailAddress)}
+                  </span>
+                </p>
+                <p>
+                  <strong>Endereço Principal:</strong>{" "}
+                  {modalPersonData.Addresses?.Primary &&
+                  (modalPersonData.Addresses.Primary.AddressMain ||
+                    modalPersonData.Addresses.Primary.Number)
+                    ? `${exibirValor(modalPersonData.Addresses.Primary.AddressMain)}${modalPersonData.Addresses.Primary.Number
+                        ? ", " + exibirValor(modalPersonData.Addresses.Primary.Number)
+                        : ""}`
+                    : "Não localizado"}
+                </p>
+                <p>
+                  <strong>Endereço Secundário:</strong>{" "}
+                  {modalPersonData.Addresses?.Secondary &&
+                  (modalPersonData.Addresses.Secondary.AddressMain ||
+                    modalPersonData.Addresses.Secondary.Number)
+                    ? `${exibirValor(modalPersonData.Addresses.Secondary.AddressMain)}${modalPersonData.Addresses.Secondary.Number
+                        ? ", " + exibirValor(modalPersonData.Addresses.Secondary.Number)
+                        : ""}`
+                    : "Não localizado"}
+                </p>
+                <p>
+                  <strong>Telefone Principal:</strong>{" "}
+                  {modalPersonData.Phones?.Primary &&
+                  (modalPersonData.Phones.Primary.AreaCode ||
+                    modalPersonData.Phones.Primary.Number)
+                    ? `${exibirValor(modalPersonData.Phones.Primary.AreaCode)} ${exibirValor(
+                        modalPersonData.Phones.Primary.Number
+                      )}`
+                    : "Não localizado"}
+                </p>
+                <p>
+                  <strong>Telefone Secundário:</strong>{" "}
+                  {modalPersonData.Phones?.Secondary &&
+                  (modalPersonData.Phones.Secondary.AreaCode ||
+                    modalPersonData.Phones.Secondary.Number)
+                    ? `${exibirValor(modalPersonData.Phones.Secondary.AreaCode)} ${exibirValor(
+                        modalPersonData.Phones.Secondary.Number
+                      )}`
+                    : "Não localizado"}
+                </p>
+              </div>
+            </div>
+          )
+        );
+      })()}
+
+      <div className="modal-actions">
+        <button className="btn-primary" onClick={() => setShowModal(false)}>
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
