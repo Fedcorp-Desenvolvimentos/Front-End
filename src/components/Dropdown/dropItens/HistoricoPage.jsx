@@ -1,23 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/HistoricoPage.css';
-import { Link } from 'react-router-dom';
 import { ConsultaService } from '../../../services/consultaService';
 import { useAuth } from '../../../context/AuthContext';
 
 const HistoricoConsulta = () => {
   const [consultas, setConsultas] = useState([]);
   const [filtro, setFiltro] = useState('');
-  const [paginaAtual, setPaginaAtual] = useState(1);
-  const intensPorPagina = 10;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedConsultaId, setSelectedConsultaId] = useState(null);
   const [detalhesConsulta, setDetalhesConsulta] = useState(null);
   const [detalhesLoading, setDetalhesLoading] = useState(false);
   const [detalhesError, setDetalhesError] = useState('');
-  const [totalPaginas, setTotalPaginas] = useState(1);
-  const [totalItens, setTotalItens] = useState(0);
-  const { user } = useAuth(); 
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchHistorico = async () => {
@@ -25,34 +20,29 @@ const HistoricoConsulta = () => {
       setError('');
       try {
         let data;
-        if (user && (user.nivel_acesso === "admin" || user.nivel_acesso === "moderador")) {
-          data = await ConsultaService.getConsultaHistory(paginaAtual, intensPorPagina);
-        } else if (user && user.id && (user.nivel_acesso === "usuario" || user.nivel_acesso === "comercial")) {
-          data = await ConsultaService.getConsultaHistory(paginaAtual, intensPorPagina);
+        if (
+          user &&
+          (user.nivel_acesso === "admin" ||
+            user.nivel_acesso === "moderador" ||
+            user.nivel_acesso === "usuario" ||
+            user.nivel_acesso === "comercial")
+        ) {
+          data = await ConsultaService.getConsultaHistory(1, 9999);
         } else {
           setError('Usuário não autenticado ou sem permissão para ver o histórico.');
           setLoading(false);
           return;
         }
         setConsultas(data.results || data);
-        setTotalItens(data.count || (data.results ? data.results.length : data.length));
-        setTotalPaginas(Math.ceil((data.count || (data.results ? data.results.length : data.length)) / intensPorPagina));
       } catch (err) {
-        console.error('Erro ao buscar histórico de consultas:', err);
         setError('Não foi possível carregar o histórico de consultas.');
       } finally {
         setLoading(false);
       }
     };
 
-    if (user) {
-      fetchHistorico();
-    }
-  }, [user, paginaAtual]);
-
-  useEffect(() => {
-    setPaginaAtual(1);
-  }, [filtro]);
+    if (user) fetchHistorico();
+  }, [user]);
 
   const handleItemClick = async (consultaId) => {
     if (selectedConsultaId === consultaId) {
@@ -69,7 +59,6 @@ const HistoricoConsulta = () => {
       const data = await ConsultaService.getHistoryByID(consultaId);
       setDetalhesConsulta(data);
     } catch (err) {
-      console.error(`Erro ao buscar detalhes da consulta ${consultaId}:`, err);
       setDetalhesError('Não foi possível carregar os detalhes desta consulta.');
     } finally {
       setDetalhesLoading(false);
@@ -84,8 +73,6 @@ const HistoricoConsulta = () => {
       (consulta.usuario_email || '').toLowerCase().includes(termo)
     );
   });
-
-  const consultasFiltradasPaginadas = consultasFiltradas;
 
   function getParametroDisplay(consulta, detalhes = null) {
     const tiposChave = [
@@ -105,11 +92,19 @@ const HistoricoConsulta = () => {
       if (detalhes && detalhes.resultado && detalhes.resultado.resultados_viacep && detalhes.resultado.resultados_viacep.length > 0) {
         return detalhes.resultado.resultados_viacep[0].logradouro || detalhes.resultado.resultados_viacep[0].cep || 'Endereço encontrado';
       }
-      if (detalhes && ((detalhes.resultado && ((detalhes.resultado.Result && detalhes.resultado.Result.length === 0) || (detalhes.resultado.resultados_viacep && detalhes.resultado.resultados_viacep.length === 0))) || !detalhes.resultado)) {
+      if (
+        detalhes &&
+        ((detalhes.resultado &&
+          ((detalhes.resultado.Result && detalhes.resultado.Result.length === 0) ||
+            (detalhes.resultado.resultados_viacep && detalhes.resultado.resultados_viacep.length === 0))) ||
+          !detalhes.resultado)
+      ) {
         return 'Pesquisa falhou';
       }
       try {
-        const param = typeof consulta.parametro_consulta === 'string' ? JSON.parse(consulta.parametro_consulta) : consulta.parametro_consulta;
+        const param = typeof consulta.parametro_consulta === 'string'
+          ? JSON.parse(consulta.parametro_consulta)
+          : consulta.parametro_consulta;
         if (param && param.q) return param.q;
         if (param && param.name) return param.name;
         return 'Chaves alternativas';
@@ -123,12 +118,12 @@ const HistoricoConsulta = () => {
   return (
     <div className="historico-container">
       <h1 className="historico-title">
-      <i className="bi bi-search"></i> Histórico de Consultas
-    </h1>
+        <i className="bi bi-search"></i> Histórico de Consultas
+      </h1>
 
-      <input 
+      <input
         type="text"
-        placeholder='Buscar por tipo, parâmetro ou email...' 
+        placeholder='Buscar por tipo, parâmetro ou email...'
         value={filtro}
         onChange={(e) => setFiltro(e.target.value)}
         className='input-pesquisa'
@@ -154,7 +149,7 @@ const HistoricoConsulta = () => {
               </tr>
             </thead>
             <tbody>
-              {consultasFiltradasPaginadas.map((consulta) => (
+              {consultasFiltradas.map((consulta) => (
                 <React.Fragment key={consulta.id}>
                   <tr
                     className={selectedConsultaId === consulta.id ? 'active-row' : ''}
@@ -164,7 +159,7 @@ const HistoricoConsulta = () => {
                     <td data-label="Parâmetro">{getParametroDisplay(consulta)}</td>
                     <td data-label="Realizada por">{consulta.usuario_email || 'N/A'}</td>
                     <td data-label="Data">{new Date(consulta.data_consulta).toLocaleDateString()}</td>
-                    <td  data-label="" className="expand-icon">
+                    <td data-label="" className="expand-icon">
                       <i className={`bi ${selectedConsultaId === consulta.id ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
                     </td>
                   </tr>
@@ -175,12 +170,12 @@ const HistoricoConsulta = () => {
                         <div className="detalhes-historico-panel">
                           {detalhesLoading && <p className="detalhes-loading">Carregando detalhes...</p>}
                           {detalhesError && <p className="detalhes-error">{detalhesError}</p>}
-                          
+
                           {detalhesConsulta && detalhesConsulta.resultado && detalhesConsulta.resultado.Result && detalhesConsulta.resultado.Result.length > 0 ? (
                             <div className="detalhes-content">
                               <h4>Detalhes da Consulta #{detalhesConsulta.id}</h4>
                               <p><strong>Tipo:</strong> {detalhesConsulta.tipo_consulta_display || detalhesConsulta.tipo_consulta}</p>
-                              <p><strong>Parâmetro:</strong> {getParametroDisplay(consultasFiltradasPaginadas.find(c => c.id === detalhesConsulta.id) || detalhesConsulta, detalhesConsulta)}</p>
+                              <p><strong>Parâmetro:</strong> {getParametroDisplay(consultasFiltradas.find(c => c.id === detalhesConsulta.id) || detalhesConsulta, detalhesConsulta)}</p>
                               <p><strong>Data/Hora Completa:</strong> {new Date(detalhesConsulta.data_consulta).toLocaleString()}</p>
                               <p><strong>Realizada por:</strong> {detalhesConsulta.usuario_email || 'N/A'}</p>
                               <p><strong>Origem:</strong> {detalhesConsulta.origem}</p>
@@ -212,18 +207,6 @@ const HistoricoConsulta = () => {
               ))}
             </tbody>
           </table>
-          
-          {totalPaginas > 1 && (
-            <div className="paginacao">
-              <button onClick={() => setPaginaAtual(p => Math.max(p - 1, 1))} disabled={paginaAtual === 1}>
-                Anterior
-              </button>
-              <span>Página {paginaAtual} de {totalPaginas}</span>
-              <button onClick={() => setPaginaAtual(p => Math.min(p + 1, totalPaginas))} disabled={paginaAtual === totalPaginas}>
-                Próxima
-              </button>
-            </div>
-          )}
         </>
       )}
     </div>
