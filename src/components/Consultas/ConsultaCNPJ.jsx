@@ -20,7 +20,6 @@ function isValidCNPJ(raw) {
     const resto = soma % 11;
     return resto < 2 ? 0 : 11 - resto;
   };
-
   const dv1 = calcDV(cnpj.slice(0, 12));
   const dv2 = calcDV(cnpj.slice(0, 12) + dv1);
   return cnpj.endsWith(`${dv1}${dv2}`);
@@ -37,7 +36,6 @@ function getFriendlyError(err, context = {}) {
       return "Tempo de resposta excedido. Tente novamente em instantes.";
     return "Não foi possível conectar ao serviço. Verifique sua conexão e tente novamente.";
   }
-
   if (status === 404) {
     if (context?.tipo_consulta === "cnpj")
       return "CNPJ não encontrado. Confira os dígitos e tente novamente.";
@@ -56,6 +54,14 @@ function getFriendlyError(err, context = {}) {
   return serverMsg || `Erro inesperado (${status}). Tente novamente.`;
 }
 
+function baixarXLSX(linhas) {
+  if (!linhas || !linhas.length) return;
+  const ws = XLSX.utils.json_to_sheet(linhas);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Resultados");
+  XLSX.writeFile(wb, "resultado-consulta-cnpjs.xlsx");
+}
+
 const ConsultaCNPJ = () => {
   const [cnpj, setCnpj] = useState("");
   const [activeForm, setActiveForm] = useState("");
@@ -72,19 +78,20 @@ const ConsultaCNPJ = () => {
   });
 
   const resultadoRef = useRef(null);
-
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
   const [selectedResultIndex, setSelectedResultIndex] = useState(null);
 
+  const [massResultRows, setMassResultRows] = useState([]);
+  const [massProgress, setMassProgress] = useState({ current: 0, total: 0 });
+  const [massProcessing, setMassProcessing] = useState(false);
+
   const flatToBasicData = (flat) => {
     if (!flat) return null;
-
     const Contact = {
       Phone1: flat.ddd_telefone_1 ?? null,
       Phone2: flat.ddd_telefone_2 ?? null,
       Email: flat.email ?? null,
     };
-
     const Address = {
       Neighborhood: flat.bairro ?? null,
       ZipCode: flat.cep ?? null,
@@ -95,7 +102,6 @@ const ConsultaCNPJ = () => {
       City: flat.municipio ?? null,
       State: flat.uf ?? null,
     };
-
     return {
       OfficialName: flat.razao_social ?? null,
       TradeName: flat.nome_fantasia ?? null,
@@ -127,30 +133,25 @@ const ConsultaCNPJ = () => {
       const basic = flatToBasicData(root);
       return basic ? [{ BasicData: basic }] : [];
     }
-
     return [];
   };
 
   const getCnpjData = (res) => {
     if (!res) return null;
     const tipo = res?.historico_salvo?.tipo_consulta;
-
     if (tipo === "cnpj") {
       return res?.resultado_api ?? res;
     }
-
     if (tipo === "cnpj_razao_social") {
       const list = getResultList(res);
       const item0 = list?.[0];
       if (item0?.BasicData) return item0.BasicData;
-
       const root = getRoot(res);
       if (root && (root.cnpj || root.razao_social)) {
         return flatToBasicData(root);
       }
       return null;
     }
-
     const list = getResultList(res);
     return list?.[0]?.BasicData ?? null;
   };
@@ -216,8 +217,7 @@ const ConsultaCNPJ = () => {
       } else {
         const qParams = [];
         if (formData.razaoSocial.trim()) qParams.push(`name{${formData.razaoSocial.trim()}}`);
-       
-
+        // adicione outros campos se quiser...
         if (qParams.length === 0) {
           validationErrorMessage = "Nenhum parâmetro de busca válido para chaves alternativas.";
           isFormValid = false;
@@ -260,13 +260,12 @@ const ConsultaCNPJ = () => {
       return;
     }
 
-    setLoading(true);
-    setError(null);
-    setResultado(null);
-    setMassConsultaMessage("Lendo planilha e preparando para consulta...");
+    setMassConsultaMessage("Lendo planilha...");
+    setMassProcessing(true);
+    setMassProgress({ current: 0, total: 0 });
+    setMassResultRows([]);
 
     const reader = new FileReader();
-
     reader.onload = async (e) => {
       try {
         const data = new Uint8Array(e.target.result);
@@ -274,27 +273,62 @@ const ConsultaCNPJ = () => {
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
-        const cnpjsParaConsulta = jsonData.map((row) => ({ CNPJ: String(row.CNPJ) }));
-        const requestBody = { cnpjs: cnpjsParaConsulta, origem: "planilha" };
 
-        setMassConsultaMessage("Enviando CNPJs para processamento em massa...");
+        const cnpjsParaConsulta = jsonData
+          .map((row) => String(row.CNPJ).replace(/\D/g, "").padStart(14, "0"))
+          .filter((cnpj) => cnpj.length === 14);
 
-        const response = await ConsultaService.processarPlanilhaCNPJ(requestBody);
-        const blob = response;
-        const url = window.URL.createObjectURL(new Blob([blob]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "planilha-resultado.xlsx");
-        document.body.appendChild(link);
-        link.click();
-        link.parentNode.removeChild(link);
-        setMassConsultaMessage("Processamento concluído! O download da planilha de resultados iniciou.");
+        if (!cnpjsParaConsulta.length)
+          throw new Error("Nenhum CNPJ válido encontrado na planilha.");
+
+        setMassConsultaMessage("Iniciando consultas individuais...");
+        setMassProgress({ current: 0, total: cnpjsParaConsulta.length });
+
+        const resultados = [];
+        for (let i = 0; i < cnpjsParaConsulta.length; i++) {
+          setMassProgress({ current: i + 1, total: cnpjsParaConsulta.length });
+          try {
+            const resp = await ConsultaService.realizarConsulta({
+              tipo_consulta: "cnpj",
+              parametro_consulta: cnpjsParaConsulta[i],
+            });
+            const data = resp.resultado_api || resp.resultado_api;
+            resultados.push({
+              CNPJ: cnpjsParaConsulta[i],
+              RazaoSocial: data.razao_social || "",
+              Situacao: data.descricao_situacao_cadastral || "",
+              Atividade: data.cnae_fiscal_descricao || "",
+              Municipio: data.municipio || "",
+              UF: data.uf || "",
+              Bairro: data.bairro||"",
+              CEP: data.cep||"",
+              Rua: data.logradouro||"",
+              Numero: data.numero||"",
+              Complemento: data.complemento||"",
+              Telefone: data.ddd_telefone_1 || data.ddd_telefone_2 || "",
+            });
+          } catch (e) {
+            resultados.push({
+              CNPJ: cnpjsParaConsulta[i],
+              RazaoSocial: "",
+              Situacao: "Erro",
+              Atividade: "",
+              Municipio: "",
+              UF: "",
+              Erro: getFriendlyError(e, { tipo_consulta: "cnpj" }),
+            });
+          }
+          await new Promise((r) => setTimeout(r, 300));
+        }
+        setMassResultRows(resultados);
+        setMassConsultaMessage("Consultas finalizadas! Baixando arquivo de resultados...");
+        baixarXLSX(resultados); // Download automático!
       } catch (err) {
-        const errorMessage =
-          err.response?.data?.message || err.message || "Erro inesperado: Verifique sua conexão e o formato do arquivo.";
-        setMassConsultaMessage(`Erro ao processar a planilha: ${errorMessage}`);
+        setMassConsultaMessage(
+          `Erro ao processar a planilha: ${err.message || "Erro inesperado"}`
+        );
       } finally {
-        setLoading(false);
+        setMassProcessing(false);
         if (event.target) event.target.value = null;
       }
     };
@@ -307,7 +341,6 @@ const ConsultaCNPJ = () => {
     setMassConsultaMessage("Baixando planilha modelo...");
     try {
       const response = await ConsultaService.baixarPlanilhaModeloCNPJ();
-
       const blob = response;
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement("a");
@@ -337,6 +370,9 @@ const ConsultaCNPJ = () => {
     setMassConsultaMessage("");
     setSelectedResultIndex(null);
     setHasQueried(false);
+    setMassResultRows([]);
+    setMassProgress({ current: 0, total: 0 });
+    setMassProcessing(false);
   };
 
   return (
@@ -390,6 +426,7 @@ const ConsultaCNPJ = () => {
         </div>
       </div>
 
+      {/* Formulário CNPJ */}
       {activeForm === "cnpj" && (
         <form className="form-container" onSubmit={handleSubmit}>
           <label htmlFor="cnpj">Digite o documento</label>
@@ -410,6 +447,7 @@ const ConsultaCNPJ = () => {
         </form>
       )}
 
+      {/* Formulário Chaves Alternativas */}
       {activeForm === "chaves" && (
         <form className="form-container" onSubmit={handleSubmit}>
           <label htmlFor="razaoSocial">Razão Social:</label>
@@ -438,6 +476,7 @@ const ConsultaCNPJ = () => {
         </form>
       )}
 
+      {/* Consulta em Massa */}
       {activeForm === "massa" && (
         <div className="form-massa-container">
           <input
@@ -446,23 +485,26 @@ const ConsultaCNPJ = () => {
             accept=".xlsx, .xls"
             style={{ display: "none" }}
             onChange={handleMassFileUpload}
-            disabled={loading}
+            disabled={massProcessing}
           />
-          <button type="button" onClick={() => document.getElementById("input-massa").click()} disabled={loading}>
+          <button type="button" onClick={() => document.getElementById("input-massa").click()} disabled={massProcessing}>
             Importar Planilha de CNPJs
           </button>
-          <button type="button" onClick={handleDownloadModel} disabled={loading}>
+          <button type="button" onClick={handleDownloadModel} disabled={loading || massProcessing}>
             Baixar Planilha Modelo
           </button>
 
-          {loading && (
+          {massProcessing && (
             <div className="loading-indicator">
               <div className="spinner"></div>
-              <p>{massConsultaMessage || "Processando..."}</p>
+              <p>
+                {massConsultaMessage} <br />
+                {massProgress.current} de {massProgress.total}
+              </p>
             </div>
           )}
 
-          {!loading && massConsultaMessage && (
+          {!massProcessing && massConsultaMessage && (
             <div className={
               massConsultaMessage.toLowerCase().includes("erro") ||
                 massConsultaMessage.toLowerCase().includes("falha")
@@ -473,32 +515,33 @@ const ConsultaCNPJ = () => {
             </div>
           )}
 
+          {/* O botão de download foi removido. Se quiser mostrar quantos processados, pode deixar o p abaixo */}
+          {!massProcessing && massResultRows.length > 0 && (
+            <div className="mass-result">
+              <p>{massResultRows.length} linhas processadas.</p>
+            </div>
+          )}
+
           {error && <p className="error-message">{error}</p>}
         </div>
       )}
 
+      {/* Resultado da consulta CNPJ única */}
       {activeForm === "cnpj" && cnpjData && (
         <div className="card-resultado" ref={resultadoRef}>
           <h4>Resultado da busca realizada</h4>
-
           <label>Razão Social:</label>
           <input type="text" value={cnpjData.razao_social || "N/A"} disabled />
-
           <label>CNPJ:</label>
           <input type="text" value={cnpjData.cnpj || "N/A"} disabled />
-
           <label>Atividade Principal:</label>
           <input type="text" value={cnpjData.cnae_fiscal_descricao || "N/A"} disabled />
-
           <label>Telefone:</label>
           <input type="text" value={cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"} disabled />
-
           <label>UF (Sede):</label>
           <input type="text" value={cnpjData.uf || "N/A"} disabled />
-
           <label>Bairro</label>
           <input type="text" value={cnpjData.bairro || "Não informada"} disabled />
-
           <label>Rua</label>
           <input
             type="text"
@@ -510,15 +553,14 @@ const ConsultaCNPJ = () => {
             }
             disabled
           />
-
           <label>Complemento</label>
           <input type="text" value={cnpjData.complemento || "Não informada"} disabled />
-
           <label>Município</label>
           <input type="text" value={cnpjData.municipio || "Não informada"} disabled />
         </div>
       )}
 
+      {/* Resultado da consulta por chaves */}
       {activeForm === "chaves" && Array.isArray(resultList) && resultList.length > 0 && (
         <div className="card-resultado" ref={resultadoRef}>
           <h4>Resultados encontrados</h4>
