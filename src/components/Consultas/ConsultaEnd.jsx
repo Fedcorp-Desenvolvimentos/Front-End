@@ -152,7 +152,7 @@ const ConsultaEnd = () => {
         response?.resultado_api
       ) {
         setResultado(response);
-        console.log(response);
+        
       } else if (response?.resultado_api) {
         setResultado(response);
       } else {

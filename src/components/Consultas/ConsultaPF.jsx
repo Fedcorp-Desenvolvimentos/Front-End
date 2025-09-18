@@ -96,7 +96,6 @@ const ConsultaPF = () => {
  try {
   const response = await ConsultaService.realizarConsulta(payload);
   setResultado(response?.data ?? response);
-  console.log("Resultado da consulta PF:", response);
 
   
   const apiStatus = response?.data?.resultado_api?.Status?.api
@@ -198,7 +197,7 @@ const ConsultaPF = () => {
                   "Data de Nascimento": formatDateBR(consultaResult.BirthDate),
                   Idade: consultaResult.Age || "N/A",
                   "Nome da Mãe": consultaResult.MotherName || "N/A",
-                  "Nome do Pai": consultaResult.FatherName || "N/A",
+                  
                   Gênero: consultaResult.Gender || "N/A",
                   "Nome Comum (Alias)":
                     consultaResult.Aliases?.CommonName || "N/A",
@@ -219,7 +218,7 @@ const ConsultaPF = () => {
                   "Data de Nascimento": "N/A",
                   Idade: "N/A",
                   "Nome da Mãe": "N/A",
-                  "Nome do Pai": "N/A",
+                  
                   Gênero: "N/A",
                   "Nome Comum (Alias)": "N/A",
                   "Indicação de Óbito": "N/A",
@@ -239,7 +238,7 @@ const ConsultaPF = () => {
                 "Data de Nascimento": "N/A",
                 Idade: "N/A",
                 "Nome da Mãe": "N/A",
-                "Nome do Pai": "N/A",
+                
                 Gênero: "N/A",
                 "Nome Comum (Alias)": "N/A",
                 "Indicação de Óbito": "N/A",
@@ -486,12 +485,7 @@ const ConsultaPF = () => {
                     value={basicData.MotherName || "N/A"}
                     disabled
                   />
-                  <label>Nome do Pai:</label>
-                  <input
-                    type="text"
-                    value={basicData.FatherName || "N/A"}
-                    disabled
-                  />
+                 
                   <label>Gênero:</label>
                   <input
                     type="text"
@@ -591,16 +585,7 @@ const ConsultaPF = () => {
             placeholder="Digite o nome da mãe"
             disabled={loading}
           />
-          <label htmlFor="fatherName">Nome do Pai</label>
-          <input
-            type="text"
-            id="fatherName"
-            name="fatherName"
-            value={formData.fatherName}
-            onChange={handleFormChange}
-            placeholder="Digite o nome do pai"
-            disabled={loading}
-          />
+       
           <button
             type="submit"
             disabled={loading || !formData.nome.trim()}
@@ -722,10 +707,7 @@ const ConsultaPF = () => {
                               <strong>Nome da Mãe:</strong>{" "}
                               {item.BasicData?.MotherName || "N/A"}
                             </p>
-                            <p>
-                              <strong>Nome do Pai:</strong>{" "}
-                              {item.BasicData?.FatherName || "N/A"}
-                            </p>
+                            
                             <p>
                               <strong>Gênero:</strong>{" "}
                               {item.BasicData?.Gender || "N/A"}

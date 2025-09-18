@@ -1,8 +1,27 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import * as XLSX from "xlsx";
 import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FileSpreadsheet } from "lucide-react";
+
+function formatarDataBrasileira(dataStr) {
+  if (!dataStr) return "";
+  // tenta ISO com hora (2024-01-09T00:00:00.000Z)
+  if (dataStr.length > 10 && dataStr[4] === '-') {
+    const [ano, mes, dia] = dataStr.split('T')[0].split('-');
+    return `${dia}/${mes}/${ano}`;
+  }
+  // só yyyy-mm-dd ou yyyy/mm/dd
+  const match = dataStr.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+  if (match) {
+    const [, ano, mes, dia] = match;
+    return `${String(dia).padStart(2, "0")}/${String(mes).padStart(2, "0")}/${ano}`;
+  }
+  // fallback: retorna original
+  return dataStr;
+}
+
 
 function isValidCNPJ(raw) {
   const cnpj = String(raw).replace(/\D/g, "");
@@ -76,6 +95,7 @@ const ConsultaCNPJ = () => {
     email: "",
     telefone: "",
   });
+
 
   const resultadoRef = useRef(null);
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
@@ -182,7 +202,6 @@ const ConsultaCNPJ = () => {
       [name]: value,
     }));
   };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -217,7 +236,6 @@ const ConsultaCNPJ = () => {
       } else {
         const qParams = [];
         if (formData.razaoSocial.trim()) qParams.push(`name{${formData.razaoSocial.trim()}}`);
-        // adicione outros campos se quiser...
         if (qParams.length === 0) {
           validationErrorMessage = "Nenhum parâmetro de busca válido para chaves alternativas.";
           isFormValid = false;
@@ -243,7 +261,9 @@ const ConsultaCNPJ = () => {
 
     try {
       const response = await ConsultaService.realizarConsulta(payload);
-      setResultado(response?.data ?? response);
+      const apiData = response?.data ?? response;
+      
+      setResultado(apiData); // só seta se não deu erro!
     } catch (err) {
       const friendly = getFriendlyError(err, payload);
       setError(friendly);
@@ -253,6 +273,7 @@ const ConsultaCNPJ = () => {
     }
   };
 
+  // ---- Consulta em Massa ----
   const handleMassFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) {
@@ -293,20 +314,25 @@ const ConsultaCNPJ = () => {
               parametro_consulta: cnpjsParaConsulta[i],
             });
             const data = resp.resultado_api || resp.resultado_api;
+            
+
             resultados.push({
               CNPJ: cnpjsParaConsulta[i],
               RazaoSocial: data.razao_social || "",
-              Situacao: data.descricao_situacao_cadastral || "",
+              
               Atividade: data.cnae_fiscal_descricao || "",
               Municipio: data.municipio || "",
               UF: data.uf || "",
-              Bairro: data.bairro||"",
-              CEP: data.cep||"",
-              Rua: data.logradouro||"",
-              Numero: data.numero||"",
-              Complemento: data.complemento||"",
+              Bairro: data.bairro || "",
+              CEP: data.cep || "",
+              Rua: data.logradouro || "",
+              Numero: data.numero || "",
+              Complemento: data.complemento || "",
               Telefone: data.ddd_telefone_1 || data.ddd_telefone_2 || "",
+              'Situação Cadastral': data.descricao_situacao_cadastral || "",
+              'Data Início Atividade': formatarDataBrasileira(data.data_inicio_atividade),
             });
+
           } catch (e) {
             resultados.push({
               CNPJ: cnpjsParaConsulta[i],
@@ -316,13 +342,15 @@ const ConsultaCNPJ = () => {
               Municipio: "",
               UF: "",
               Erro: getFriendlyError(e, { tipo_consulta: "cnpj" }),
+              SituacaoReceita: "",
+              DataInclusao: "",
             });
           }
           await new Promise((r) => setTimeout(r, 300));
         }
         setMassResultRows(resultados);
         setMassConsultaMessage("Consultas finalizadas! Baixando arquivo de resultados...");
-        baixarXLSX(resultados); // Download automático!
+        baixarXLSX(resultados);
       } catch (err) {
         setMassConsultaMessage(
           `Erro ao processar a planilha: ${err.message || "Erro inesperado"}`
@@ -536,8 +564,16 @@ const ConsultaCNPJ = () => {
           <input type="text" value={cnpjData.cnpj || "N/A"} disabled />
           <label>Atividade Principal:</label>
           <input type="text" value={cnpjData.cnae_fiscal_descricao || "N/A"} disabled />
+
           <label>Telefone:</label>
           <input type="text" value={cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"} disabled />
+          <label>Situação Cadastral:</label>
+          <input type="text" value={cnpjData.descricao_situacao_cadastral || "N/A"} disabled />
+
+          <label>Data de Início de Atividade:</label>
+         <input type="text" value={formatarDataBrasileira(cnpjData.data_inicio_atividade) || "N/A"} disabled />
+
+
           <label>UF (Sede):</label>
           <input type="text" value={cnpjData.uf || "N/A"} disabled />
           <label>Bairro</label>

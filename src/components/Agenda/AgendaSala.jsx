@@ -5,14 +5,8 @@ import {
   FaChevronRight,
   FaCalendarAlt,
 } from "react-icons/fa";
-import {
-  format,
-  addDays,
-  startOfWeek,
-  startOfMonth,
-  getDay,
-  parseISO,
-} from "date-fns";
+import { format, addDays, startOfWeek, startOfMonth, getDay, parseISO, startOfDay } from "date-fns";
+
 import ptBR from "date-fns/locale/pt-BR";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -152,7 +146,7 @@ export default function AgendaSala() {
               const isLivre = reservasSlot.length === 0;
               return (
                 <td key={dIdx} className={`agenda-cell ${isLivre ? "livre" : "ocupado"}`}>
-                  {isLivre ? (
+                  {isLivre && dia >= startOfDay(new Date()) ? (
                     <button
                       className="agenda-slot-btn"
                       title="Reservar"
@@ -160,6 +154,9 @@ export default function AgendaSala() {
                     >
                       <FaPlus size={15} />
                     </button>
+                  ) : isLivre ? (
+                   
+                    <span style={{ color: "#f37171ff" }}></span>
                   ) : (
                     <button
                       className="agenda-reservado-pill"
