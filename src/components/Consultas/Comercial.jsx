@@ -89,7 +89,7 @@ const ConsultaComercial = () => {
     setLoading(true);
     try {
       const { resultado_api } = await ConsultaService.consultarComercial(form.cnpj);
-      console.log("Resposta completa da API:", resultado_api);
+      
       const empresa = resultado_api?.Result?.[0] || null;
       if (empresa) {
         setResult(empresa);
@@ -117,7 +117,7 @@ const ConsultaComercial = () => {
     setModalPersonData(null);
     try {
       const { resultado_api } = await ConsultaService.consultarContatoComercial(cpf);
-      console.log("Resposta completa da API:", resultado_api);
+      
       const regData = resultado_api?.Result?.[0]?.RegistrationData || null;
       if (regData) setModalPersonData(regData);
       else setModalError("Nenhum dado de contato encontrado para esta pessoa.");

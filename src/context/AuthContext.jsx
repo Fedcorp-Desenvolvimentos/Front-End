@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }) => {
                 setIsAuthenticated(true);
             } catch (error) {
                 // Se a requisição falhar, o token é inválido/expirado
-                console.log("Usuário não autenticado ou sessão expirada:", error.response?.status);
+               
                 // Remove o token inválido para evitar futuras requisições
                 localStorage.removeItem('accessToken');
                 setUser(null);
