@@ -617,28 +617,39 @@ const ConsultaCNPJ = () => {
             </button>
           </div>
 
-          <label>Atividades Secundárias:</label>
-          <div className="input-copy-group">
-            <input type="text"
-              value={
-                Array.isArray(cnpjData.cnaes_secundarios)
-                  ? cnpjData.cnaes_secundarios.filter(c => c.descricao).map(c => c.descricao).join(", ") || "Nenhuma"
-                  : "Nenhuma"
-              }
-              disabled
-            />
-            <button type="button" className="copy-btn" title="Copiar Atividades Secundárias"
-              onClick={() =>
-                copiarParaClipboard(
-                  Array.isArray(cnpjData.cnaes_secundarios)
-                    ? cnpjData.cnaes_secundarios.filter(c => c.descricao).map(c => c.descricao).join(", ") || "Nenhuma"
-                    : "Nenhuma",
-                  "atividades_secundarias"
-                )
-              }>
-              {copiado.atividades_secundarias ? <FiCheck color="#20bf55" /> : <FiCopy />}
-            </button>
-          </div>
+        <label style={{ marginBottom: 0 }}>Atividades Secundárias:</label>
+<div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+  <ul style={{ margin: 0, paddingLeft: 24 }}>
+    {(Array.isArray(cnpjData.cnaes_secundarios) && cnpjData.cnaes_secundarios.length > 0)
+      ? cnpjData.cnaes_secundarios
+          .filter(c => !!c.descricao && c.descricao.trim() !== "")
+          .map((c, idx) => (
+            <li key={idx} style={{ marginBottom: 2 }}>{c.descricao}</li>
+          ))
+      : <li>Nenhuma</li>
+    }
+  </ul>
+  <button
+    type="button"
+    className="copy-btn"
+    title="Copiar todas as Atividades Secundárias"
+    style={{ marginTop: 2 }}
+    onClick={() =>
+      copiarParaClipboard(
+        Array.isArray(cnpjData.cnaes_secundarios)
+          ? cnpjData.cnaes_secundarios
+              .filter(c => !!c.descricao && c.descricao.trim() !== "")
+              .map(c => c.descricao)
+              .join('\n') || "Nenhuma"
+          : "Nenhuma",
+        "atividades_secundarias"
+      )
+    }
+  >
+    {copiado.atividades_secundarias ? <FiCheck color="#20bf55" /> : <FiCopy />}
+  </button>
+</div>
+
 
           <label>Matriz / Filial:</label>
           <div className="input-copy-group">
