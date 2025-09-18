@@ -3,6 +3,8 @@ import * as XLSX from "xlsx";
 import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FileSpreadsheet } from "lucide-react";
+import { FiCopy, FiCheck } from "react-icons/fi";
+
 
 function formatDateBR(dateStr) {
   if (!dateStr) return "N/A";
@@ -13,6 +15,21 @@ function formatDateBR(dateStr) {
 }
 
 const ConsultaPF = () => {
+
+  const [copiado, setCopiado] = useState({});
+  const [showPopup, setShowPopup] = useState(false);
+
+  function copiarParaClipboard(texto, campo) {
+    if (!texto) return;
+    navigator.clipboard.writeText(texto);
+    setCopiado((prev) => ({ ...prev, [campo]: true }));
+    setShowPopup(true);
+    setTimeout(() => {
+      setCopiado((prev) => ({ ...prev, [campo]: false }));
+      setShowPopup(false);
+    }, 1100);
+  }
+
   const [activeForm, setActiveForm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -93,15 +110,15 @@ const ConsultaPF = () => {
       return;
     }
 
- try {
-  const response = await ConsultaService.realizarConsulta(payload);
-  setResultado(response?.data ?? response);
+    try {
+      const response = await ConsultaService.realizarConsulta(payload);
+      setResultado(response?.data ?? response);
 
-  
-  const apiStatus = response?.data?.resultado_api?.Status?.api
-    || response?.resultado_api?.Status?.api;
 
-  if (Array.isArray(apiStatus) && apiStatus[0]?.Code === -128) {
+      const apiStatus = response?.data?.resultado_api?.Status?.api
+        || response?.resultado_api?.Status?.api;
+
+      if (Array.isArray(apiStatus) && apiStatus[0]?.Code === -128) {
         setError("Erro na base de consulta, tente novamente mais tarde");
       } else {
         const errorMessage =
@@ -197,7 +214,7 @@ const ConsultaPF = () => {
                   "Data de Nascimento": formatDateBR(consultaResult.BirthDate),
                   Idade: consultaResult.Age || "N/A",
                   "Nome da Mãe": consultaResult.MotherName || "N/A",
-                  
+
                   Gênero: consultaResult.Gender || "N/A",
                   "Nome Comum (Alias)":
                     consultaResult.Aliases?.CommonName || "N/A",
@@ -218,7 +235,7 @@ const ConsultaPF = () => {
                   "Data de Nascimento": "N/A",
                   Idade: "N/A",
                   "Nome da Mãe": "N/A",
-                  
+
                   Gênero: "N/A",
                   "Nome Comum (Alias)": "N/A",
                   "Indicação de Óbito": "N/A",
@@ -238,7 +255,7 @@ const ConsultaPF = () => {
                 "Data de Nascimento": "N/A",
                 Idade: "N/A",
                 "Nome da Mãe": "N/A",
-                
+
                 Gênero: "N/A",
                 "Nome Comum (Alias)": "N/A",
                 "Indicação de Óbito": "N/A",
@@ -450,70 +467,149 @@ const ConsultaPF = () => {
       {activeForm === "cpf" &&
         resultado?.resultado_api?.Result &&
         resultado.resultado_api.Result.length > 0 && (
-          <div className="card-resultado" ref={resultadoRef}>
-            <h4>Resultado da busca realizada</h4>
-            {(() => {
-              const resultItem = resultado.resultado_api.Result[0];
-              const basicData = resultItem?.BasicData || {};
-              return (
-                <>
-                  <label>Nome Completo:</label>
-                  <input type="text" value={basicData.Name || "N/A"} disabled />
-                  <label>CPF:</label>
-                  <input
-                    type="text"
-                    value={basicData.TaxIdNumber || "N/A"}
-                    disabled
-                  />
-                  <label>Situação Cadastral:</label>
-                  <input
-                    type="text"
-                    value={basicData.TaxIdStatus || "N/A"}
-                    disabled
-                  />
-                  <label>Data de Nascimento:</label>
-                  <input
-                    type="text"
-                    value={formatDateBR(basicData.BirthDate)}
-                    disabled
-                  />
-                  <label>Idade:</label>
-                  <input type="text" value={basicData.Age || "N/A"} disabled />
-                  <label>Nome da Mãe:</label>
-                  <input
-                    type="text"
-                    value={basicData.MotherName || "N/A"}
-                    disabled
-                  />
-                 
-                  <label>Gênero:</label>
-                  <input
-                    type="text"
-                    value={basicData.Gender || "N/A"}
-                    disabled
-                  />
-                  <label>Nome Comum (Alias):</label>
-                  <input
-                    type="text"
-                    value={basicData.Aliases?.CommonName || "N/A"}
-                    disabled
-                  />
-                  <label>Indicação de Óbito:</label>
-                  <input
-                    type="text"
-                    value={
-                      basicData.HasObitIndication !== undefined
-                        ? basicData.HasObitIndication
-                          ? "Sim"
-                          : "Não"
-                        : "N/A"
-                    }
-                    disabled
-                  />
-                </>
-              );
-            })()}
-          </div>
+       <div className="card-resultado" ref={resultadoRef}>
+  <h4>Resultado da busca realizada</h4>
+  {(() => {
+    const resultItem = resultado.resultado_api.Result[0];
+    const basicData = resultItem?.BasicData || {};
+    return (
+      <>
+        <label>Nome Completo:</label>
+        <div className="input-copy-group">
+          <input type="text" value={basicData.Name || "N/A"} disabled />
+          <button
+            type="button"
+            className="copy-btn"
+            title="Copiar Nome"
+            onClick={() => copiarParaClipboard(basicData.Name || "N/A", "nome")}
+          >
+            {copiado.nome ? <FiCheck color="#20bf55" /> : <FiCopy />}
+          </button>
+        </div>
+
+        <label>CPF:</label>
+        <div className="input-copy-group">
+          <input type="text" value={basicData.TaxIdNumber || "N/A"} disabled />
+          <button
+            type="button"
+            className="copy-btn"
+            title="Copiar CPF"
+            onClick={() => copiarParaClipboard(basicData.TaxIdNumber || "N/A", "cpf")}
+          >
+            {copiado.cpf ? <FiCheck color="#20bf55" /> : <FiCopy />}
+          </button>
+        </div>
+
+        <label>Situação Cadastral:</label>
+        <div className="input-copy-group">
+          <input type="text" value={basicData.TaxIdStatus || "N/A"} disabled />
+          <button
+            type="button"
+            className="copy-btn"
+            title="Copiar Situação"
+            onClick={() => copiarParaClipboard(basicData.TaxIdStatus || "N/A", "situacao")}
+          >
+            {copiado.situacao ? <FiCheck color="#20bf55" /> : <FiCopy />}
+          </button>
+        </div>
+
+        <label>Data de Nascimento:</label>
+        <div className="input-copy-group">
+          <input type="text" value={formatDateBR(basicData.BirthDate)} disabled />
+          <button
+            type="button"
+            className="copy-btn"
+            title="Copiar Data de Nascimento"
+            onClick={() => copiarParaClipboard(formatDateBR(basicData.BirthDate), "nascimento")}
+          >
+            {copiado.nascimento ? <FiCheck color="#20bf55" /> : <FiCopy />}
+          </button>
+        </div>
+
+        <label>Idade:</label>
+        <div className="input-copy-group">
+          <input type="text" value={basicData.Age || "N/A"} disabled />
+          <button
+            type="button"
+            className="copy-btn"
+            title="Copiar Idade"
+            onClick={() => copiarParaClipboard(basicData.Age || "N/A", "idade")}
+          >
+            {copiado.idade ? <FiCheck color="#20bf55" /> : <FiCopy />}
+          </button>
+        </div>
+
+        <label>Nome da Mãe:</label>
+        <div className="input-copy-group">
+          <input type="text" value={basicData.MotherName || "N/A"} disabled />
+          <button
+            type="button"
+            className="copy-btn"
+            title="Copiar Nome da Mãe"
+            onClick={() => copiarParaClipboard(basicData.MotherName || "N/A", "mae")}
+          >
+            {copiado.mae ? <FiCheck color="#20bf55" /> : <FiCopy />}
+          </button>
+        </div>
+
+        <label>Gênero:</label>
+        <div className="input-copy-group">
+          <input type="text" value={basicData.Gender || "N/A"} disabled />
+          <button
+            type="button"
+            className="copy-btn"
+            title="Copiar Gênero"
+            onClick={() => copiarParaClipboard(basicData.Gender || "N/A", "genero")}
+          >
+            {copiado.genero ? <FiCheck color="#20bf55" /> : <FiCopy />}
+          </button>
+        </div>
+
+        <label>Nome Comum (Alias):</label>
+        <div className="input-copy-group">
+          <input type="text" value={basicData.Aliases?.CommonName || "N/A"} disabled />
+          <button
+            type="button"
+            className="copy-btn"
+            title="Copiar Alias"
+            onClick={() => copiarParaClipboard(basicData.Aliases?.CommonName || "N/A", "alias")}
+          >
+            {copiado.alias ? <FiCheck color="#20bf55" /> : <FiCopy />}
+          </button>
+        </div>
+
+        <label>Indicação de Óbito:</label>
+        <div className="input-copy-group">
+          <input
+            type="text"
+            value={
+              basicData.HasObitIndication !== undefined
+                ? basicData.HasObitIndication ? "Sim" : "Não"
+                : "N/A"
+            }
+            disabled
+          />
+          <button
+            type="button"
+            className="copy-btn"
+            title="Copiar Óbito"
+            onClick={() =>
+              copiarParaClipboard(
+                basicData.HasObitIndication !== undefined
+                  ? basicData.HasObitIndication ? "Sim" : "Não"
+                  : "N/A",
+                "obito"
+              )
+            }
+          >
+            {copiado.obito ? <FiCheck color="#20bf55" /> : <FiCopy />}
+          </button>
+        </div>
+      </>
+    );
+  })()}
+</div>
+
         )}
 
       {activeForm === "chaves" && (
@@ -585,7 +681,7 @@ const ConsultaPF = () => {
             placeholder="Digite o nome da mãe"
             disabled={loading}
           />
-       
+
           <button
             type="submit"
             disabled={loading || !formData.nome.trim()}
@@ -677,8 +773,8 @@ const ConsultaPF = () => {
                       <td className="expand-icon">
                         <i
                           className={`bi ${selectedResultIndex === idx
-                              ? "bi-chevron-up"
-                              : "bi-chevron-down"
+                            ? "bi-chevron-up"
+                            : "bi-chevron-down"
                             }`}
                         ></i>
                       </td>
@@ -707,7 +803,7 @@ const ConsultaPF = () => {
                               <strong>Nome da Mãe:</strong>{" "}
                               {item.BasicData?.MotherName || "N/A"}
                             </p>
-                            
+
                             <p>
                               <strong>Gênero:</strong>{" "}
                               {item.BasicData?.Gender || "N/A"}

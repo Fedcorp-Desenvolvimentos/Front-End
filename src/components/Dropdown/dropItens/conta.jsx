@@ -18,10 +18,21 @@ const ConfigConta = () => {
     const [empresaEditada, setEmpresaEditada] = useState('');
     const [isFedEditado, setIsFedEditado] = useState(false);
 
+    const [pagina, setPagina] = useState(1);
+    const [porPagina, setPorPagina] = useState(15); // Pode mudar o tamanho
+    const [totalPaginas, setTotalPaginas] = useState(1);
+    const [totalResultados, setTotalResultados] = useState(0);
+
     const fetchUsuarios = async () => {
         try {
-            const response = await UserService.getAllUsers();
+            const response = await UserService.getAllUsers(pagina, porPagina, filtroBusca);
             setUsuarios(response.results || response);
+            setTotalResultados(response.count || (response.results ? response.results.length : 0));
+            if (response.count) {
+                setTotalPaginas(Math.max(1, Math.ceil(response.count / porPagina)));
+            } else {
+                setTotalPaginas(1);
+            }
         } catch (error) {
             setMensagemErro("Erro ao carregar usuários. Tente novamente.");
             setTimeout(() => setMensagemErro(''), 5000);
@@ -30,7 +41,8 @@ const ConfigConta = () => {
 
     useEffect(() => {
         fetchUsuarios();
-    }, []);
+        // eslint-disable-next-line
+    }, [pagina, porPagina, filtroBusca]); // Atualiza na troca de página, filtro ou limite
 
     const exibirMensagem = (tipo, mensagem) => {
         if (tipo === 'sucesso') {
@@ -101,15 +113,22 @@ const ConfigConta = () => {
         }
     };
 
-    const usuariosFiltrados = usuarios.filter((usuario) => {
-        const termo = filtroBusca.toLowerCase();
-        return (
-            usuario.nome_completo?.toLowerCase().includes(termo) ||
-            usuario.email?.toLowerCase().includes(termo)
-        );
-    });
-
     const niveisAcesso = ["admin", "usuario", "comercial", "moderador"];
+
+    const renderPagination = () => (
+        <div className="pagination-bar">
+            <button
+                onClick={() => setPagina(p => Math.max(1, p - 1))}
+                disabled={pagina === 1}
+            >Anterior</button>
+            <span>Página {pagina} de {totalPaginas}</span>
+            <button
+                onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
+                disabled={pagina === totalPaginas}
+            >Próxima</button>
+            <span className="total-registros">Total: {totalResultados}</span>
+        </div>
+    );
 
     return (
         <div className="conta-container">
@@ -138,7 +157,10 @@ const ConfigConta = () => {
                             type="text"
                             placeholder="Buscar por nome ou e-mail"
                             value={filtroBusca}
-                            onChange={(e) => setFiltroBusca(e.target.value)}
+                            onChange={e => {
+                                setPagina(1); // Sempre volta pra página 1 ao buscar
+                                setFiltroBusca(e.target.value)
+                            }}
                         />
                     </div>
 
@@ -152,7 +174,7 @@ const ConfigConta = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {usuariosFiltrados.map(usuario => (
+                            {usuarios.map(usuario => (
                                 <tr key={usuario.id}>
                                     <td>{usuario.nome_completo}</td>
                                     <td>{usuario.email}</td>
@@ -183,6 +205,8 @@ const ConfigConta = () => {
                             ))}
                         </tbody>
                     </table>
+
+                    {renderPagination()}
                 </div>
 
                 {mostrarModalExclusao && (
