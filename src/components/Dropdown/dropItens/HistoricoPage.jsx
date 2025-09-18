@@ -13,6 +13,10 @@ const HistoricoConsulta = () => {
   const [detalhesLoading, setDetalhesLoading] = useState(false);
   const [detalhesError, setDetalhesError] = useState('');
   const { user } = useAuth();
+  const [pagina, setPagina] = useState(1);
+  const [porPagina, setPorPagina] = useState(20); 
+  const [totalPaginas, setTotalPaginas] = useState(1);
+  const [totalResultados, setTotalResultados] = useState(0);
 
   useEffect(() => {
     const fetchHistorico = async () => {
@@ -27,13 +31,19 @@ const HistoricoConsulta = () => {
             user.nivel_acesso === "usuario" ||
             user.nivel_acesso === "comercial")
         ) {
-          data = await ConsultaService.getConsultaHistory(1, 9999);
+          data = await ConsultaService.getConsultaHistory(pagina, porPagina);
         } else {
           setError('Usuário não autenticado ou sem permissão para ver o histórico.');
           setLoading(false);
           return;
         }
         setConsultas(data.results || data);
+        setTotalResultados(data.count || (data.results ? data.results.length : 0));
+        if (data.count) {
+          setTotalPaginas(Math.max(1, Math.ceil(data.count / porPagina)));
+        } else {
+          setTotalPaginas(1);
+        }
       } catch (err) {
         setError('Não foi possível carregar o histórico de consultas.');
       } finally {
@@ -42,7 +52,7 @@ const HistoricoConsulta = () => {
     };
 
     if (user) fetchHistorico();
-  }, [user]);
+  }, [user, pagina, porPagina]);
 
   const handleItemClick = async (consultaId) => {
     if (selectedConsultaId === consultaId) {
@@ -114,6 +124,21 @@ const HistoricoConsulta = () => {
     }
     return consulta.parametro_consulta;
   }
+
+  const renderPagination = () => (
+    <div className="pagination-bar">
+      <button
+        onClick={() => setPagina(p => Math.max(1, p - 1))}
+        disabled={pagina === 1}
+      >Anterior</button>
+      <span>Página {pagina} de {totalPaginas}</span>
+      <button
+        onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
+        disabled={pagina === totalPaginas}
+      >Próxima</button>
+      <span className="total-registros">Total: {totalResultados}</span>
+    </div>
+  );
 
   return (
     <div className="historico-container">
@@ -207,6 +232,7 @@ const HistoricoConsulta = () => {
               ))}
             </tbody>
           </table>
+          {renderPagination()}
         </>
       )}
     </div>

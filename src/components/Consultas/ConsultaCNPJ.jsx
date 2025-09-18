@@ -4,21 +4,23 @@ import * as XLSX from "xlsx";
 import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FileSpreadsheet } from "lucide-react";
+import { FiCopy, FiCheck } from "react-icons/fi";
+
 
 function formatarDataBrasileira(dataStr) {
   if (!dataStr) return "";
-  // tenta ISO com hora (2024-01-09T00:00:00.000Z)
+
   if (dataStr.length > 10 && dataStr[4] === '-') {
     const [ano, mes, dia] = dataStr.split('T')[0].split('-');
     return `${dia}/${mes}/${ano}`;
   }
-  // só yyyy-mm-dd ou yyyy/mm/dd
+
   const match = dataStr.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
   if (match) {
     const [, ano, mes, dia] = match;
     return `${String(dia).padStart(2, "0")}/${String(mes).padStart(2, "0")}/${ano}`;
   }
-  // fallback: retorna original
+
   return dataStr;
 }
 
@@ -82,6 +84,19 @@ function baixarXLSX(linhas) {
 }
 
 const ConsultaCNPJ = () => {
+
+  const [copiado, setCopiado] = useState({});
+  const [showPopup, setShowPopup] = useState(false);
+  function copiarParaClipboard(texto, campo) {
+    if (!texto) return;
+    navigator.clipboard.writeText(texto);
+    setCopiado((prev) => ({ ...prev, [campo]: true }));
+    setShowPopup(true);
+    setTimeout(() => {
+      setCopiado((prev) => ({ ...prev, [campo]: false }));
+      setShowPopup(false);
+    }, 1000);
+  }
   const [cnpj, setCnpj] = useState("");
   const [activeForm, setActiveForm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -262,8 +277,8 @@ const ConsultaCNPJ = () => {
     try {
       const response = await ConsultaService.realizarConsulta(payload);
       const apiData = response?.data ?? response;
-      
-      setResultado(apiData); // só seta se não deu erro!
+
+      setResultado(apiData);
     } catch (err) {
       const friendly = getFriendlyError(err, payload);
       setError(friendly);
@@ -314,12 +329,11 @@ const ConsultaCNPJ = () => {
               parametro_consulta: cnpjsParaConsulta[i],
             });
             const data = resp.resultado_api || resp.resultado_api;
-            
+
 
             resultados.push({
               CNPJ: cnpjsParaConsulta[i],
               RazaoSocial: data.razao_social || "",
-              
               Atividade: data.cnae_fiscal_descricao || "",
               Municipio: data.municipio || "",
               UF: data.uf || "",
@@ -331,6 +345,15 @@ const ConsultaCNPJ = () => {
               Telefone: data.ddd_telefone_1 || data.ddd_telefone_2 || "",
               'Situação Cadastral': data.descricao_situacao_cadastral || "",
               'Data Início Atividade': formatarDataBrasileira(data.data_inicio_atividade),
+              'Matriz/Filial': data.descricao_identificador_matriz_filial || "",
+              'Atividades Secundárias': (
+                Array.isArray(data.cnaes_secundarios)
+                  ? data.cnaes_secundarios
+                    .map((c) => c.descricao)
+                    .filter((d) => !!d && d.trim() !== "")
+                    .join(", ")
+                  : ""
+              ),
             });
 
           } catch (e) {
@@ -403,7 +426,17 @@ const ConsultaCNPJ = () => {
     setMassProcessing(false);
   };
 
+  {
+    showPopup && (
+      <div className="popup-copiado">
+        <FiCheck style={{ marginRight: 8 }} />
+        Copiado para área de transferência!
+      </div>
+    )
+  }
+
   return (
+
     <div className="consulta-container03">
       <h1 className="consultas-title">
         <i className="bi-clipboard-data"></i> Consultas Disponíveis
@@ -543,7 +576,6 @@ const ConsultaCNPJ = () => {
             </div>
           )}
 
-          {/* O botão de download foi removido. Se quiser mostrar quantos processados, pode deixar o p abaixo */}
           {!massProcessing && massResultRows.length > 0 && (
             <div className="mass-result">
               <p>{massResultRows.length} linhas processadas.</p>
@@ -554,47 +586,166 @@ const ConsultaCNPJ = () => {
         </div>
       )}
 
-      {/* Resultado da consulta CNPJ única */}
       {activeForm === "cnpj" && cnpjData && (
         <div className="card-resultado" ref={resultadoRef}>
           <h4>Resultado da busca realizada</h4>
+
           <label>Razão Social:</label>
-          <input type="text" value={cnpjData.razao_social || "N/A"} disabled />
+          <div className="input-copy-group">
+            <input type="text" value={cnpjData.razao_social || "N/A"} disabled />
+            <button type="button" className="copy-btn" title="Copiar Razão Social"
+              onClick={() => copiarParaClipboard(cnpjData.razao_social || "N/A", "razao_social")}>
+              {copiado.razao_social ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
+
           <label>CNPJ:</label>
-          <input type="text" value={cnpjData.cnpj || "N/A"} disabled />
+          <div className="input-copy-group">
+            <input type="text" value={cnpjData.cnpj || "N/A"} disabled />
+            <button type="button" className="copy-btn" title="Copiar CNPJ"
+              onClick={() => copiarParaClipboard(cnpjData.cnpj || "N/A", "cnpj")}>
+              {copiado.cnpj ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
+
           <label>Atividade Principal:</label>
-          <input type="text" value={cnpjData.cnae_fiscal_descricao || "N/A"} disabled />
+          <div className="input-copy-group">
+            <input type="text" value={cnpjData.cnae_fiscal_descricao || "N/A"} disabled />
+            <button type="button" className="copy-btn" title="Copiar Atividade Principal"
+              onClick={() => copiarParaClipboard(cnpjData.cnae_fiscal_descricao || "N/A", "atividade_principal")}>
+              {copiado.atividade_principal ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
+
+          <label>Atividades Secundárias:</label>
+          <div className="input-copy-group">
+            <input type="text"
+              value={
+                Array.isArray(cnpjData.cnaes_secundarios)
+                  ? cnpjData.cnaes_secundarios.filter(c => c.descricao).map(c => c.descricao).join(", ") || "Nenhuma"
+                  : "Nenhuma"
+              }
+              disabled
+            />
+            <button type="button" className="copy-btn" title="Copiar Atividades Secundárias"
+              onClick={() =>
+                copiarParaClipboard(
+                  Array.isArray(cnpjData.cnaes_secundarios)
+                    ? cnpjData.cnaes_secundarios.filter(c => c.descricao).map(c => c.descricao).join(", ") || "Nenhuma"
+                    : "Nenhuma",
+                  "atividades_secundarias"
+                )
+              }>
+              {copiado.atividades_secundarias ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
+
+          <label>Matriz / Filial:</label>
+          <div className="input-copy-group">
+            <input type="text" value={cnpjData.descricao_identificador_matriz_filial || "N/A"} disabled />
+            <button type="button" className="copy-btn" title="Copiar Matriz/Filial"
+              onClick={() => copiarParaClipboard(cnpjData.descricao_identificador_matriz_filial || "N/A", "matriz_filial")}>
+              {copiado.matriz_filial ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
 
           <label>Telefone:</label>
-          <input type="text" value={cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"} disabled />
+          <div className="input-copy-group">
+            <input type="text" value={cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"} disabled />
+            <button type="button" className="copy-btn" title="Copiar Telefone"
+              onClick={() => copiarParaClipboard(cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A", "telefone")}>
+              {copiado.telefone ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
+
           <label>Situação Cadastral:</label>
-          <input type="text" value={cnpjData.descricao_situacao_cadastral || "N/A"} disabled />
+          <div className="input-copy-group">
+            <input type="text" value={cnpjData.descricao_situacao_cadastral || "N/A"} disabled />
+            <button type="button" className="copy-btn" title="Copiar Situação Cadastral"
+              onClick={() => copiarParaClipboard(cnpjData.descricao_situacao_cadastral || "N/A", "situacao_cadastral")}>
+              {copiado.situacao_cadastral ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
 
           <label>Data de Início de Atividade:</label>
-         <input type="text" value={formatarDataBrasileira(cnpjData.data_inicio_atividade) || "N/A"} disabled />
-
+          <div className="input-copy-group">
+            <input type="text" value={formatarDataBrasileira(cnpjData.data_inicio_atividade) || "N/A"} disabled />
+            <button type="button" className="copy-btn" title="Copiar Data de Início"
+              onClick={() => copiarParaClipboard(formatarDataBrasileira(cnpjData.data_inicio_atividade) || "N/A", "data_inicio")}>
+              {copiado.data_inicio ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
 
           <label>UF (Sede):</label>
-          <input type="text" value={cnpjData.uf || "N/A"} disabled />
-          <label>Bairro</label>
-          <input type="text" value={cnpjData.bairro || "Não informada"} disabled />
-          <label>Rua</label>
-          <input
-            type="text"
-            value={
-              cnpjData.descricao_tipo_de_logradouro && cnpjData.logradouro
-                ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro}${cnpjData.numero ? `, ${cnpjData.numero}` : ""
-                }`
-                : cnpjData.descricao_tipo_de_logradouro || cnpjData.logradouro || "Não informada"
-            }
-            disabled
-          />
-          <label>Complemento</label>
-          <input type="text" value={cnpjData.complemento || "Não informada"} disabled />
-          <label>Município</label>
-          <input type="text" value={cnpjData.municipio || "Não informada"} disabled />
+          <div className="input-copy-group">
+            <input type="text" value={cnpjData.uf || "N/A"} disabled />
+            <button type="button" className="copy-btn" title="Copiar UF"
+              onClick={() => copiarParaClipboard(cnpjData.uf || "N/A", "uf")}>
+              {copiado.uf ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
+
+          <label>Bairro:</label>
+          <div className="input-copy-group">
+            <input type="text" value={cnpjData.bairro || "Não informada"} disabled />
+            <button type="button" className="copy-btn" title="Copiar Bairro"
+              onClick={() => copiarParaClipboard(cnpjData.bairro || "Não informada", "bairro")}>
+              {copiado.bairro ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
+
+          <label>CEP:</label>
+          <div className="input-copy-group">
+            <input type="text" value={cnpjData.cep || "Não informado"} disabled />
+            <button type="button" className="copy-btn" title="Copiar CEP"
+              onClick={() => copiarParaClipboard(cnpjData.cep || "Não informado", "cep")}>
+              {copiado.cep ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
+
+          <label>Rua:</label>
+          <div className="input-copy-group">
+            <input
+              type="text"
+              value={
+                cnpjData.descricao_tipo_de_logradouro && cnpjData.logradouro
+                  ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro}${cnpjData.numero ? `, ${cnpjData.numero}` : ""}`
+                  : cnpjData.descricao_tipo_de_logradouro || cnpjData.logradouro || "Não informada"
+              }
+              disabled
+            />
+            <button type="button" className="copy-btn" title="Copiar Rua"
+              onClick={() => copiarParaClipboard(
+                cnpjData.descricao_tipo_de_logradouro && cnpjData.logradouro
+                  ? `${cnpjData.descricao_tipo_de_logradouro} ${cnpjData.logradouro}${cnpjData.numero ? `, ${cnpjData.numero}` : ""}`
+                  : cnpjData.descricao_tipo_de_logradouro || cnpjData.logradouro || "Não informada",
+                "rua"
+              )}>
+              {copiado.rua ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
+
+          <label>Complemento:</label>
+          <div className="input-copy-group">
+            <input type="text" value={cnpjData.complemento || "Não informada"} disabled />
+            <button type="button" className="copy-btn" title="Copiar Complemento"
+              onClick={() => copiarParaClipboard(cnpjData.complemento || "Não informada", "complemento")}>
+              {copiado.complemento ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
+
+          <label>Município:</label>
+          <div className="input-copy-group">
+            <input type="text" value={cnpjData.municipio || "Não informada"} disabled />
+            <button type="button" className="copy-btn" title="Copiar Município"
+              onClick={() => copiarParaClipboard(cnpjData.municipio || "Não informada", "municipio")}>
+              {copiado.municipio ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
         </div>
       )}
+
+
 
       {/* Resultado da consulta por chaves */}
       {activeForm === "chaves" && Array.isArray(resultList) && resultList.length > 0 && (
