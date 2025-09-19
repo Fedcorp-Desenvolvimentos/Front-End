@@ -288,7 +288,6 @@ const ConsultaCNPJ = () => {
     }
   };
 
-  // ---- Consulta em Massa ----
   const handleMassFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) {
@@ -487,7 +486,6 @@ const ConsultaCNPJ = () => {
         </div>
       </div>
 
-      {/* Formulário CNPJ */}
       {activeForm === "cnpj" && (
         <form className="form-container" onSubmit={handleSubmit}>
           <label htmlFor="cnpj">Digite o documento</label>
@@ -508,7 +506,6 @@ const ConsultaCNPJ = () => {
         </form>
       )}
 
-      {/* Formulário Chaves Alternativas */}
       {activeForm === "chaves" && (
         <form className="form-container" onSubmit={handleSubmit}>
           <label htmlFor="razaoSocial">Razão Social:</label>
@@ -537,7 +534,6 @@ const ConsultaCNPJ = () => {
         </form>
       )}
 
-      {/* Consulta em Massa */}
       {activeForm === "massa" && (
         <div className="form-massa-container">
           <input
@@ -617,38 +613,38 @@ const ConsultaCNPJ = () => {
             </button>
           </div>
 
-        <label style={{ marginBottom: 0 }}>Atividades Secundárias:</label>
-<div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-  <ul style={{ margin: 0, paddingLeft: 24 }}>
-    {(Array.isArray(cnpjData.cnaes_secundarios) && cnpjData.cnaes_secundarios.length > 0)
-      ? cnpjData.cnaes_secundarios
-          .filter(c => !!c.descricao && c.descricao.trim() !== "")
-          .map((c, idx) => (
-            <li key={idx} style={{ marginBottom: 2 }}>{c.descricao}</li>
-          ))
-      : <li>Nenhuma</li>
-    }
-  </ul>
-  <button
-    type="button"
-    className="copy-btn"
-    title="Copiar todas as Atividades Secundárias"
-    style={{ marginTop: 2 }}
-    onClick={() =>
-      copiarParaClipboard(
-        Array.isArray(cnpjData.cnaes_secundarios)
-          ? cnpjData.cnaes_secundarios
-              .filter(c => !!c.descricao && c.descricao.trim() !== "")
-              .map(c => c.descricao)
-              .join('\n') || "Nenhuma"
-          : "Nenhuma",
-        "atividades_secundarias"
-      )
-    }
-  >
-    {copiado.atividades_secundarias ? <FiCheck color="#20bf55" /> : <FiCopy />}
-  </button>
-</div>
+          <label style={{ marginBottom: 0 }}>Atividades Secundárias:</label>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+            <ul style={{ margin: 0, paddingLeft: 24 }}>
+              {(Array.isArray(cnpjData.cnaes_secundarios) && cnpjData.cnaes_secundarios.length > 0)
+                ? cnpjData.cnaes_secundarios
+                  .filter(c => !!c.descricao && c.descricao.trim() !== "")
+                  .map((c, idx) => (
+                    <li key={idx} style={{ marginBottom: 2 }}>{c.descricao}</li>
+                  ))
+                : <li>Nenhuma</li>
+              }
+            </ul>
+            <button
+              type="button"
+              className="copy-btn"
+              title="Copiar todas as Atividades Secundárias"
+              style={{ marginTop: 2 }}
+              onClick={() =>
+                copiarParaClipboard(
+                  Array.isArray(cnpjData.cnaes_secundarios)
+                    ? cnpjData.cnaes_secundarios
+                      .filter(c => !!c.descricao && c.descricao.trim() !== "")
+                      .map(c => c.descricao)
+                      .join('\n') || "Nenhuma"
+                    : "Nenhuma",
+                  "atividades_secundarias"
+                )
+              }
+            >
+              {copiado.atividades_secundarias ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
 
 
           <label>Matriz / Filial:</label>
@@ -753,10 +749,22 @@ const ConsultaCNPJ = () => {
               {copiado.municipio ? <FiCheck color="#20bf55" /> : <FiCopy />}
             </button>
           </div>
+
+          {(cnpjData.cep && (cnpjData.descricao_tipo_de_logradouro || cnpjData.logradouro)) && (
+            <button
+              type="button"
+              className="maps-btn"
+              style={{ marginTop: 12, marginBottom: 12 }}
+              onClick={() => {
+                const endereco = `${cnpjData.cep} ${cnpjData.descricao_tipo_de_logradouro || ""} ${cnpjData.logradouro || ""}${cnpjData.numero ? `, ${cnpjData.numero}` : ""}`;
+                window.open(`https://www.google.com/maps/place/${encodeURIComponent(endereco)}`, "_blank");
+              }}
+            >
+              Ver endereço no maps
+            </button>
+          )}
         </div>
       )}
-
-
 
       {/* Resultado da consulta por chaves */}
       {activeForm === "chaves" && Array.isArray(resultList) && resultList.length > 0 && (
