@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://back-fedconnect-y46st.ondigitalocean.app/",
+  baseURL: "https://bigcorp-backend.onrender.com/",
 });
 
 // Intercepta todas as requisições Axios
