@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "back-fedconnect-y46st.ondigitalocean.app/",
+  baseURL: "https://back-fedconnect-y46st.ondigitalocean.app/",
 });
 
 // Intercepta todas as requisições Axios
