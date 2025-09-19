@@ -9,23 +9,17 @@ import * as XLSX from "xlsx";
 const ConsultaComercial = () => {
   const [activeCard, setActiveCard] = useState(null);
   const [accordionOpen, setAccordionOpen] = useState(null);
-
   const resultadoRef = useRef(null);
-
   const formCnpjRef = useRef(null);
   const formMassaRef = useRef(null);
-
-
   const [form, setForm] = useState({ cnpj: "" });
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
   const [showModal, setShowModal] = useState(false);
   const [modalPersonData, setModalPersonData] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState(null);
-
   const [file, setFile] = useState(null);
   const [bulkResults, setBulkResults] = useState([]);
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
@@ -198,7 +192,6 @@ const ConsultaComercial = () => {
           const workbook = XLSX.read(data, { type: "array" });
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
-
           const jsonSheet = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
           let cnpjs = [];
@@ -226,7 +219,6 @@ const ConsultaComercial = () => {
           );
 
           const payload = { cnpjs: cnpjs };
-
           const excelBlob = await ConsultaService.consultarComercialMassa(
             payload
           );
@@ -351,7 +343,7 @@ const ConsultaComercial = () => {
                 onClick={() => navigate("/cotacao-conteudo")}
               >
                 <FaSearch size={25} className="subcard-icon" />
-                <span>Cotação Conteúdo</span>
+                <span>Estudo Conteúdo</span>
               </div>
             </div>
           )}

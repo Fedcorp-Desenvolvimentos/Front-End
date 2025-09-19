@@ -2,13 +2,79 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import "../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 
+// Mapeamento número da apólice -> nome amigável
+const APOLICES_MAP = {
+  "132": "ALUG",
+  "238": "ALUG",
+  "274": "ALUG",
+  "278": "ALUG",
+  "279": "ALUG",
+  "280": "ALUG",
+  "4803": "ALUG",
+  "4008": "CONTEUDO",
+  "5008": "CONTEUDO",
+  "9008": "CONTEUDO",
+  "15008": "CONTEUDO",
+  "10008": "CONTEUDO",
+  "131": "GARANTIA DA COTA",
+  "178": "GARANTIA DA COTA",
+  "275": "GARANTIA DA COTA",
+  "277": "GARANTIA DA COTA",
+  "281": "GARANTIA DA COTA",
+  "283": "GARANTIA DA COTA",
+  "6008": "LOCAÇÃO MENSAL",
+  "7008": "LOCAÇÃO MENSAL",
+  "R'": "LOCAÇÃO ANUAL",
+  "C": "LOCAÇÃO ANUAL",
+  "13008": "RUPTURA",
+  "14008": "RUPTURA",
+  "3701": "VIDA",
+  "4802": "VIDA",
+  "4803": "VIDA",
+  "4805": "VIDA",
+  "4806": "VIDA",
+  "5803": "VIDA",
+  "6800": "VIDA",
+  "7301": "VIDA",
+  "7500": "VIDA",
+  "7501": "VIDA",
+  "7800": "VIDA",
+  "8800": "VIDA",
+  "BOAT": "BOAT",
+  "BOAT01": "BOAT",
+  "BOATRN01": "BOAT",
+  "VR000": "VR",
+  "VR0001": "VR",
+  "CD000010": "SST",
+  "CD0001": "SST",
+  "CD00010": "SST",
+  "CD00011": "SST",
+  "CD00012": "SST",
+  "CD0002": "SST",
+  "CD0003": "CURSO",
+  "CD0004": "AUTOVISTORIA",
+  "CD0005": "SST",
+  "CD0006": "SST",
+  "CD0007": "VISTORIA LOCATICIA",
+  "CD0008": "SST",
+  "CD0009": "SST",
+  "CD0010": "SST",
+  "CD0010.1": "SST",
+  "CD0011": "SST",
+  "CD0002": "ASO",
+  "CDBOAT01": "CONSULTA MEDICA - EXAME",
+  "CEBOAT01": "CONSULTA MEDICA - EXAME",
+  "BAPS001": "BAPS",
+  "BPS": "BAPS",
+  "BPS001": "BAPS"
+};
+
 function SeguradoItem({ segurado, idx, expandedIndex, setExpandedIndex }) {
     const uniqueId = `idx-${idx}`;
-
     const isExpanded = expandedIndex === uniqueId;
 
     const ignoreKeys = [
-        "NOME_SEGURADO", "NOME", "CPF_CNPJ", "FUNCAO",
+        "NOME_SEGURADO", "NOME", "Nome", "nome", "nome_segurado", "CPF_CNPJ", "FUNCAO",
         "ADMINISTRADORA", "ADMINISTRADORA_NOME", "STATUS", "STATUS_SEG"
     ];
 
@@ -61,6 +127,8 @@ function SeguradoItem({ segurado, idx, expandedIndex, setExpandedIndex }) {
         }
     }
 
+    const produtoApolice = APOLICES_MAP[segurado.APOLICE] || segurado.APOLICE || "Apólice não informada";
+
     return (
         <li className={`item-segurado${isExpanded ? " expanded" : ""}`}>
             <button
@@ -71,20 +139,22 @@ function SeguradoItem({ segurado, idx, expandedIndex, setExpandedIndex }) {
             >
                 <span style={{ display: "flex", flexDirection: "column", textAlign: "start" }}>
                     <b>
-                        {
-                            segurado.NOME_SEGURADO ||
-                            segurado.NOME ||
-                            segurado.Nome ||
-                            segurado.nome ||
-                            segurado.nome_segurado ||
-                            "Nome não informado"
-                        }
+                        {segurado.NOME_SEGURADO ||
+                        segurado.NOME ||
+                        segurado.Nome ||
+                        segurado.nome ||
+                        segurado.nome_segurado ||
+                        "Nome não informado"}
                     </b>
                     {segurado.CPF_CNPJ && (
                         <span className="cpf-label">
                             CPF/CNPJ: <span className="cpf">{segurado.CPF_CNPJ}</span>
                         </span>
                     )}
+                    
+                    <span className="apolice-produto" style={{ color: "#1858d6", fontWeight: 600, fontSize: 15 }}>
+                        Produto: {produtoApolice}
+                    </span>
                 </span>
                 <span className="icon">{isExpanded ? "▲" : "▼"}</span>
             </button>
@@ -103,8 +173,13 @@ function SeguradoItem({ segurado, idx, expandedIndex, setExpandedIndex }) {
                                 {traduzirStatus(segurado.STATUS_SEG || segurado.STATUS)}
                             </li>
                         )}
+                        {/* Exibe demais campos, exceto os ignorados */}
                         {Object.entries(segurado).map(([chave, valor]) => {
                             if (ignoreKeys.includes(chave)) {
+                                return null;
+                            }
+                            if (chave === "APOLICE") {
+                                // Já está exibindo acima, não precisa repetir
                                 return null;
                             }
                             const isMoeda = camposMoeda.includes(chave);
@@ -127,9 +202,6 @@ function SeguradoItem({ segurado, idx, expandedIndex, setExpandedIndex }) {
     );
 }
 
-// ------------------------------------
-// COMPONENTE PRINCIPAL
-// ------------------------------------
 function traduzirErroApi(mensagem) {
     if (!mensagem) return "Erro inesperado. Por favor, tente novamente.";
 
@@ -185,6 +257,17 @@ const ConsultaSegurado = () => {
     };
 
     const [formData, setFormData] = useState(initialFormData);
+    const campoData = 'DT_INCLUSAO'; 
+
+    const resultadoOrdenado = resultado && Array.isArray(resultado)
+        ? [...resultado].sort((a, b) => {
+            if (!a[campoData]) return 1;
+            if (!b[campoData]) return -1;
+            const dataA = new Date(a[campoData]);
+            const dataB = new Date(b[campoData]);
+            return dataB - dataA;
+        })
+        : [];
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -658,7 +741,7 @@ const ConsultaSegurado = () => {
                         </div>
                     ) : (
                         <ul className="lista-segurados">
-                            {resultado.map((seg, idx) => (
+                            {resultadoOrdenado.map((seg, idx) => (
                                 <SeguradoItem
                                     key={`segurado-idx-${idx}`}
                                     segurado={seg}
