@@ -6,6 +6,10 @@ import { ConsultaService } from "../../services/consultaService";
 import { FileSpreadsheet } from "lucide-react";
 import { FiCopy, FiCheck } from "react-icons/fi";
 
+function preencherZeros(valor, tamanho) {
+  valor = String(valor).replace(/\D/g, "");
+  return valor.padStart(tamanho, "0");
+}
 
 function formatarDataBrasileira(dataStr) {
   if (!dataStr) return "";
@@ -310,8 +314,9 @@ const ConsultaCNPJ = () => {
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
         const cnpjsParaConsulta = jsonData
-          .map((row) => String(row.CNPJ).replace(/\D/g, "").padStart(14, "0"))
-          .filter((cnpj) => cnpj.length === 14);
+          .map((row) => preencherZeros(row.CNPJ, 14))
+          .filter((cnpj) => cnpj.length === 14 && isValidCNPJ(cnpj));
+
 
         if (!cnpjsParaConsulta.length)
           throw new Error("Nenhum CNPJ válido encontrado na planilha.");
