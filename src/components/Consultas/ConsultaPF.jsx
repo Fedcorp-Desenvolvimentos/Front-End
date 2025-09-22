@@ -5,6 +5,10 @@ import { ConsultaService } from "../../services/consultaService";
 import { FileSpreadsheet } from "lucide-react";
 import { FiCopy, FiCheck } from "react-icons/fi";
 
+function preencherZeros(valor, tamanho) {
+  valor = String(valor).replace(/\D/g, "");
+  return valor.padStart(tamanho, "0");
+}
 
 function formatDateBR(dateStr) {
   if (!dateStr) return "N/A";
@@ -158,7 +162,7 @@ const ConsultaPF = () => {
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
         const cpfsParaConsulta = jsonData.map((row) => ({
-          CPF: String(row.CPF || "").replace(/\D/g, ""),
+          CPF: preencherZeros(row.CPF, 11)
         }));
 
         const cpfsValidos = cpfsParaConsulta.filter(
@@ -467,148 +471,148 @@ const ConsultaPF = () => {
       {activeForm === "cpf" &&
         resultado?.resultado_api?.Result &&
         resultado.resultado_api.Result.length > 0 && (
-       <div className="card-resultado" ref={resultadoRef}>
-  <h4>Resultado da busca realizada</h4>
-  {(() => {
-    const resultItem = resultado.resultado_api.Result[0];
-    const basicData = resultItem?.BasicData || {};
-    return (
-      <>
-        <label>Nome Completo:</label>
-        <div className="input-copy-group">
-          <input type="text" value={basicData.Name || "N/A"} disabled />
-          <button
-            type="button"
-            className="copy-btn"
-            title="Copiar Nome"
-            onClick={() => copiarParaClipboard(basicData.Name || "N/A", "nome")}
-          >
-            {copiado.nome ? <FiCheck color="#20bf55" /> : <FiCopy />}
-          </button>
-        </div>
+          <div className="card-resultado" ref={resultadoRef}>
+            <h4>Resultado da busca realizada</h4>
+            {(() => {
+              const resultItem = resultado.resultado_api.Result[0];
+              const basicData = resultItem?.BasicData || {};
+              return (
+                <>
+                  <label>Nome Completo:</label>
+                  <div className="input-copy-group">
+                    <input type="text" value={basicData.Name || "N/A"} disabled />
+                    <button
+                      type="button"
+                      className="copy-btn"
+                      title="Copiar Nome"
+                      onClick={() => copiarParaClipboard(basicData.Name || "N/A", "nome")}
+                    >
+                      {copiado.nome ? <FiCheck color="#20bf55" /> : <FiCopy />}
+                    </button>
+                  </div>
 
-        <label>CPF:</label>
-        <div className="input-copy-group">
-          <input type="text" value={basicData.TaxIdNumber || "N/A"} disabled />
-          <button
-            type="button"
-            className="copy-btn"
-            title="Copiar CPF"
-            onClick={() => copiarParaClipboard(basicData.TaxIdNumber || "N/A", "cpf")}
-          >
-            {copiado.cpf ? <FiCheck color="#20bf55" /> : <FiCopy />}
-          </button>
-        </div>
+                  <label>CPF:</label>
+                  <div className="input-copy-group">
+                    <input type="text" value={basicData.TaxIdNumber || "N/A"} disabled />
+                    <button
+                      type="button"
+                      className="copy-btn"
+                      title="Copiar CPF"
+                      onClick={() => copiarParaClipboard(basicData.TaxIdNumber || "N/A", "cpf")}
+                    >
+                      {copiado.cpf ? <FiCheck color="#20bf55" /> : <FiCopy />}
+                    </button>
+                  </div>
 
-        <label>Situação Cadastral:</label>
-        <div className="input-copy-group">
-          <input type="text" value={basicData.TaxIdStatus || "N/A"} disabled />
-          <button
-            type="button"
-            className="copy-btn"
-            title="Copiar Situação"
-            onClick={() => copiarParaClipboard(basicData.TaxIdStatus || "N/A", "situacao")}
-          >
-            {copiado.situacao ? <FiCheck color="#20bf55" /> : <FiCopy />}
-          </button>
-        </div>
+                  <label>Situação Cadastral:</label>
+                  <div className="input-copy-group">
+                    <input type="text" value={basicData.TaxIdStatus || "N/A"} disabled />
+                    <button
+                      type="button"
+                      className="copy-btn"
+                      title="Copiar Situação"
+                      onClick={() => copiarParaClipboard(basicData.TaxIdStatus || "N/A", "situacao")}
+                    >
+                      {copiado.situacao ? <FiCheck color="#20bf55" /> : <FiCopy />}
+                    </button>
+                  </div>
 
-        <label>Data de Nascimento:</label>
-        <div className="input-copy-group">
-          <input type="text" value={formatDateBR(basicData.BirthDate)} disabled />
-          <button
-            type="button"
-            className="copy-btn"
-            title="Copiar Data de Nascimento"
-            onClick={() => copiarParaClipboard(formatDateBR(basicData.BirthDate), "nascimento")}
-          >
-            {copiado.nascimento ? <FiCheck color="#20bf55" /> : <FiCopy />}
-          </button>
-        </div>
+                  <label>Data de Nascimento:</label>
+                  <div className="input-copy-group">
+                    <input type="text" value={formatDateBR(basicData.BirthDate)} disabled />
+                    <button
+                      type="button"
+                      className="copy-btn"
+                      title="Copiar Data de Nascimento"
+                      onClick={() => copiarParaClipboard(formatDateBR(basicData.BirthDate), "nascimento")}
+                    >
+                      {copiado.nascimento ? <FiCheck color="#20bf55" /> : <FiCopy />}
+                    </button>
+                  </div>
 
-        <label>Idade:</label>
-        <div className="input-copy-group">
-          <input type="text" value={basicData.Age || "N/A"} disabled />
-          <button
-            type="button"
-            className="copy-btn"
-            title="Copiar Idade"
-            onClick={() => copiarParaClipboard(basicData.Age || "N/A", "idade")}
-          >
-            {copiado.idade ? <FiCheck color="#20bf55" /> : <FiCopy />}
-          </button>
-        </div>
+                  <label>Idade:</label>
+                  <div className="input-copy-group">
+                    <input type="text" value={basicData.Age || "N/A"} disabled />
+                    <button
+                      type="button"
+                      className="copy-btn"
+                      title="Copiar Idade"
+                      onClick={() => copiarParaClipboard(basicData.Age || "N/A", "idade")}
+                    >
+                      {copiado.idade ? <FiCheck color="#20bf55" /> : <FiCopy />}
+                    </button>
+                  </div>
 
-        <label>Nome da Mãe:</label>
-        <div className="input-copy-group">
-          <input type="text" value={basicData.MotherName || "N/A"} disabled />
-          <button
-            type="button"
-            className="copy-btn"
-            title="Copiar Nome da Mãe"
-            onClick={() => copiarParaClipboard(basicData.MotherName || "N/A", "mae")}
-          >
-            {copiado.mae ? <FiCheck color="#20bf55" /> : <FiCopy />}
-          </button>
-        </div>
+                  <label>Nome da Mãe:</label>
+                  <div className="input-copy-group">
+                    <input type="text" value={basicData.MotherName || "N/A"} disabled />
+                    <button
+                      type="button"
+                      className="copy-btn"
+                      title="Copiar Nome da Mãe"
+                      onClick={() => copiarParaClipboard(basicData.MotherName || "N/A", "mae")}
+                    >
+                      {copiado.mae ? <FiCheck color="#20bf55" /> : <FiCopy />}
+                    </button>
+                  </div>
 
-        <label>Gênero:</label>
-        <div className="input-copy-group">
-          <input type="text" value={basicData.Gender || "N/A"} disabled />
-          <button
-            type="button"
-            className="copy-btn"
-            title="Copiar Gênero"
-            onClick={() => copiarParaClipboard(basicData.Gender || "N/A", "genero")}
-          >
-            {copiado.genero ? <FiCheck color="#20bf55" /> : <FiCopy />}
-          </button>
-        </div>
+                  <label>Gênero:</label>
+                  <div className="input-copy-group">
+                    <input type="text" value={basicData.Gender || "N/A"} disabled />
+                    <button
+                      type="button"
+                      className="copy-btn"
+                      title="Copiar Gênero"
+                      onClick={() => copiarParaClipboard(basicData.Gender || "N/A", "genero")}
+                    >
+                      {copiado.genero ? <FiCheck color="#20bf55" /> : <FiCopy />}
+                    </button>
+                  </div>
 
-        <label>Nome Comum (Alias):</label>
-        <div className="input-copy-group">
-          <input type="text" value={basicData.Aliases?.CommonName || "N/A"} disabled />
-          <button
-            type="button"
-            className="copy-btn"
-            title="Copiar Alias"
-            onClick={() => copiarParaClipboard(basicData.Aliases?.CommonName || "N/A", "alias")}
-          >
-            {copiado.alias ? <FiCheck color="#20bf55" /> : <FiCopy />}
-          </button>
-        </div>
+                  <label>Nome Comum (Alias):</label>
+                  <div className="input-copy-group">
+                    <input type="text" value={basicData.Aliases?.CommonName || "N/A"} disabled />
+                    <button
+                      type="button"
+                      className="copy-btn"
+                      title="Copiar Alias"
+                      onClick={() => copiarParaClipboard(basicData.Aliases?.CommonName || "N/A", "alias")}
+                    >
+                      {copiado.alias ? <FiCheck color="#20bf55" /> : <FiCopy />}
+                    </button>
+                  </div>
 
-        <label>Indicação de Óbito:</label>
-        <div className="input-copy-group">
-          <input
-            type="text"
-            value={
-              basicData.HasObitIndication !== undefined
-                ? basicData.HasObitIndication ? "Sim" : "Não"
-                : "N/A"
-            }
-            disabled
-          />
-          <button
-            type="button"
-            className="copy-btn"
-            title="Copiar Óbito"
-            onClick={() =>
-              copiarParaClipboard(
-                basicData.HasObitIndication !== undefined
-                  ? basicData.HasObitIndication ? "Sim" : "Não"
-                  : "N/A",
-                "obito"
-              )
-            }
-          >
-            {copiado.obito ? <FiCheck color="#20bf55" /> : <FiCopy />}
-          </button>
-        </div>
-      </>
-    );
-  })()}
-</div>
+                  <label>Indicação de Óbito:</label>
+                  <div className="input-copy-group">
+                    <input
+                      type="text"
+                      value={
+                        basicData.HasObitIndication !== undefined
+                          ? basicData.HasObitIndication ? "Sim" : "Não"
+                          : "N/A"
+                      }
+                      disabled
+                    />
+                    <button
+                      type="button"
+                      className="copy-btn"
+                      title="Copiar Óbito"
+                      onClick={() =>
+                        copiarParaClipboard(
+                          basicData.HasObitIndication !== undefined
+                            ? basicData.HasObitIndication ? "Sim" : "Não"
+                            : "N/A",
+                          "obito"
+                        )
+                      }
+                    >
+                      {copiado.obito ? <FiCheck color="#20bf55" /> : <FiCopy />}
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
 
         )}
 
