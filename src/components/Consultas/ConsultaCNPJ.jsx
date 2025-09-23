@@ -281,7 +281,6 @@ const ConsultaCNPJ = () => {
     try {
       const response = await ConsultaService.realizarConsulta(payload);
       const apiData = response?.data ?? response;
-
       setResultado(apiData);
     } catch (err) {
       const friendly = getFriendlyError(err, payload);
@@ -339,6 +338,7 @@ const ConsultaCNPJ = () => {
               CNPJ: cnpjsParaConsulta[i],
               RazaoSocial: data.razao_social || "",
               Atividade: data.cnae_fiscal_descricao || "",
+              CNAE: data.cnae_fiscal || "",
               Municipio: data.municipio || "",
               UF: data.uf || "",
               Bairro: data.bairro || "",
@@ -618,6 +618,16 @@ const ConsultaCNPJ = () => {
             </button>
           </div>
 
+          <label>CNAE:</label>
+          <div className="input-copy-group">
+            <input type="text" value={cnpjData.cnae_fiscal || "N/A"} disabled />
+            <button type="button" className="copy-btn" title="Copiar CNAE Fiscal"
+              onClick={() => copiarParaClipboard(cnpjData.cnae_fiscal || "N/A", "cnae_fiscal")}>
+              {copiado.cnae_fiscal ? <FiCheck color="#20bf55" /> : <FiCopy />}
+            </button>
+          </div>
+
+
           <label style={{ marginBottom: 0 }}>Atividades Secundárias:</label>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
             <ul style={{ margin: 0, paddingLeft: 24 }}>
@@ -820,6 +830,7 @@ const ConsultaCNPJ = () => {
                             <p>
                               <strong>Situação Cadastral:</strong> {BD?.TaxIdStatus || "Não localizado"}
                             </p>
+                           
                             <p>
                               <strong>Telefone:</strong> {CT?.Phone1 || CT?.Phone2 || "N/A"}
                             </p>
