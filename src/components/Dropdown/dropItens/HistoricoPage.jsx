@@ -163,75 +163,79 @@ const HistoricoConsulta = () => {
 
       {!loading && !error && consultas.length > 0 && (
         <>
-          <table className="historico-table">
-            <thead>
-              <tr>
-                <th>Tipo de Consulta</th>
-                <th>Parâmetro</th>
-                <th>Realizada por</th>
-                <th>Data</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {consultasFiltradas.map((consulta) => (
-                <React.Fragment key={consulta.id}>
-                  <tr
-                    className={selectedConsultaId === consulta.id ? 'active-row' : ''}
-                    onClick={() => handleItemClick(consulta.id)}
-                  >
-                    <td data-label="Tipo de Consulta">{consulta.tipo_consulta_display || consulta.tipo_consulta}</td>
-                    <td data-label="Parâmetro">{getParametroDisplay(consulta)}</td>
-                    <td data-label="Realizada por">{consulta.usuario_email || 'N/A'}</td>
-                    <td data-label="Data">{new Date(consulta.data_consulta).toLocaleDateString()}</td>
-                    <td data-label="" className="expand-icon">
-                      <i className={`bi ${selectedConsultaId === consulta.id ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
-                    </td>
-                  </tr>
-
-                  {selectedConsultaId === consulta.id && (
-                    <tr>
-                      <td colSpan="5">
-                        <div className="detalhes-historico-panel">
-                          {detalhesLoading && <p className="detalhes-loading">Carregando detalhes...</p>}
-                          {detalhesError && <p className="detalhes-error">{detalhesError}</p>}
-
-                          {detalhesConsulta && detalhesConsulta.resultado && detalhesConsulta.resultado.Result && detalhesConsulta.resultado.Result.length > 0 ? (
-                            <div className="detalhes-content">
-                              <h4>Detalhes da Consulta #{detalhesConsulta.id}</h4>
-                              <p><strong>Tipo:</strong> {detalhesConsulta.tipo_consulta_display || detalhesConsulta.tipo_consulta}</p>
-                              <p><strong>Parâmetro:</strong> {getParametroDisplay(consultasFiltradas.find(c => c.id === detalhesConsulta.id) || detalhesConsulta, detalhesConsulta)}</p>
-                              <p><strong>Data/Hora Completa:</strong> {new Date(detalhesConsulta.data_consulta).toLocaleString()}</p>
-                              <p><strong>Realizada por:</strong> {detalhesConsulta.usuario_email || 'N/A'}</p>
-                              <p><strong>Origem:</strong> {detalhesConsulta.origem}</p>
-                              <p><strong>Tempo de Resposta:</strong> {detalhesConsulta.resultado.ElapsedMilliseconds || 'N/A'} ms</p>
-
-                              <div className="resultado-box">
-                                <h5>Resultado da Consulta:</h5>
-                                {detalhesConsulta.resultado.Result[0].BasicData && (
-                                  <>
-                                    <p><strong>Nome:</strong> {detalhesConsulta.resultado.Result[0].BasicData.Name || 'N/A'}</p>
-                                    <p><strong>Situação Cadastral:</strong> {detalhesConsulta.resultado.Result[0].BasicData.TaxIdStatus || 'N/A'}</p>
-                                    <p><strong>Data de Nascimento:</strong> {detalhesConsulta.resultado.Result[0].BasicData.CapturedBirthDateFromRFSource || 'N/A'}</p>
-                                    <p><strong>Nome da Mãe:</strong> {detalhesConsulta.resultado.Result[0].BasicData.MotherName || 'N/A'}</p>
-                                  </>
-                                )}
-                                {detalhesConsulta.resultado.Result[0].MatchKeys && (
-                                  <p><strong>Chave de Correspondência:</strong> {detalhesConsulta.resultado.Result[0].MatchKeys}</p>
-                                )}
-                              </div>
-                            </div>
-                          ) : (
-                            <p className="no-data-message">Nenhum resultado detalhado disponível para esta consulta.</p>
-                          )}
-                        </div>
+          {consultasFiltradas.length === 0 ? (
+            <p className="sem-consultas">Nenhum resultado encontrado para esse filtro.</p>
+          ) : (
+            <table className="historico-table">
+              <thead>
+                <tr>
+                  <th>Tipo de Consulta</th>
+                  <th>Parâmetro</th>
+                  <th>Realizada por</th>
+                  <th>Data</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {consultasFiltradas.map((consulta) => (
+                  <React.Fragment key={consulta.id}>
+                    <tr
+                      className={selectedConsultaId === consulta.id ? 'active-row' : ''}
+                      onClick={() => handleItemClick(consulta.id)}
+                    >
+                      <td data-label="Tipo de Consulta">{consulta.tipo_consulta_display || consulta.tipo_consulta}</td>
+                      <td data-label="Parâmetro">{getParametroDisplay(consulta)}</td>
+                      <td data-label="Realizada por">{consulta.usuario_email || 'N/A'}</td>
+                      <td data-label="Data">{new Date(consulta.data_consulta).toLocaleDateString()}</td>
+                      <td data-label="" className="expand-icon">
+                        <i className={`bi ${selectedConsultaId === consulta.id ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
                       </td>
                     </tr>
-                  )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
+
+                    {selectedConsultaId === consulta.id && (
+                      <tr>
+                        <td colSpan="5">
+                          <div className="detalhes-historico-panel">
+                            {detalhesLoading && <p className="detalhes-loading">Carregando detalhes...</p>}
+                            {detalhesError && <p className="detalhes-error">{detalhesError}</p>}
+
+                            {detalhesConsulta && detalhesConsulta.resultado && detalhesConsulta.resultado.Result && detalhesConsulta.resultado.Result.length > 0 ? (
+                              <div className="detalhes-content">
+                                <h4>Detalhes da Consulta #{detalhesConsulta.id}</h4>
+                                <p><strong>Tipo:</strong> {detalhesConsulta.tipo_consulta_display || detalhesConsulta.tipo_consulta}</p>
+                                <p><strong>Parâmetro:</strong> {getParametroDisplay(consultasFiltradas.find(c => c.id === detalhesConsulta.id) || detalhesConsulta, detalhesConsulta)}</p>
+                                <p><strong>Data/Hora Completa:</strong> {new Date(detalhesConsulta.data_consulta).toLocaleString()}</p>
+                                <p><strong>Realizada por:</strong> {detalhesConsulta.usuario_email || 'N/A'}</p>
+                                <p><strong>Origem:</strong> {detalhesConsulta.origem}</p>
+                                <p><strong>Tempo de Resposta:</strong> {detalhesConsulta.resultado.ElapsedMilliseconds || 'N/A'} ms</p>
+
+                                <div className="resultado-box">
+                                  <h5>Resultado da Consulta:</h5>
+                                  {detalhesConsulta.resultado.Result[0].BasicData && (
+                                    <>
+                                      <p><strong>Nome:</strong> {detalhesConsulta.resultado.Result[0].BasicData.Name || 'N/A'}</p>
+                                      <p><strong>Situação Cadastral:</strong> {detalhesConsulta.resultado.Result[0].BasicData.TaxIdStatus || 'N/A'}</p>
+                                      <p><strong>Data de Nascimento:</strong> {detalhesConsulta.resultado.Result[0].BasicData.CapturedBirthDateFromRFSource || 'N/A'}</p>
+                                      <p><strong>Nome da Mãe:</strong> {detalhesConsulta.resultado.Result[0].BasicData.MotherName || 'N/A'}</p>
+                                    </>
+                                  )}
+                                  {detalhesConsulta.resultado.Result[0].MatchKeys && (
+                                    <p><strong>Chave de Correspondência:</strong> {detalhesConsulta.resultado.Result[0].MatchKeys}</p>
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="no-data-message">Nenhum resultado detalhado disponível para esta consulta.</p>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          )}
           {renderPagination()}
         </>
       )}
