@@ -8,9 +8,12 @@ export const AgendaService = {
    * Busca todas as reservas de agenda do backend.
    * @returns {Promise<Array>} Uma promessa que retorna uma lista de reservas.
    */
-  getReservas: async () => {
+   getReservas: async (dataInicio, dataFim) => {
     try {
-      const response = await api.get(API_URL);
+      const params = {};
+        params.data_inicio = dataInicio;
+        params.data_fim = dataFim;
+      const response = await api.get(API_URL, { params });
       return response.data;
     } catch (error) {
       console.error("Erro ao buscar reservas:", error);

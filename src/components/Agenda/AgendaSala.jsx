@@ -5,7 +5,15 @@ import {
   FaChevronRight,
   FaCalendarAlt,
 } from "react-icons/fa";
-import { format, addDays, startOfWeek, startOfMonth, getDay, parseISO, startOfDay } from "date-fns";
+import {
+  format,
+  addDays,
+  startOfWeek,
+  startOfMonth,
+  getDay,
+  parseISO,
+  startOfDay,
+} from "date-fns";
 
 import ptBR from "date-fns/locale/pt-BR";
 import DatePicker from "react-datepicker";
@@ -23,15 +31,28 @@ function getFirstMondayOfMonth(date) {
 }
 
 const HORARIOS = [
-  "09:00", "10:00", "11:00", "12:00", "13:00",
-  "14:00", "15:00", "16:00", "17:00", "18:00",
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+  "18:00",
 ];
 
 const diasSemana = ["Seg", "Ter", "Qua", "Qui", "Sex"];
 
 const MonthButton = forwardRef(function MonthButton({ value, onClick }, ref) {
   return (
-    <button ref={ref} className="agenda-calendar-btn" title={value || "Escolher mês"} onClick={onClick}>
+    <button
+      ref={ref}
+      className="agenda-calendar-btn"
+      title={value || "Escolher mês"}
+      onClick={onClick}
+    >
       <FaCalendarAlt size={22} />
     </button>
   );
@@ -50,9 +71,9 @@ export default function AgendaSala() {
   const { user } = useAuth();
   const userRole = String(user?.nivel_acesso || "").toLowerCase();
 
-  const fetchReservas = async () => {
+  const fetchReservas = async (dataInicio, dataFim) => {
     try {
-      const response = await AgendaService.getReservas();
+      const response = await AgendaService.getReservas(dataInicio, dataFim);
       let data;
       if (response && response.results) {
         data = response.results;
@@ -71,7 +92,11 @@ export default function AgendaSala() {
     }
   };
 
-  useEffect(() => { fetchReservas(); }, [startDate]);
+  useEffect(() => {
+    const dataInicio = format(startDate, "yyyy-MM-dd");
+    const dataFim = format(addDays(startDate, 4), "yyyy-MM-dd");
+    fetchReservas(dataInicio, dataFim);
+  }, [startDate]);
 
   const handleWeekChange = (inc) => setStartDate(addDays(startDate, inc * 7));
 
@@ -96,11 +121,8 @@ export default function AgendaSala() {
       await AgendaService.createReserva(payload);
       closeModal();
       fetchReservas();
-    } catch (error) {
-
-    }
+    } catch (error) {}
   };
-
 
   const handleDeleteReserva = async (reservaParaDeletar) => {
     try {
@@ -145,7 +167,10 @@ export default function AgendaSala() {
               );
               const isLivre = reservasSlot.length === 0;
               return (
-                <td key={dIdx} className={`agenda-cell ${isLivre ? "livre" : "ocupado"}`}>
+                <td
+                  key={dIdx}
+                  className={`agenda-cell ${isLivre ? "livre" : "ocupado"}`}
+                >
                   {isLivre && dia >= startOfDay(new Date()) ? (
                     <button
                       className="agenda-slot-btn"
@@ -155,7 +180,6 @@ export default function AgendaSala() {
                       <FaPlus size={15} />
                     </button>
                   ) : isLivre ? (
-                   
                     <span style={{ color: "#f37171ff" }}></span>
                   ) : (
                     <button
@@ -244,7 +268,6 @@ export default function AgendaSala() {
           Reserva excluída com sucesso!
         </div>
       )}
-
     </div>
   );
 }
