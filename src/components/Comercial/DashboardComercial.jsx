@@ -6,7 +6,6 @@ import { AgendaComercialService } from "../../services/agenda_comercial";
 import "../styles/DashboardComercial.css";
 
 import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 
 export default function DashboardComercial() {
   const [visitas, setVisitas] = useState([]);
@@ -48,10 +47,7 @@ export default function DashboardComercial() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Visitas");
 
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-
-    saveAs(blob, "Relatorio_Visitas.xlsx");
+    XLSX.writeFile(wb, "Relatorio_Visitas.xlsx");
   }
 
   async function atualizarStatus(id, novoStatus) {
