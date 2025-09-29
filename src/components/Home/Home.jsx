@@ -11,7 +11,7 @@ function useIsMobile(breakpoint = 700) {
       setIsMobile(getIsMobile());
     }
     window.addEventListener("resize", handleResize);
-    handleResize(); 
+    handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, [breakpoint]);
 
@@ -76,6 +76,7 @@ const Home = () => {
     : bannerAtual.src.desktop;
 
   useEffect(() => {
+    console.log("isMobile?", isMobile, "bannerSrc:", bannerSrc);
   }, [isMobile, bannerSrc]);
 
   return (

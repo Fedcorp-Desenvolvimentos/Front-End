@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 import Login from './components/Login/Login';
-import EsqueciSenha from './components/Login/EsqueciSenha/EsqueciSenha';
+import EsqueciSenha from './components/Login/EsqueciSenha';
 
 import Home from './components/Home/Home';
 import ConsultasHome from './components/Consultas/ConsultasHome';
@@ -21,6 +21,9 @@ import EnvEmail from './components/Views/EnvEmail';
 import ConfigEmail from './components/Views/ConfigEmail';
 
 import AgendaSala from './components/Agenda/AgendaSala';
+
+import Acompanhamento from './components/Comercial/DashboardComercial'
+import AgendaComercial from './components/Comercial/AgendaComercial'
 
 import Conta from './components/Dropdown/dropItens/conta';
 import Config from './components/Dropdown/dropItens/Configuracoes';
@@ -84,6 +87,8 @@ function AppRoutes() {
             <Route path="/envio-email" element={<EnvEmail />} />
             <Route path="/config-email" element={<ConfigEmail />} />
             <Route path="/agenda" element={<AgendaSala />} />
+            <Route path="/acompanhamento" element={<Acompanhamento />} />
+            <Route path="/agenda-comercial" element={<AgendaComercial />} />
           </Route>
         </Route>
       </Routes>
