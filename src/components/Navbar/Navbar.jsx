@@ -136,7 +136,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               </li>
             )} */}
 
-             {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
+            {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
               <li className={location.pathname === "/agenda" ? "active" : ""}>
                 <Link to="/agenda">
                   <div className="sidebar-icon-tooltip">
