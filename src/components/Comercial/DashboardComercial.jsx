@@ -360,13 +360,15 @@ export default function DashboardComercial() {
           Exportar Relatório
         </button>
       </section>
+      <div className="dashboard-kanban">
+        <KanbanVisitas
+          visitas={filteredVisitas}
+          onConfirmar={abrirModalConfirmacao}
+          onStatusChange={atualizarStatus}
+          onCardClick={handleCardClick}
+        />
+      </div>
 
-      <KanbanVisitas
-        visitas={filteredVisitas}
-        onConfirmar={abrirModalConfirmacao}
-        onStatusChange={atualizarStatus}
-        onCardClick={handleCardClick}
-      />
 
       {visitaDetalhe && (
         <DetalheVisita
