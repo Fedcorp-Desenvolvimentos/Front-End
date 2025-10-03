@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import "../styles/AgendaComercial.css";
 import { AgendaComercialService } from "../../services/agenda_comercial";
 
@@ -7,75 +7,114 @@ function formatDateBR(iso) {
   const [y, m, d] = iso.split("-");
   return `${d}/${m}/${y}`;
 }
+function formatHour(h) {
+  return h?.slice(0, 5) || "--:--";
+}
+function sameMonthISO(iso, refDate) {
+  if (!iso) return false;
+  const [y, m] = iso.split("-");
+  return Number(y) === refDate.getFullYear() && Number(m) === refDate.getMonth() + 1;
+}
+function getMonthLabel(date) {
+  return date.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+}
+function addMonths(date, delta) {
+  const d = new Date(date.getTime());
+  d.setMonth(d.getMonth() + delta, 1);
+  return d;
+}
 
 const EMPTY_FORM = {
   empresa: "",
   data: "",
   hora: "",
-  endereco: "",
-  contato: "",
   observacao: "",
   status: "agendado",
 };
 
+const STATUS_ORDER = ["agendado", "realizada", "cancelada"];
+const STATUS_LABEL = {
+  agendado: "Agendado",
+  realizada: "Realizada",
+  cancelada: "Cancelada",
+};
+
 export default function AgendaComercial() {
+  // mês exibido (inicia no mês atual)
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    const d = new Date();
+    d.setDate(1);
+    return d;
+  });
+  const monthLabel = useMemo(() => getMonthLabel(currentMonth), [currentMonth]);
+
+  // filtros (apenas empresa)
+  const [filters, setFilters] = useState({ empresa: "" });
+
   const [visitas, setVisitas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
-  const [filters, setFilters] = useState({ text: "", date: "", status: "all" });
 
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [editId, setEditId] = useState(null);
   const isEditing = editId !== null;
 
-  // Novo: modal e controle para cancelar visita
+  // Cancelamento (com motivo)
   const [cancelarModal, setCancelarModal] = useState({ aberto: false, visita: null });
   const [motivoCancelamento, setMotivoCancelamento] = useState("");
   const [erroCancelamento, setErroCancelamento] = useState("");
 
-  async function fetchVisitas(f = filters) {
+  // quando o cancelamento é disparado a partir do modal de edição
+  const [pendingCancelFromEdit, setPendingCancelFromEdit] = useState(null); // { visitaId } | null
+
+  const fetchVisitas = useCallback(async () => {
     try {
       setLoading(true);
       setErro("");
       const response = await AgendaComercialService.getVisitas();
-      const visitasDaAPI = response.results;
+      const todas = Array.isArray(response?.results) ? response.results : [];
 
-      let visitasFiltradas = Array.isArray(visitasDaAPI) ? visitasDaAPI : [];
+      // filtra por mês escolhido
+      let doMes = todas.filter((v) => sameMonthISO(v.data, currentMonth));
 
-      if (f.text) {
-        const t = f.text.toLowerCase();
-        visitasFiltradas = visitasFiltradas.filter(v =>
-          (v.empresa || "").toLowerCase().includes(t)
-        );
+      // aplica filtro (empresa)
+      if (filters.empresa) {
+        const t = filters.empresa.toLowerCase();
+        doMes = doMes.filter((v) => (v.empresa || "").toLowerCase().includes(t));
       }
-      if (f.date) visitasFiltradas = visitasFiltradas.filter(v => v.data === f.date);
-      if (f.status !== "all") visitasFiltradas = visitasFiltradas.filter(v => v.status === f.status);
 
-      setVisitas(visitasFiltradas);
+      // ordena por data e hora
+      doMes.sort((a, b) => {
+        if (a.data === b.data) return (a.hora || "").localeCompare(b.hora || "");
+        return a.data.localeCompare(b.data);
+      });
+
+      setVisitas(doMes);
     } catch (e) {
       console.error("Erro ao carregar a agenda:", e);
       setErro("Falha ao carregar a agenda. Tente novamente.");
     } finally {
       setLoading(false);
     }
-  }
+  }, [currentMonth, filters.empresa]);
 
-  useEffect(() => { fetchVisitas(); }, []);
-  useEffect(() => { fetchVisitas(filters); }, [filters]);
+  useEffect(() => {
+    fetchVisitas();
+  }, [fetchVisitas]);
 
-  const grouped = useMemo(() => {
-    if (!Array.isArray(visitas)) {
-      return [];
+  // Agrupa para Kanban
+  const columns = useMemo(() => {
+    const map = { agendado: [], realizada: [], cancelada: [] };
+    for (const v of visitas) {
+      const s = (v.status || "agendado").toLowerCase();
+      if (map[s]) map[s].push(v);
+      else map.agendado.push(v);
     }
-    const byDate = {};
-    visitas.forEach(v => {
-      byDate[v.data] = byDate[v.data] || [];
-      byDate[v.data].push(v);
-    });
-    return Object.entries(byDate).sort(([a], [b]) => a.localeCompare(b));
+    return map;
   }, [visitas]);
 
+  // CRUD / Modais
   function openCreate() {
     setEditId(null);
     setForm(EMPTY_FORM);
@@ -83,6 +122,8 @@ export default function AgendaComercial() {
   }
 
   function openEdit(v) {
+    // só permite editar se status for "agendado"
+    if ((v.status || "").toLowerCase() !== "agendado") return;
     setEditId(v.id);
     setForm({
       empresa: v.empresa || "",
@@ -106,6 +147,17 @@ export default function AgendaComercial() {
       setErro("Preencha cliente/empresa e data.");
       return;
     }
+
+    // Se tentar salvar como Cancelada no modal de edição, exigir motivo
+    if (isEditing && form.status === "cancelada") {
+      setPendingCancelFromEdit({ visitaId: editId });
+      setModalOpen(false);
+      setCancelarModal({ aberto: true, visita: { id: editId } });
+      setMotivoCancelamento("");
+      setErroCancelamento("");
+      return; // não prossegue com o submit normal
+    }
+
     try {
       setErro("");
       const payload = {
@@ -115,7 +167,6 @@ export default function AgendaComercial() {
         obs: form.observacao,
         status: form.status,
       };
-
       if (isEditing) {
         await AgendaComercialService.confirmarVisita(editId, payload);
       } else {
@@ -129,13 +180,51 @@ export default function AgendaComercial() {
     }
   }
 
-  async function toggleStatus(v) {
-    const novoStatus = v.status === "agendado" ? "realizada" : "agendado";
-    await AgendaComercialService.updateVisitaStatus(v.id, novoStatus);
-    fetchVisitas();
+  async function updateStatus(id, novoStatus, extraPayload = {}) {
+    try {
+      await AgendaComercialService.updateVisitaStatus(id, novoStatus, extraPayload);
+      await fetchVisitas();
+    } catch (e) {
+      console.error("Erro ao atualizar status:", e);
+      setErro("Não foi possível atualizar o status.");
+    }
   }
 
+  // Drag & Drop — habilita só para "agendado"
+  function onDragStart(e, visita) {
+    if ((visita.status || "").toLowerCase() !== "agendado") return;
+    e.dataTransfer.setData("text/plain", String(visita.id));
+  }
+  function onDragOver(e) {
+    e.preventDefault();
+  }
+  function onDrop(e, targetStatus) {
+    e.preventDefault();
+    const id = e.dataTransfer.getData("text/plain");
+    const visita = visitas.find((v) => String(v.id) === id);
+    if (!visita) return;
+
+    // só permite arrastar a partir de "agendado"
+    if ((visita.status || "").toLowerCase() !== "agendado") return;
+
+    // Se o destino for "cancelada", exigir motivo via modal (não atualiza direto)
+    if (targetStatus === "cancelada") {
+      setPendingCancelFromEdit(null); // drop não veio do modal de edição
+      setCancelarModal({ aberto: true, visita });
+      setMotivoCancelamento("");
+      setErroCancelamento("");
+      return;
+    }
+
+    // Para outros destinos (ex.: realizada), atualiza normalmente
+    if ((visita.status || "agendado") !== targetStatus) {
+      updateStatus(visita.id, targetStatus);
+    }
+  }
+
+  // Cancelamento (sempre com motivo)
   function openCancelarModal(visita) {
+    setPendingCancelFromEdit(null); // botão do card, não é fluxo do modal de edição
     setCancelarModal({ aberto: true, visita });
     setMotivoCancelamento("");
     setErroCancelamento("");
@@ -152,112 +241,145 @@ export default function AgendaComercial() {
     }
     try {
       setErroCancelamento("");
-      // Ajuste o payload conforme seu backend. Aqui mandamos o motivo junto.
-      await AgendaComercialService.updateVisitaStatus(
-        cancelarModal.visita.id,
-        "cancelada",
-        { motivo_cancelamento: motivoCancelamento }
-      );
+
+      const targetId = cancelarModal.visita?.id || pendingCancelFromEdit?.visitaId;
+      if (!targetId) {
+        setErroCancelamento("Não foi possível identificar a visita.");
+        return;
+      }
+
+      await updateStatus(targetId, "cancelada", { motivo_cancelamento: motivoCancelamento });
+
+      if (pendingCancelFromEdit) {
+        setPendingCancelFromEdit(null);
+      }
+
       closeCancelarModal();
-      fetchVisitas();
-    } catch (err) {
+    } catch {
       setErroCancelamento("Erro ao cancelar a visita.");
     }
+  }
+
+  // Navegação de mês
+  function goPrevMonth() {
+    setCurrentMonth((d) => addMonths(d, -1));
+  }
+  function goNextMonth() {
+    setCurrentMonth((d) => addMonths(d, 1));
   }
 
   return (
     <div className="agenda-page">
       <header className="agenda-header">
-        <h2>Agenda Comercial</h2>
-        <button className="btn-primary" onClick={openCreate}>+ Nova Visita</button>
+        <div className="agenda-header-left">
+          <h2>Agenda Comercial</h2>
+        </div>
+        <div className="agenda-header-right">
+          <button className="btn-primary" onClick={openCreate}>+ Nova Visita</button>
+        </div>
       </header>
-      <div className="agenda-filtros">
+
+      {/* Filtros + mês */}
+      <div className="dashboard-filtros agenda-filtros">
         <input
           type="text"
           placeholder="Buscar por empresa…"
-          value={filters.text}
-          onChange={(e) => setFilters({ ...filters, text: e.target.value })}
+          value={filters.empresa}
+          onChange={(e) =>
+            setFilters((f) => ({ ...f, empresa: e.target.value }))
+          }
         />
-        <input
-          type="date"
-          value={filters.date}
-          onChange={(e) => setFilters({ ...filters, date: e.target.value })}
-        />
-        <select
-          value={filters.status}
-          onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+
+        <div className="dashboard-mes-controls">
+          <button className="month-btn" onClick={goPrevMonth} aria-label="Mês anterior">‹</button>
+          <span className="month-label">{monthLabel}</span>
+          <button className="month-btn" onClick={goNextMonth} aria-label="Próximo mês">›</button>
+        </div>
+
+        <button
+          className="btn-light"
+          onClick={() => setFilters({ empresa: "" })}
         >
-          <option value="all">Todos</option>
-          <option value="agendado">Agendado</option>
-          <option value="realizada">Realizada</option>
-          <option value="cancelada">Cancelada</option>
-        </select>
-        <button className="btn-light" onClick={() => setFilters({ text: "", date: "", status: "all" })}>
           Limpar
         </button>
       </div>
+
       {erro && <div className="alert error">{erro}</div>}
+
       {loading ? (
         <div className="skeleton">Carregando visitas…</div>
-      ) : grouped.length === 0 ? (
-        <div className="empty">Nenhuma visita encontrada.</div>
       ) : (
-        <div className="agenda-lista">
-          {grouped.map(([data, items]) => (
-            <section key={data} className="agenda-grupo">
-              <h3 className="grupo-titulo">📆 {formatDateBR(data)}</h3>
-              <div className="cards">
-                {items.map(v => (
-                  <article key={v.id} className={`card ${v.status}`}>
-                    <div className="card-head">
-                      <span className="hora">{v.hora}</span>
-                      <span className={`status ${v.status}`}>
-                        {v.status === "agendado"
-                          ? "Agendado"
-                          : v.status === "realizada"
-                            ? "Realizada"
-                            : v.status === "cancelada"
-                              ? "Cancelada"
-                              : v.status}
-                      </span>
-                    </div>
-                    <div className="card-body">
-                      <div className="linha"><strong>Cliente/Empresa:</strong> {v.empresa}</div>
-                      <div className="linha"><strong>Responsável:</strong> {v.responsavel?.nome_completo || ""}</div>
-                      {v.obs && <div className="obs">{v.obs}</div>}
-                      {v.status === "cancelada" && v.motivo_cancelamento && (
-                        <div className="obs-cancelada">
-                          <strong>Motivo do cancelamento:</strong> {v.motivo_cancelamento}
-                        </div>
-                      )}
-                    </div>
-                    <div className="card-actions">
-                      
-                      <div className="spacer" />
-                      <button className="btn-light" onClick={() => openEdit(v)}>Editar</button>
-                      {v.status === "agendado" && (
-                        <button className="btn-danger" onClick={() => openCancelarModal(v)}>
-                          Cancelar
-                        </button>
-                      )}
-                    </div>
+        <div className="kanban" role="list">
+          {STATUS_ORDER.map((status) => (
+            <section
+              key={status}
+              className={`kanban-col ${status}`}
+              onDragOver={onDragOver}
+              onDrop={(e) => onDrop(e, status)}
+              aria-label={`Coluna ${STATUS_LABEL[status]}`}
+            >
+              <header className="kanban-col-header">
+                <h3>{STATUS_LABEL[status]}</h3>
+                <span className="badge">{(columns[status] || []).length}</span>
+              </header>
 
-                  </article>
-                ))}
+              <div className="kanban-col-body">
+                {(columns[status] || []).length === 0 ? (
+                  <div className="empty-col">Sem registros</div>
+                ) : (
+                  columns[status].map((v) => (
+                    <article
+                      key={v.id}
+                      className={`kcard ${v.status} ${v.status === "agendado" ? "is-draggable" : "is-locked"}`}
+                      draggable={v.status === "agendado"}
+                      onDragStart={v.status === "agendado" ? (e) => onDragStart(e, v) : undefined}
+                      role="listitem"
+                    >
+                      <div className="kcard-head">
+                        <span className="kcard-date">{formatDateBR(v.data)}</span>
+                        <span className="kcard-hour">{formatHour(v.hora)}</span>
+                      </div>
+
+                      <div className="kcard-body">
+                        <div className="kline"><strong>Empresa:</strong> {v.empresa}</div>
+                        {v.responsavel?.nome_completo && (
+                          <div className="kline"><strong>Responsável:</strong> {v.responsavel.nome_completo}</div>
+                        )}
+                        {v.obs && <div className="kobs">{v.obs}</div>}
+                        {v.status === "cancelada" && v.motivo_cancelamento && (
+                          <div className="kobs-cancelada">
+                            <strong>Motivo:</strong> {v.motivo_cancelamento}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="kcard-actions">
+                        {v.status === "agendado" && (
+                          <>
+                            <button className="btn-light" onClick={() => openEdit(v)}>Editar</button>
+                            <button
+                              className="btn-danger"
+                              onClick={() => openCancelarModal(v)}
+                            >
+                              Cancelar
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </article>
+                  ))
+                )}
               </div>
             </section>
           ))}
         </div>
       )}
 
+      {/* Modal criar/editar */}
       {modalOpen && (
-        <div
-          className="modal-overlay"
-          role="presentation"
-          onClick={closeModal}
-        >
+        <div className="modal-overlay" role="presentation" onClick={closeModal}>
           <div
-            className="modal"
+            className="modal modal-wide"
             role="dialog"
             aria-modal="true"
             aria-labelledby="agenda-modal-title"
@@ -309,8 +431,10 @@ export default function AgendaComercial() {
                   >
                     <option value="agendado">Agendado</option>
                     <option value="realizada">Realizada</option>
+                    <option value="cancelada">Cancelada</option>
                   </select>
                 </label>
+
                 <label className="full">
                   Observação
                   <textarea
@@ -333,9 +457,10 @@ export default function AgendaComercial() {
         </div>
       )}
 
+      {/* Modal cancelamento (motivo obrigatório) */}
       {cancelarModal.aberto && (
         <div className="modal-overlay" onClick={closeCancelarModal}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Cancelar visita</h3>
               <button className="icon-btn" aria-label="Fechar" onClick={closeCancelarModal}>×</button>
@@ -346,17 +471,14 @@ export default function AgendaComercial() {
                 rows={4}
                 style={{ width: "100%" }}
                 value={motivoCancelamento}
-                onChange={e => setMotivoCancelamento(e.target.value)}
+                onChange={(e) => setMotivoCancelamento(e.target.value)}
                 placeholder="Motivo do cancelamento (obrigatório)"
               />
               {erroCancelamento && <div className="alert error">{erroCancelamento}</div>}
             </div>
             <div className="modal-actions">
               <button className="btn-light" onClick={closeCancelarModal}>Voltar</button>
-              <button
-                className="btn-danger"
-                onClick={handleCancelarVisita}
-              >Confirmar cancelamento</button>
+              <button className="btn-danger" onClick={handleCancelarVisita}>Confirmar cancelamento</button>
             </div>
           </div>
         </div>
