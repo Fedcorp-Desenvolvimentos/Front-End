@@ -33,9 +33,9 @@
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;  /* gráfico fica na ESQUERDA, botão na DIREITA */
+  justify-content: space-between;
   min-width: 0;
-  height: 180px;  /* altura baixa e fixa */
+  height: 180px;
   box-sizing: border-box;
   gap: 0;
 }
@@ -64,6 +64,7 @@
   margin-left: 18px;
   align-self: center;
 }
+
 .btn-exportar-relatorio:hover {
   background: #133a96;
 }
@@ -137,75 +138,15 @@
   font-weight: 700;
   box-shadow: 0 1px 4px #1858d610;
 }
+
 .kanban-card button:last-child {
   background: #f44336;
 }
+
 .kanban-card button:hover {
   filter: brightness(1.11);
 }
 
-@media (max-width: 1200px) {
-  .kanban-visitas {
-    gap: 14px;
-  }
-  .kanban-col {
-    min-width: 270px;
-    max-width: 99vw;
-    height: auto;
-  }
-  .dashboard-graph-container,
-  .dashboard-botao-exportar {
-    max-width: 99vw;
-  }
-  .graph-wrapper {
-    width: 99vw;
-    max-width: 95vw;
-  }
-}
-
-@media (max-width: 950px) {
-  .fedconnect-dashboard {
-    margin-left: 0;
-    padding: 12px 2vw 10px 2vw;
-  }
-  .kanban-visitas {
-    flex-direction: column;
-    gap: 14px;
-    align-items: stretch;
-  }
-  .kanban-col {
-    min-width: 0;
-    max-width: 99vw;
-    height: auto;
-  }
-  .dashboard-graph-container,
-  .dashboard-botao-exportar {
-    max-width: 99vw;
-  }
-}
-
-@media (max-width: 600px) {
-  .kanban-col {
-    padding: 11px 8px;
-    border-radius: 1rem;
-  }
-  .kanban-card {
-    padding: 9px 8px;
-    border-radius: .7rem;
-    font-size: .97rem;
-  }
-  .graph-wrapper {
-    height: 90px;
-    min-width: 90vw;
-    width: 99vw;
-    max-width: 99vw;
-  }
-  .dashboard-graph-container,
-  .dashboard-botao-exportar {
-    padding: 8px 2vw;
-    max-width: 99vw;
-  }
-}
 .modal-overlay {
   background: rgba(10, 20, 38, 0.38);
   position: fixed;
@@ -233,8 +174,15 @@
 }
 
 @keyframes modal-zoom {
-  from { transform: scale(0.97) translateY(20px); opacity: 0; }
-  to { transform: scale(1) translateY(0); opacity: 1; }
+  from {
+    transform: scale(0.97) translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }
 
 .modal-fedconnect h2 {
@@ -346,6 +294,7 @@
   margin-left: 7px;
   transition: background .14s;
 }
+
 .modal-fedconnect .btn-danger:hover {
   background: #b62315;
 }
@@ -363,25 +312,209 @@
   opacity: 0.7;
   transition: opacity .16s;
 }
+
 .modal-close:hover {
   opacity: 1;
 }
+
+.agenda-filtros {
+   display: flex !important;
+  align-items: center;
+  gap: 6px;                 /* espaçamento enxuto entre itens */
+  flex-wrap: nowrap;        /* mantém tudo na mesma linha em desktop */
+  margin: 0;
+}
+
+.agenda-filtros>input[type="text"] {
+  width: 80% !important;
+  max-width: none !important;
+  box-sizing: border-box;
+  height: 34px;
+  padding: 6px 10px;
+  font-size: 0.93rem;
+  border-radius: 10px;
+  border: 1px solid #dbeafe;
+  margin: 0 !important;
+}
+
+.agenda-filtros>select {
+  width: 180px;
+  height: 40px;
+  padding: 4px 8px;
+  font-size: 0.93rem;
+  border-radius: 10px;
+  border: 1px solid #dbeafe;
+  margin: 0 !important;
+  white-space: nowrap;
+}
+
+.agenda-filtros .dashboard-mes-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  height: 40px;
+  max-height: 38px;
+  border-radius: 8px;
+  background: #eef2ff;
+  box-shadow: none;
+  margin: 0 !important;
+}
+
+.agenda-filtros .dashboard-mes-controls .month-btn {
+  height: 26px;
+  min-width: 26px;
+  padding: 0 6px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+}
+
+.agenda-filtros .dashboard-mes-controls .month-label {
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px dashed #dbeafe;
+  background: #fff;
+  line-height: 1.1;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-filtros .dashboard-mes-controls .month-input {
+  height: 26px;
+  min-width: 96px;
+  font-size: 0.86rem;
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+/* 5) Botão Limpar compacto */
+.agenda-filtros>.btn-light {
+  height: 34px;
+  line-height: 34px;
+  padding: 0 10px;
+  font-size: 0.86rem;
+  border-radius: 10px;
+  white-space: nowrap;
+  margin: 0 !important;
+}
+
+/* 6) Responsivo: no mobile empilha normal */
+@media (max-width: 900px) {
+  .agenda-filtros {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .agenda-filtros>select,
+  .agenda-filtros>.btn-light {
+    width: 100%;
+  }
+
+  .agenda-filtros .dashboard-mes-controls {
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    flex-wrap: wrap;
+  }
+}
+
+
 
 @media (max-width: 600px) {
   .modal-fedconnect {
     max-width: 99vw;
     padding: 18px 4vw 8px 4vw;
   }
+
   .modal-fedconnect .modal-actions {
     flex-direction: column;
     gap: 9px;
   }
-  .modal-fedconnect .btn-primary, 
-  .modal-fedconnect .btn-secondary, 
+
+  .modal-fedconnect .btn-primary,
+  .modal-fedconnect .btn-secondary,
   .modal-fedconnect .btn-danger {
     width: 100%;
     font-size: 1.01rem;
     padding: 13px 0;
     margin: 0;
+  }
+}
+
+
+@media (max-width: 1200px) {
+  .kanban-visitas {
+    gap: 14px;
+  }
+
+  .kanban-col {
+    min-width: 270px;
+    max-width: 99vw;
+    height: auto;
+  }
+
+  .dashboard-graph-container,
+  .dashboard-botao-exportar {
+    max-width: 99vw;
+  }
+
+  .graph-wrapper {
+    width: 99vw;
+    max-width: 95vw;
+  }
+}
+
+@media (max-width: 950px) {
+  .fedconnect-dashboard {
+    margin-left: 0;
+    padding: 12px 2vw 10px 2vw;
+  }
+
+  .kanban-visitas {
+    flex-direction: column;
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  .kanban-col {
+    min-width: 0;
+    max-width: 99vw;
+    height: auto;
+  }
+
+  .dashboard-graph-container,
+  .dashboard-botao-exportar {
+    max-width: 99vw;
+  }
+}
+
+@media (max-width: 600px) {
+  .kanban-col {
+    padding: 11px 8px;
+    border-radius: 1rem;
+  }
+
+  .kanban-card {
+    padding: 9px 8px;
+    border-radius: .7rem;
+    font-size: .97rem;
+  }
+
+  .graph-wrapper {
+    height: 90px;
+    min-width: 90vw;
+    width: 99vw;
+    max-width: 99vw;
+  }
+
+  .dashboard-graph-container,
+  .dashboard-botao-exportar {
+    padding: 8px 2vw;
+    max-width: 99vw;
   }
 }

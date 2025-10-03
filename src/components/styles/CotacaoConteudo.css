@@ -203,10 +203,11 @@
   
 @media (min-width: 1400px) {
   .cotacao-container {
-    margin-left: 25vw !important;  
+    margin-left: 18vw !important;  
     max-width: 1200px !important;
     padding: 48px 48px 38px 48px !important;
     border-radius: 2rem !important;
+    margin-top: 3.5rem;
   }
 }
 

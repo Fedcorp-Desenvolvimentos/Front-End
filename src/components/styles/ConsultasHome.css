@@ -108,7 +108,7 @@
 /* DESKTOP GRANDE: Sidebar fixa */
 @media (min-width: 1500px) {
   .home-grid {
-    margin-left: 24vw;  
+    margin-left: 18vw;  
     margin-right: 0;
     padding-left: 0;
   }
