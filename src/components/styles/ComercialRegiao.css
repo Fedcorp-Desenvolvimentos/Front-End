@@ -277,10 +277,11 @@
 
 @media (min-width: 1400px) {
   .comercial-regiao-container {
-    margin-left: 34vw !important;   
+    margin-left: 31vw !important;   
     max-width: 800px !important;
     padding: 3rem 3rem !important;
     border-radius: 2rem !important;
+    margin-top: 5rem;
   }
 }
 
