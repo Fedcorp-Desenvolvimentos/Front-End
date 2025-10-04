@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaHome } from "react-icons/fa";
 import "../styles/CotacaoConteudo.css";
-import { calcularCotacao } from "../../services/cotacaoService";
+import cotacaoService from "../../services/cotacaoService";
 
 const CotacaoConteudo = () => {
   // Estados para os inputs
@@ -63,7 +63,7 @@ const CotacaoConteudo = () => {
 
     // 2. Chama a API
     try {
-      const response = await calcularCotacao(dadosParaEnvio);
+      const response = await cotacaoService.cotacaoIncendio(dadosParaEnvio);
       console.log(`Cotação:${response}`);
       // 3. Atualiza os estados com os resultados da API
       const resultados = response.data;

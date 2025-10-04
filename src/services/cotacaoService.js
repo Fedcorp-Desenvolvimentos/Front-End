@@ -1,7 +1,15 @@
-import api from "./api";
+import api from "./api"; // Garanta que o caminho para sua instância do Axios esteja correto
 
-export const calcularCotacao = async (payload) => {
-  const response = await api.post("cotacao/incendio-conteudo/", payload);
-
-  return response.data;
+const cotacaoService = {
+  cotacaoIncendio: async (paylod) => {
+    try {
+      const response = await api.post("cotacao/conteudo-incendio/", paylod);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao criar reserva:", error);
+      throw error;
+    }
+  },
 };
+
+export default cotacaoService;
