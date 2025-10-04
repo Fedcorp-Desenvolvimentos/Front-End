@@ -31,7 +31,7 @@ function normalizeDateYYYYMMDD(value) {
   try {
     const dt = new Date(value);
     if (!Number.isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
-  } catch { }
+  } catch {}
   return String(value);
 }
 
@@ -74,11 +74,16 @@ export default function DashboardComercial() {
     comercial: "all",
   });
 
-  async function fetchVisitas() {
+  async function fetchVisitas(month) {
     try {
       setLoading(true);
       setErro("");
-      const response = await AgendaComercialService.getVisitas();
+      const year = month.getFullYear();
+      const monthNumber = month.getMonth() + 1;
+      const response = await AgendaComercialService.getVisitas({
+        ano: year,
+        mes: monthNumber,
+      });
 
       const results =
         (Array.isArray(response?.results) && response.results) ||
@@ -116,8 +121,8 @@ export default function DashboardComercial() {
   }
 
   useEffect(() => {
-    fetchVisitas();
-  }, []);
+    fetchVisitas(activeMonth);
+  }, [activeMonth]);
 
   const comerciaisOptions = useMemo(() => {
     const set = new Set();
@@ -159,6 +164,8 @@ export default function DashboardComercial() {
       const vDate = parseISODate(vISO);
       if (!vDate || Number.isNaN(vDate.getTime())) return false;
 
+      // Este filtro de data agora é redundante, mas mantido para compatibilidade,
+      // pois os dados já virão filtrados do backend.
       const inActiveMonth = vDate >= monthStart && vDate <= monthEnd;
 
       return empresaOk && comercialOk && inActiveMonth;
@@ -224,7 +231,7 @@ export default function DashboardComercial() {
   async function atualizarStatus(id, novoStatus) {
     try {
       await AgendaComercialService.updateVisitaStatus(id, novoStatus);
-      fetchVisitas();
+      fetchVisitas(activeMonth);
     } catch (e) {
       console.error("Erro ao atualizar status:", e);
       setErro("Não foi possível atualizar o status.");
@@ -257,17 +264,33 @@ export default function DashboardComercial() {
       <div className="fedconnect-dashboard">
         <p>Carregando visitas...</p>
         <div className="dashboard-mes-controls">
-          <button className="month-btn" onClick={goPrevMonth} aria-label="Mês anterior">‹</button>
+          <button
+            className="month-btn"
+            onClick={goPrevMonth}
+            aria-label="Mês anterior"
+          >
+            ‹
+          </button>
           <span className="month-label">{monthLabel}</span>
-          <button className="month-btn" onClick={goNextMonth} aria-label="Próximo mês">›</button>
+          <button
+            className="month-btn"
+            onClick={goNextMonth}
+            aria-label="Próximo mês"
+          >
+            ›
+          </button>
           <input
             type="month"
             className="month-input"
             onChange={handleMonthInput}
             aria-label="Selecionar mês"
-            value={`${activeMonth.getFullYear()}-${String(activeMonth.getMonth() + 1).padStart(2, '0')}`}
+            value={`${activeMonth.getFullYear()}-${String(
+              activeMonth.getMonth() + 1
+            ).padStart(2, "0")}`}
           />
-          <button className="month-btn today" onClick={goTodayMonth}>Hoje</button>
+          <button className="month-btn today" onClick={goTodayMonth}>
+            Hoje
+          </button>
         </div>
       </div>
     );
@@ -279,17 +302,33 @@ export default function DashboardComercial() {
         <p className="alert error">{erro}</p>
 
         <div className="dashboard-mes-controls">
-          <button className="month-btn" onClick={goPrevMonth} aria-label="Mês anterior">‹</button>
+          <button
+            className="month-btn"
+            onClick={goPrevMonth}
+            aria-label="Mês anterior"
+          >
+            ‹
+          </button>
           <span className="month-label">{monthLabel}</span>
-          <button className="month-btn" onClick={goNextMonth} aria-label="Próximo mês">›</button>
+          <button
+            className="month-btn"
+            onClick={goNextMonth}
+            aria-label="Próximo mês"
+          >
+            ›
+          </button>
           <input
             type="month"
             className="month-input"
             onChange={handleMonthInput}
             aria-label="Selecionar mês"
-            value={`${activeMonth.getFullYear()}-${String(activeMonth.getMonth() + 1).padStart(2, '0')}`}
+            value={`${activeMonth.getFullYear()}-${String(
+              activeMonth.getMonth() + 1
+            ).padStart(2, "0")}`}
           />
-          <button className="month-btn today" onClick={goTodayMonth}>Hoje</button>
+          <button className="month-btn today" onClick={goTodayMonth}>
+            Hoje
+          </button>
         </div>
       </div>
     );
@@ -326,16 +365,38 @@ export default function DashboardComercial() {
         </select>
 
         <div className="dashboard-mes-controls">
-          <button className="month-btn" onClick={goPrevMonth} aria-label="Mês anterior">‹</button>
+          <button
+            className="month-btn"
+            onClick={goPrevMonth}
+            aria-label="Mês anterior"
+          >
+            ‹
+          </button>
           <span className="month-label">{monthLabel}</span>
-          <button className="month-btn" onClick={goNextMonth} aria-label="Próximo mês">›</button>
+          <button
+            className="month-btn"
+            onClick={goNextMonth}
+            aria-label="Próximo mês"
+          >
+            ›
+          </button>
+          <input
+            type="month"
+            className="month-input"
+            onChange={handleMonthInput}
+            aria-label="Selecionar mês"
+            value={`${activeMonth.getFullYear()}-${String(
+              activeMonth.getMonth() + 1
+            ).padStart(2, "0")}`}
+          />
+          <button className="month-btn today" onClick={goTodayMonth}>
+            Hoje
+          </button>
         </div>
 
         <button
           className="btn-light"
-          onClick={() =>
-            setFilters({ empresa: "", comercial: "all" })
-          }
+          onClick={() => setFilters({ empresa: "", comercial: "all" })}
         >
           Limpar
         </button>
@@ -368,7 +429,6 @@ export default function DashboardComercial() {
           onCardClick={handleCardClick}
         />
       </div>
-
 
       {visitaDetalhe && (
         <DetalheVisita
