@@ -1,5 +1,7 @@
 import api from "./api";
 
-export const calcularCotacao = (payload) => {
-  return api.post(API_URL + "cotacao/incendio-conteudo/", payload);
+export const calcularCotacao = async (payload) => {
+  const response = await api.post("cotacao/incendio-conteudo/", payload);
+
+  return response.data;
 };
