@@ -7,16 +7,25 @@ const CotacaoConteudo = () => {
   // Estados para os inputs
   const [incendio, setIncendio] = useState("");
   const [aluguel, setAluguel] = useState("");
-  const [premioProposto, setPremioProposto] = useState(""); // Adicionado
+  const [premioProposto, setPremioProposto] = useState("");
   const [repasse, setRepasse] = useState("");
 
   // Estados para os resultados da API
-  const [isTotal, setIsTotal] = useState(0);
-  const [premioBruto, setPremioBruto] = useState(0);
-  const [valorRepasse, setValorRepasse] = useState(0);
+  const [premioLiquido, setPremioLiquido] = useState(0);
+  const [comissaoAdministradora, setComissaoAdministradora] = useState(0);
+  const [assistenciaBasica, setAssistenciaBasica] = useState(0);
+  const [premioLiquidoSeguradora, setPremioLiquidoSeguradora] = useState(0);
+  const [premioBrutoSeguradora, setPremioBrutoSeguradora] = useState(0);
+  const [repasseSeguradoraBruto, setRepasseSeguradoraBruto] = useState(0);
+  const [imposto, setImposto] = useState(0);
+  const [repasseLiquido, setRepasseLiquido] = useState(0);
+  const [entradas, setEntradas] = useState(0);
+  const [saidas, setSaidas] = useState(0);
+  const [resultado, setResultado] = useState(0);
+  const [percentual, setPercentual] = useState(0);
   const [showResultado, setShowResultado] = useState(false);
 
-  // Funções de formatação (mantidas)
+  // Funções de formatação
   const desformatarMoeda = (valor) => {
     return Number(valor.replace(/\D/g, "")) / 100;
   };
@@ -37,6 +46,19 @@ const CotacaoConteudo = () => {
     return num.toString().replace(".", ",") + "%";
   };
 
+  const formatarValorParaMoeda = (valor) => {
+    if (typeof valor !== "number") return "R$ 0,00";
+    return valor.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
+
+  const formatarValorParaPorcentagem = (valor) => {
+    if (typeof valor !== "number") return "0%";
+    return `${valor.toFixed(2).replace(".", ",")}%`; // Retorna o valor direto se já vier em formato decimal
+  };
+
   const handleChange =
     (setter, type = "money") =>
     (e) => {
@@ -49,29 +71,35 @@ const CotacaoConteudo = () => {
       setShowResultado(false);
     };
 
-  // Nova função para lidar com o clique do botão
   const handleGerarResultado = async () => {
-    // 1. Desformata os valores dos inputs para enviar ao backend
     const dadosParaEnvio = {
       incendio_conteudo: desformatarMoeda(incendio),
       perda_aluguel: desformatarMoeda(aluguel),
-      premio_proposto: desformatarMoeda(premioProposto), // Adicionado
+      premio_proposto: desformatarMoeda(premioProposto),
       repasse_percentual: Number(
         repasse.replace("%", "").replace(",", ".") || 0
       ),
     };
 
-    // 2. Chama a API
     try {
       const response = await cotacaoService.cotacaoIncendio(dadosParaEnvio);
-      console.log(`Cotação:${response}`);
-      // 3. Atualiza os estados com os resultados da API
-      const resultados = response.data;
-      setIsTotal(resultados.is_total);
-      setPremioBruto(resultados.premio_bruto);
-      setValorRepasse(resultados.repasse_administradora);
+      console.log("Resposta da API:", response);
 
-      // 4. Mostra a seção de resultados
+      // Atualiza os estados com os dados formatados da API
+      setPremioLiquido(response.premio_liquido);
+      setComissaoAdministradora(response.comissao_administradora);
+      setAssistenciaBasica(response.assistencia_basica);
+      setPremioLiquidoSeguradora(response.premio_liquido_seguradora);
+      setPremioBrutoSeguradora(response.premio_bruto_seguradora);
+      setRepasseSeguradoraBruto(response.repasse_seguradora_bruto);
+      setImposto(response.imposto);
+      setRepasseLiquido(response.repasse_liquido);
+      setEntradas(response.entradas);
+      setSaidas(response.saidas);
+      setResultado(response.resultado);
+      setPercentual(response.percentual);
+
+      // Exibe a seção de resultados
       setShowResultado(true);
     } catch (error) {
       console.error("Erro ao calcular a cotação:", error);
@@ -81,6 +109,12 @@ const CotacaoConteudo = () => {
     }
   };
 
+  // Lógica para exibir IS Total e Repasse Administradora em tempo real
+  const isTotal = desformatarMoeda(incendio) + desformatarMoeda(aluguel);
+  const repasseAdministradora =
+    desformatarMoeda(premioProposto) *
+    (Number(repasse.replace("%", "").replace(",", ".")) / 100);
+
   return (
     <div className="cotacao-container">
       <div className="icone-cabecalho">
@@ -89,6 +123,7 @@ const CotacaoConteudo = () => {
       <h2 className="titulo-pagina">Estudo – Incêndio Conteúdo</h2>
 
       <div className="input-grid">
+        {/* Campos de Input */}
         <div className="campo">
           <label>Incêndio Conteúdo (R$)</label>
           <input
@@ -111,19 +146,12 @@ const CotacaoConteudo = () => {
 
         <div className="campo readonly">
           <label>IS Total (R$)</label>
-          <input
-            type="text"
-            value={isTotal.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
-            readOnly
-          />
+          <input type="text" value={formatarValorParaMoeda(isTotal)} readOnly />
         </div>
 
         <div className="campo">
           <label>Prêmio Proposto (R$)</label>
-          <input // Adicionado
+          <input
             type="text"
             value={premioProposto}
             onChange={handleChange(setPremioProposto)}
@@ -143,13 +171,10 @@ const CotacaoConteudo = () => {
         </div>
 
         <div className="campo readonly">
-          <label>Repasse Administradora</label>
+          <label>Repasse Administradora (R$)</label>
           <input
             type="text"
-            value={valorRepasse.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
+            value={formatarValorParaMoeda(repasseAdministradora)}
             readOnly
           />
         </div>
@@ -164,21 +189,106 @@ const CotacaoConteudo = () => {
       </button>
 
       {showResultado && (
-        <div className="resultado-fedcorp-linha">
-          <div className="campo readonly">
-            <label>Resultado Fedcorp</label>
-            <input
-              type="text"
-              value={(premioBruto - valorRepasse).toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-              readOnly
-            />
+        <div className="resultados-container">
+          <div className="linha-resultado">
+            <div className="campo readonly">
+              <label>Prêmio Líquido (R$)</label>
+              <input
+                type="text"
+                value={formatarValorParaMoeda(premioLiquido)}
+                readOnly
+              />
+            </div>
+            <div className="campo readonly">
+              <label>Comissão Administradora (R$)</label>
+              <input
+                type="text"
+                value={formatarValorParaMoeda(comissaoAdministradora)}
+                readOnly
+              />
+            </div>
           </div>
-          <div className="campo readonly">
-            <label>Repasse Fedcorp (%)</label>
-            <span className="ferramenta-em-breve">Em Produção</span>
+          <div className="linha-resultado">
+            <div className="campo readonly">
+              <label>Assistência Básica (R$)</label>
+              <input
+                type="text"
+                value={formatarValorParaMoeda(assistenciaBasica)}
+                readOnly
+              />
+            </div>
+            <div className="campo readonly">
+              <label>Prêmio Líquido Seguradora (R$)</label>
+              <input
+                type="text"
+                value={formatarValorParaMoeda(premioLiquidoSeguradora)}
+                readOnly
+              />
+            </div>
+          </div>
+          <div className="linha-resultado">
+            <div className="campo readonly">
+              <label>Prêmio Bruto Seguradora (R$)</label>
+              <input
+                type="text"
+                value={formatarValorParaMoeda(premioBrutoSeguradora)}
+                readOnly
+              />
+            </div>
+            <div className="campo readonly">
+              <label>Repasse Seguradora Bruto (R$)</label>
+              <input
+                type="text"
+                value={formatarValorParaMoeda(repasseSeguradoraBruto)}
+                readOnly
+              />
+            </div>
+          </div>
+          <div className="linha-resultado">
+            <div className="campo readonly">
+              <label>Repasse Líquido (R$)</label>
+              <input
+                type="text"
+                value={formatarValorParaMoeda(repasseLiquido)}
+                readOnly
+              />
+            </div>
+            <div className="campo readonly">
+              <label>Entradas (R$)</label>
+              <input
+                type="text"
+                value={formatarValorParaMoeda(entradas)}
+                readOnly
+              />
+            </div>
+          </div>
+          <div className="linha-resultado">
+            <div className="campo readonly">
+              <label>Saídas (R$)</label>
+              <input
+                type="text"
+                value={formatarValorParaMoeda(saidas)}
+                readOnly
+              />
+            </div>
+            <div className="campo readonly">
+              <label>Resultado (R$)</label>
+              <input
+                type="text"
+                value={formatarValorParaMoeda(resultado)}
+                readOnly
+              />
+            </div>
+          </div>
+          <div className="resultado-final-linha">
+            <div className="campo readonly">
+              <label>Resultado Final (%)</label>
+              <input
+                type="text"
+                value={formatarValorParaPorcentagem(percentual)}
+                readOnly
+              />
+            </div>
           </div>
         </div>
       )}

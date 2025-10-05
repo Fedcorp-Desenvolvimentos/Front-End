@@ -3,7 +3,7 @@ import api from "./api"; // Garanta que o caminho para sua instância do Axios e
 const cotacaoService = {
   cotacaoIncendio: async (paylod) => {
     try {
-      const response = await api.post("cotacao/conteudo-incendio/", paylod);
+      const response = await api.post("cotacao/incendio-conteudo/", paylod);
       return response.data;
     } catch (error) {
       console.error("Erro ao criar reserva:", error);
