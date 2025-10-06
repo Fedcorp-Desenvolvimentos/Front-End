@@ -4,13 +4,14 @@ import "../styles/CotacaoConteudo.css";
 import cotacaoService from "../../services/cotacaoService";
 
 const CotacaoConteudo = () => {
-  // Estados para os inputs
+  const [tipoImovel, setTipoImovel] = useState("residencial");
+  const [assistencia, setAssistencia] = useState("basica");
+
   const [incendio, setIncendio] = useState("");
   const [aluguel, setAluguel] = useState("");
   const [premioProposto, setPremioProposto] = useState("");
   const [repasse, setRepasse] = useState("");
 
-  // Estados para os resultados da API
   const [premioLiquido, setPremioLiquido] = useState(0);
   const [comissaoAdministradora, setComissaoAdministradora] = useState(0);
   const [assistenciaBasica, setAssistenciaBasica] = useState(0);
@@ -25,21 +26,15 @@ const CotacaoConteudo = () => {
   const [percentual, setPercentual] = useState(0);
   const [showResultado, setShowResultado] = useState(false);
 
-  // Funções de formatação
-  const desformatarMoeda = (valor) => {
-    return Number(valor.replace(/\D/g, "")) / 100;
-  };
+  const desformatarMoeda = (valor) => Number(String(valor).replace(/\D/g, "")) / 100;
 
   const formatarMoeda = (valor) => {
-    const num = Number(valor.replace(/\D/g, "")) / 100;
-    return num.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
+    const num = Number(String(valor).replace(/\D/g, "")) / 100;
+    return num.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   };
 
   const formatarPorcentagem = (valor) => {
-    let num = valor.replace(/[^0-9.,]/g, "").replace(",", ".");
+    let num = String(valor).replace(/[^0-9.,]/g, "").replace(",", ".");
     if (num === "") return "";
     num = parseFloat(num);
     if (isNaN(num)) return "";
@@ -48,7 +43,7 @@ const CotacaoConteudo = () => {
 
   const formatarValorParaMoeda = (valor) => {
     if (typeof valor !== "number") return "R$ 0,00";
-    return valor.toLocaleString("pt-BR", {
+    return Number(valor).toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
     });
@@ -56,28 +51,27 @@ const CotacaoConteudo = () => {
 
   const formatarValorParaPorcentagem = (valor) => {
     if (typeof valor !== "number") return "0%";
-    return `${valor.toFixed(2).replace(".", ",")}%`; // Retorna o valor direto se já vier em formato decimal
+    return `${Number(valor).toFixed(2).replace(".", ",")}%`;
   };
 
   const handleChange =
     (setter, type = "money") =>
-    (e) => {
-      const valor = e.target.value;
-      if (type === "percent") {
-        setter(formatarPorcentagem(valor));
-      } else {
-        setter(formatarMoeda(valor));
-      }
-      setShowResultado(false);
-    };
+      (e) => {
+        const valor = e.target.value;
+        if (type === "percent") setter(formatarPorcentagem(valor));
+        else setter(formatarMoeda(valor));
+        setShowResultado(false);
+      };
 
   const handleGerarResultado = async () => {
     const dadosParaEnvio = {
+      tipo_imovel: tipoImovel,
+      assistencia_tipo: assistencia,
       incendio_conteudo: desformatarMoeda(incendio),
       perda_aluguel: desformatarMoeda(aluguel),
       premio_proposto: desformatarMoeda(premioProposto),
       repasse_percentual: Number(
-        repasse.replace("%", "").replace(",", ".") || 0
+        String(repasse).replace("%", "").replace(",", ".") || 0
       ),
     };
 
@@ -85,7 +79,6 @@ const CotacaoConteudo = () => {
       const response = await cotacaoService.cotacaoIncendio(dadosParaEnvio);
       console.log("Resposta da API:", response);
 
-      // Atualiza os estados com os dados formatados da API
       setPremioLiquido(response.premio_liquido);
       setComissaoAdministradora(response.comissao_administradora);
       setAssistenciaBasica(response.assistencia_basica);
@@ -99,21 +92,20 @@ const CotacaoConteudo = () => {
       setResultado(response.resultado);
       setPercentual(response.percentual);
 
-      // Exibe a seção de resultados
       setShowResultado(true);
     } catch (error) {
       console.error("Erro ao calcular a cotação:", error);
-      alert(
-        "Ocorreu um erro ao gerar o resultado. Verifique os dados e tente novamente."
-      );
+      alert("Ocorreu um erro ao gerar o resultado. Verifique os dados e tente novamente.");
     }
   };
 
-  // Lógica para exibir IS Total e Repasse Administradora em tempo real
   const isTotal = desformatarMoeda(incendio) + desformatarMoeda(aluguel);
   const repasseAdministradora =
     desformatarMoeda(premioProposto) *
-    (Number(repasse.replace("%", "").replace(",", ".")) / 100);
+    (Number(String(repasse).replace("%", "").replace(",", ".")) / 100);
+
+  const labelAssistencia =
+    assistencia === "faz_tudo_lar" ? "Assistência Faz Tudo Lar (R$)" : "Assistência Básica (R$)";
 
   return (
     <div className="cotacao-container">
@@ -122,8 +114,63 @@ const CotacaoConteudo = () => {
       </div>
       <h2 className="titulo-pagina">Estudo – Incêndio Conteúdo</h2>
 
+      {/* Flags lado a lado */}
+      <div className="flags-grid">
+        <div className="campo">
+          <label>Tipo do Imóvel</label>
+          <div className="opcoes-tipo">
+            <label>
+              <input
+                type="radio"
+                name="tipoImovel"
+                value="residencial"
+                checked={tipoImovel === "residencial"}
+                onChange={() => { setTipoImovel("residencial"); setShowResultado(false); }}
+              />
+              Residencial
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="tipoImovel"
+                value="comercial"
+                checked={tipoImovel === "comercial"}
+                onChange={() => { setTipoImovel("comercial"); setShowResultado(false); }}
+              />
+              Comercial
+            </label>
+          </div>
+        </div>
+
+        <div className="campo">
+          <label>Assistência</label>
+          <div className="opcoes-tipo">
+            <label>
+              <input
+                type="radio"
+                name="assistencia"
+                value="basica"
+                checked={assistencia === "basica"}
+                onChange={() => { setAssistencia("basica"); setShowResultado(false); }}
+              />
+              Básica
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="assistencia"
+                value="faz_tudo_lar"
+                checked={assistencia === "faz_tudo_lar"}
+                onChange={() => { setAssistencia("faz_tudo_lar"); setShowResultado(false); }}
+              />
+              Faz Tudo Lar
+            </label>
+          </div>
+        </div>
+      </div>
+
+
       <div className="input-grid">
-        {/* Campos de Input */}
         <div className="campo">
           <label>Incêndio Conteúdo (R$)</label>
           <input
@@ -208,9 +255,10 @@ const CotacaoConteudo = () => {
               />
             </div>
           </div>
+
           <div className="linha-resultado">
             <div className="campo readonly">
-              <label>Assistência Básica (R$)</label>
+              <label>{labelAssistencia}</label>
               <input
                 type="text"
                 value={formatarValorParaMoeda(assistenciaBasica)}
@@ -226,6 +274,7 @@ const CotacaoConteudo = () => {
               />
             </div>
           </div>
+
           <div className="linha-resultado">
             <div className="campo readonly">
               <label>Prêmio Bruto Seguradora (R$)</label>
@@ -244,6 +293,7 @@ const CotacaoConteudo = () => {
               />
             </div>
           </div>
+
           <div className="linha-resultado">
             <div className="campo readonly">
               <label>Repasse Líquido (R$)</label>
@@ -262,6 +312,7 @@ const CotacaoConteudo = () => {
               />
             </div>
           </div>
+
           <div className="linha-resultado">
             <div className="campo readonly">
               <label>Saídas (R$)</label>
@@ -280,6 +331,7 @@ const CotacaoConteudo = () => {
               />
             </div>
           </div>
+
           <div className="resultado-final-linha">
             <div className="campo readonly">
               <label>Resultado Final (%)</label>
