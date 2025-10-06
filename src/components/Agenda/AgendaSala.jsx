@@ -105,7 +105,6 @@ export default function AgendaSala() {
     setSelectedSlot(null);
   };
 
-  // checa conflito localmente
   const isSlotDisponivel = (dataDateObj, horario) => {
     const alvo = format(dataDateObj, "yyyy-MM-dd");
     return !reservas.some(
@@ -208,7 +207,7 @@ export default function AgendaSala() {
                   ) : isLivre ? (
                     <span style={{ color: "#f37171ff" }}></span>
                   ) : (
-                    // Sempre mostra "Reservado" e abre o detalhe; o tema fica só no modal
+                    
                     <button
                       className="agenda-reservado-pill"
                       title="Ver detalhes"
