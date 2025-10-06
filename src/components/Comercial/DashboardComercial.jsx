@@ -422,6 +422,7 @@ export default function DashboardComercial() {
             </option>
           ))}
         </select>
+
         <input
           type="month"
           className="month-input"
@@ -431,7 +432,6 @@ export default function DashboardComercial() {
             activeMonth.getMonth() + 1
           ).padStart(2, "0")}`}
         />
-
 
         <button
           className="btn-light"
@@ -519,31 +519,6 @@ export default function DashboardComercial() {
         />
       )}
 
-      {/* Se você já possui modal em outro lugar, remova este bloco */}
-      {modal && (
-        <div className="modal-overlay" onClick={() => setModal(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <h3>Confirmar cancelamento</h3>
-            <p>
-              Deseja cancelar a visita de <strong>{modal?.empresa}</strong>?
-            </p>
-            <div className="modal-actions">
-              <button className="btn-light" onClick={() => setModal(null)}>
-                Voltar
-              </button>
-              <button
-                className="btn-danger"
-                onClick={async () => {
-                  await atualizarStatus(String(modal?.id), "cancelada");
-                  setModal(null);
-                }}
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
