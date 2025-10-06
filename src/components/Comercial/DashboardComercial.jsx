@@ -6,6 +6,7 @@ import { AgendaComercialService } from "../../services/agenda_comercial";
 import "../styles/DashboardComercial.css";
 import * as XLSX from "xlsx";
 
+/* ==================== utils ==================== */
 function toBRDate(d) {
   try {
     if (!d) return "N/A";
@@ -31,7 +32,7 @@ function normalizeDateYYYYMMDD(value) {
   try {
     const dt = new Date(value);
     if (!Number.isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
-  } catch {}
+  } catch { }
   return String(value);
 }
 
@@ -57,6 +58,119 @@ function getMonthBounds(date) {
   return { start, end };
 }
 
+/* ==================== hook de breakpoint ==================== */
+function useIsMobile(maxWidth = 768) {
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined"
+      ? window.matchMedia(`(max-width:${maxWidth}px)`).matches
+      : false
+  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia(`(max-width:${maxWidth}px)`);
+    const onChange = (e) => setIsMobile(e.matches);
+    mq.addEventListener?.("change", onChange);
+    mq.addListener?.(onChange);
+    return () => {
+      mq.removeEventListener?.("change", onChange);
+      mq.removeListener?.(onChange);
+    };
+  }, [maxWidth]);
+  return isMobile;
+}
+
+/* ==================== helpers para status ==================== */
+function normalizeStatus(raw) {
+  const s = String(raw || "").trim().toLowerCase();
+  if (s.includes("agend")) return "agendadas";
+  if (s.includes("realiz") || s.includes("feito") || s.includes("conclu"))
+    return "realizadas";
+  if (s.includes("cancel")) return "canceladas";
+  return "outras";
+}
+function groupByStatus(visitas) {
+  const groups = { agendadas: [], realizadas: [], canceladas: [], outras: [] };
+  (visitas || []).forEach((v) => {
+    const key = normalizeStatus(v.status);
+    (groups[key] || groups.outras).push(v);
+  });
+  return groups;
+}
+function StatusPill({ status }) {
+  const st = normalizeStatus(status);
+  return <span className={`pill pill-${st}`}>{status || "—"}</span>;
+}
+
+/* ==================== Accordion Mobile ==================== */
+function MobileAccordionVisitas({ visitas, onCardClick }) {
+  const groups = useMemo(() => groupByStatus(visitas), [visitas]);
+  const [openKey, setOpenKey] = useState("agendadas");
+
+  const sections = [
+    { key: "agendadas", title: `Agendadas (${groups.agendadas.length})` },
+    { key: "realizadas", title: `Realizadas (${groups.realizadas.length})` },
+    { key: "canceladas", title: `Canceladas (${groups.canceladas.length})` },
+  ];
+
+  return (
+    <div className="accordion">
+      {sections.map((sec) => (
+        <div key={sec.key} className="accordion-item">
+          <button
+            className="accordion-header"
+            aria-expanded={openKey === sec.key}
+            onClick={() => setOpenKey((k) => (k === sec.key ? "" : sec.key))}
+          >
+            <span>{sec.title}</span>
+            <span className="chevron" aria-hidden>
+              ▾
+            </span>
+          </button>
+
+          <div
+            className={`accordion-content ${openKey === sec.key ? "open" : ""
+              }`}
+          >
+            {groups[sec.key].length === 0 ? (
+              <div className="empty">Sem registros</div>
+            ) : (
+              <ul className="accordion-list">
+                {groups[sec.key].map((v) => {
+                  const id = String(v?.id ?? "");
+                  return (
+                    <li key={id} className="accordion-card">
+                      <button
+                        className="card-main"
+                        onClick={() => onCardClick?.(v)}
+                        aria-label={`Detalhes da visita ${v?.empresa || ""}`}
+                      >
+                        <div className="card-title">
+                          <strong>{v?.empresa || "—"}</strong>
+                        </div>
+                        <div className="card-meta">
+                          <span>{toBRDate(v?.data)}</span>
+                          <span>•</span>
+                          <span>
+                            {getComercialName(v) || "Sem responsável"}
+                          </span>
+                        </div>
+                        <div className="card-status">
+                          <StatusPill status={v?.status} />
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ==================== componente principal ==================== */
 export default function DashboardComercial() {
   const [visitas, setVisitas] = useState([]);
   const [modal, setModal] = useState(null);
@@ -74,12 +188,16 @@ export default function DashboardComercial() {
     comercial: "all",
   });
 
+  const isMobile = useIsMobile(768);
+
   async function fetchVisitas(month) {
     try {
       setLoading(true);
       setErro("");
       const year = month.getFullYear();
       const monthNumber = month.getMonth() + 1;
+
+      // NOVO: backend agora recebe ano/mes
       const response = await AgendaComercialService.getVisitas({
         ano: year,
         mes: monthNumber,
@@ -104,10 +222,7 @@ export default function DashboardComercial() {
           v?.detalhes_cancelamento?.motivo ??
           v?.cancel?.reason ??
           "";
-        return {
-          ...v,
-          motivo_cancelamento: String(motivo || "").trim(),
-        };
+        return { ...v, motivo_cancelamento: String(motivo || "").trim() };
       });
 
       setVisitas(normalized);
@@ -147,7 +262,6 @@ export default function DashboardComercial() {
 
   const filteredVisitas = useMemo(() => {
     if (!Array.isArray(visitas)) return [];
-
     const empresaTerm = filters.empresa.trim().toLowerCase();
     const comercialSel = filters.comercial;
 
@@ -155,7 +269,6 @@ export default function DashboardComercial() {
       const empresaOk = empresaTerm
         ? (v?.empresa || "").toLowerCase().includes(empresaTerm)
         : true;
-
       const comercialNome = getComercialName(v);
       const comercialOk =
         comercialSel === "all" ? true : comercialNome === comercialSel;
@@ -164,13 +277,22 @@ export default function DashboardComercial() {
       const vDate = parseISODate(vISO);
       if (!vDate || Number.isNaN(vDate.getTime())) return false;
 
-      // Este filtro de data agora é redundante, mas mantido para compatibilidade,
-      // pois os dados já virão filtrados do backend.
+      // Mantido por segurança; back já filtra por ano/mes
       const inActiveMonth = vDate >= monthStart && vDate <= monthEnd;
 
       return empresaOk && comercialOk && inActiveMonth;
     });
   }, [visitas, filters, monthStart, monthEnd]);
+
+  /* ====== totalizador para mobile ====== */
+  const totals = useMemo(() => {
+    const g = groupByStatus(filteredVisitas);
+    return {
+      agendadas: g.agendadas.length,
+      realizadas: g.realizadas.length,
+      canceladas: g.canceladas.length,
+    };
+  }, [filteredVisitas]);
 
   function exportarRelatorioExcel() {
     try {
@@ -194,12 +316,12 @@ export default function DashboardComercial() {
 
       const ws = XLSX.utils.json_to_sheet(dadosParaExportar);
       ws["!cols"] = [
-        { wch: 30 }, // Empresa
-        { wch: 12 }, // Data
-        { wch: 16 }, // Status
-        { wch: 28 }, // Responsável
-        { wch: 34 }, // Motivo Cancelamento
-        { wch: 40 }, // Observações
+        { wch: 30 },
+        { wch: 12 },
+        { wch: 16 },
+        { wch: 28 },
+        { wch: 34 },
+        { wch: 40 },
       ];
 
       const wb = XLSX.utils.book_new();
@@ -208,7 +330,6 @@ export default function DashboardComercial() {
       const filename = `Relatorio_Visitas_${new Date()
         .toISOString()
         .slice(0, 10)}.xlsx`;
-
       if (typeof XLSX.writeFile === "function") {
         XLSX.writeFile(wb, filename, { compression: true });
         return;
@@ -228,6 +349,7 @@ export default function DashboardComercial() {
     setVisitaDetalhe(merged);
   }
 
+  // Mantidos para o Kanban desktop (se necessário)
   async function atualizarStatus(id, novoStatus) {
     try {
       await AgendaComercialService.updateVisitaStatus(id, novoStatus);
@@ -237,11 +359,11 @@ export default function DashboardComercial() {
       setErro("Não foi possível atualizar o status.");
     }
   }
-
   function abrirModalConfirmacao(visita) {
     setModal(visita);
   }
 
+  // CONTROLE ÚNICO DE MÊS
   function goPrevMonth() {
     setActiveMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
   }
@@ -254,44 +376,11 @@ export default function DashboardComercial() {
     const [y, m] = value.split("-").map(Number);
     if (y && m) setActiveMonth(new Date(y, m - 1, 1));
   }
-  function goTodayMonth() {
-    const now = new Date();
-    setActiveMonth(new Date(now.getFullYear(), now.getMonth(), 1));
-  }
 
   if (loading) {
     return (
       <div className="fedconnect-dashboard">
         <p>Carregando visitas...</p>
-        <div className="dashboard-mes-controls">
-          <button
-            className="month-btn"
-            onClick={goPrevMonth}
-            aria-label="Mês anterior"
-          >
-            ‹
-          </button>
-          <span className="month-label">{monthLabel}</span>
-          <button
-            className="month-btn"
-            onClick={goNextMonth}
-            aria-label="Próximo mês"
-          >
-            ›
-          </button>
-          <input
-            type="month"
-            className="month-input"
-            onChange={handleMonthInput}
-            aria-label="Selecionar mês"
-            value={`${activeMonth.getFullYear()}-${String(
-              activeMonth.getMonth() + 1
-            ).padStart(2, "0")}`}
-          />
-          <button className="month-btn today" onClick={goTodayMonth}>
-            Hoje
-          </button>
-        </div>
       </div>
     );
   }
@@ -300,36 +389,6 @@ export default function DashboardComercial() {
     return (
       <div className="fedconnect-dashboard">
         <p className="alert error">{erro}</p>
-
-        <div className="dashboard-mes-controls">
-          <button
-            className="month-btn"
-            onClick={goPrevMonth}
-            aria-label="Mês anterior"
-          >
-            ‹
-          </button>
-          <span className="month-label">{monthLabel}</span>
-          <button
-            className="month-btn"
-            onClick={goNextMonth}
-            aria-label="Próximo mês"
-          >
-            ›
-          </button>
-          <input
-            type="month"
-            className="month-input"
-            onChange={handleMonthInput}
-            aria-label="Selecionar mês"
-            value={`${activeMonth.getFullYear()}-${String(
-              activeMonth.getMonth() + 1
-            ).padStart(2, "0")}`}
-          />
-          <button className="month-btn today" onClick={goTodayMonth}>
-            Hoje
-          </button>
-        </div>
       </div>
     );
   }
@@ -363,36 +422,16 @@ export default function DashboardComercial() {
             </option>
           ))}
         </select>
+        <input
+          type="month"
+          className="month-input"
+          onChange={handleMonthInput}
+          aria-label="Selecionar mês"
+          value={`${activeMonth.getFullYear()}-${String(
+            activeMonth.getMonth() + 1
+          ).padStart(2, "0")}`}
+        />
 
-        <div className="dashboard-mes-controls">
-          <button
-            className="month-btn"
-            onClick={goPrevMonth}
-            aria-label="Mês anterior"
-          >
-            ‹
-          </button>
-          <span className="month-label">{monthLabel}</span>
-          <button
-            className="month-btn"
-            onClick={goNextMonth}
-            aria-label="Próximo mês"
-          >
-            ›
-          </button>
-          <input
-            type="month"
-            className="month-input"
-            onChange={handleMonthInput}
-            aria-label="Selecionar mês"
-            value={`${activeMonth.getFullYear()}-${String(
-              activeMonth.getMonth() + 1
-            ).padStart(2, "0")}`}
-          />
-          <button className="month-btn today" onClick={goTodayMonth}>
-            Hoje
-          </button>
-        </div>
 
         <button
           className="btn-light"
@@ -402,32 +441,75 @@ export default function DashboardComercial() {
         </button>
       </div>
 
-      <section className="dashboard-graph-container">
-        <div className="graph-wrapper">
-          <GraficoVisitas visitas={filteredVisitas} />
-        </div>
+      {/* Desktop: gráfico | Mobile: totalizador */}
+      {isMobile ? (
+        <>
+          <section className="dashboard-totalizador">
+            <div className="totals">
+              <span>
+                <strong>Agendadas:</strong> {totals.agendadas}
+              </span>
+              <span className="sep">|</span>
+              <span>
+                <strong>Realizadas:</strong> {totals.realizadas}
+              </span>
+              <span className="sep">|</span>
+              <span>
+                <strong>Canceladas:</strong> {totals.canceladas}
+              </span>
+            </div>
+          </section>
 
-        <button
-          className="btn-exportar-relatorio"
-          onClick={exportarRelatorioExcel}
-          disabled={!filteredVisitas?.length}
-          title={
-            filteredVisitas?.length
-              ? "Exportar relatório em Excel"
-              : "Sem dados para exportar"
-          }
-          aria-disabled={!filteredVisitas?.length}
-        >
-          Exportar Relatório
-        </button>
-      </section>
+          <button
+            className="btn-exportar-relatorio"
+            onClick={exportarRelatorioExcel}
+            disabled={!filteredVisitas?.length}
+            title={
+              filteredVisitas?.length
+                ? "Exportar relatório em Excel"
+                : "Sem dados para exportar"
+            }
+            aria-disabled={!filteredVisitas?.length}
+          >
+            Exportar Relatório
+          </button>
+        </>
+      ) : (
+        <section className="dashboard-graph-container">
+          <div className="graph-wrapper">
+            <GraficoVisitas visitas={filteredVisitas} />
+          </div>
+
+          <button
+            className="btn-exportar-relatorio"
+            onClick={exportarRelatorioExcel}
+            disabled={!filteredVisitas?.length}
+            title={
+              filteredVisitas?.length
+                ? "Exportar relatório em Excel"
+                : "Sem dados para exportar"
+            }
+            aria-disabled={!filteredVisitas?.length}
+          >
+            Exportar Relatório
+          </button>
+        </section>
+      )}
+
       <div className="dashboard-kanban">
-        <KanbanVisitas
-          visitas={filteredVisitas}
-          onConfirmar={abrirModalConfirmacao}
-          onStatusChange={atualizarStatus}
-          onCardClick={handleCardClick}
-        />
+        {isMobile ? (
+          <MobileAccordionVisitas
+            visitas={filteredVisitas}
+            onCardClick={handleCardClick}
+          />
+        ) : (
+          <KanbanVisitas
+            visitas={filteredVisitas}
+            onConfirmar={abrirModalConfirmacao}
+            onStatusChange={atualizarStatus}
+            onCardClick={handleCardClick}
+          />
+        )}
       </div>
 
       {visitaDetalhe && (
@@ -435,6 +517,32 @@ export default function DashboardComercial() {
           visita={visitaDetalhe}
           onClose={() => setVisitaDetalhe(null)}
         />
+      )}
+
+      {/* Se você já possui modal em outro lugar, remova este bloco */}
+      {modal && (
+        <div className="modal-overlay" onClick={() => setModal(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3>Confirmar cancelamento</h3>
+            <p>
+              Deseja cancelar a visita de <strong>{modal?.empresa}</strong>?
+            </p>
+            <div className="modal-actions">
+              <button className="btn-light" onClick={() => setModal(null)}>
+                Voltar
+              </button>
+              <button
+                className="btn-danger"
+                onClick={async () => {
+                  await atualizarStatus(String(modal?.id), "cancelada");
+                  setModal(null);
+                }}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

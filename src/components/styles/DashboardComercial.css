@@ -201,16 +201,16 @@
 
 .kcard-body {
   max-height: 160px;
-    overflow-y: auto;
+  overflow-y: auto;
 }
 
 .dashboard-kanban .kanban,
 .dashboard-kanban .kanban-visitas {
   display: grid;
-    grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 14px;
   align-items: stretch;
-  }
+}
 
 .dashboard-kanban .kanban-col {
   display: flex;
@@ -260,6 +260,7 @@
 }
 
 @media (max-width: 1100px) {
+
   .dashboard-kanban .kanban,
   .dashboard-kanban .kanban-visitas {
     grid-template-columns: 1fr 1fr;
@@ -481,7 +482,7 @@
   white-space: nowrap;
 }
 
-.agenda-filtros .dashboard-mes-controls {
+.agenda-filtros .dashboard-mes-controls, .month-input {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -1029,4 +1030,249 @@
 .modal-wide .agenda-form select,
 .modal-wide .agenda-form textarea {
   font-size: 0.98rem;
+}
+
+.accordion {
+  margin-left: 3rem;
+  display: grid;
+  gap: 10px;
+}
+
+.accordion-item {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .06);
+  overflow: hidden;
+  border: 1px solid #eef2f7;
+}
+
+.accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #f7f9fc;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-weight: 700;
+  color: #1858d6;
+}
+
+.accordion-header .chevron {
+  transition: transform .2s ease;
+}
+
+.accordion-header[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .25s ease, padding .25s ease;
+  padding: 0 12px;
+}
+
+.accordion-content.open {
+  max-height: 900px;
+  padding: 8px 12px 12px;
+}
+
+.accordion-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.accordion-card {
+  border: 1px solid #e9eef5;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+}
+
+.accordion-card .card-main {
+  width: 100%;
+  display: grid;
+  gap: 6px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.accordion-card .card-title {
+  font-size: 0.98rem;
+  color: #0f1d40;
+}
+
+.accordion-card .card-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: #5a6b86;
+}
+
+.accordion-card .card-status {
+  margin-top: 2px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.pill-agendadas {
+  background: #e7f1ff;
+  color: #1858d6;
+  border-color: #cfe4ff;
+}
+
+.pill-realizadas {
+  background: #e9f9f0;
+  color: #1d9e52;
+  border-color: #c9f0da;
+}
+
+.pill-canceladas {
+  background: #fdeeee;
+  color: #d0302f;
+  border-color: #f9d3d3;
+}
+
+.pill-outras {
+  background: #f1f5f9;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+
+.accordion-card .card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn-ghost {
+  background: #f7f9fc;
+  border: 1px solid #e6edf7;
+  color: #1858d6;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+}
+
+.btn-ghost.danger {
+  color: #d0302f;
+  border-color: #f0d6d6;
+  background: #fff6f6;
+}
+
+.empty {
+  color: #6b7890;
+  font-size: 0.9rem;
+  padding: 6px 2px 10px;
+}
+
+/* ======= Modal básico (se já tiver, pode ignorar) ======= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px;
+  width: min(92vw, 420px);
+  box-shadow: 0 12px 44px rgba(0, 0, 0, .15);
+}
+
+.modal-card h3 {
+  margin: 0 0 8px 0;
+  color: #0f1d40;
+}
+
+.modal-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btn-danger {
+  background: #d0302f;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+/* ======= Responsividade: só usa accordion em mobile ======= */
+@media (max-width: 768px) {
+  .dashboard-kanban .kanban-container {
+    display: none;
+  }
+
+  /* se o KanbanVisitas tiver esse container */
+  .accordion {
+    display: grid;
+  }
+}
+
+@media (min-width: 769px) {
+  .accordion {
+    display: none;
+  }
+
+}
+
+.dashboard-totalizador {
+  margin-left: 2rem;
+  margin-bottom: 2rem;
+  background: #fff;
+  border: 1px solid #e9eef5;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+}
+
+.dashboard-totalizador .totals {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  color: #0f1d40;
+  flex-wrap: wrap;
+}
+
+.dashboard-totalizador .totals .sep {
+  opacity: .6;
+}
+
+@media (max-width: 768px) {
+  .dashboard-graph-container {
+    display: none;
+  }
+
+  .btn-exportar-relatorio {
+    width: 100%;
+    margin-top: 8px;
+  }
 }
