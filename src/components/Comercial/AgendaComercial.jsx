@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback } from "react";
 import "../styles/AgendaComercial.css";
 import { AgendaComercialService } from "../../services/agenda_comercial";
 
+/* ============== utils de data/mês ============== */
 function formatDateBR(iso) {
   if (!iso) return "";
   const [y, m, d] = iso.split("-");
@@ -9,13 +10,6 @@ function formatDateBR(iso) {
 }
 function formatHour(h) {
   return h?.slice(0, 5) || "--:--";
-}
-function sameMonthISO(iso, refDate) {
-  if (!iso) return false;
-  const [y, m] = iso.split("-");
-  return (
-    Number(y) === refDate.getFullYear() && Number(m) === refDate.getMonth() + 1
-  );
 }
 function getMonthLabel(date) {
   return date.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
@@ -26,13 +20,35 @@ function addMonths(date, delta) {
   return d;
 }
 
+/* ============== hook de breakpoint ============== */
+function useIsMobile(maxWidth = 768) {
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined"
+      ? window.matchMedia(`(max-width:${maxWidth}px)`).matches
+      : false
+  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia(`(max-width:${maxWidth}px)`);
+    const onChange = (e) => setIsMobile(e.matches);
+    mq.addEventListener?.("change", onChange);
+    mq.addListener?.(onChange);
+    return () => {
+      mq.removeEventListener?.("change", onChange);
+      mq.removeListener?.(onChange);
+    };
+  }, [maxWidth]);
+  return isMobile;
+}
+
+/* ============== constantes e estado inicial ============== */
 const EMPTY_FORM = {
   empresa: "",
   data: "",
   hora: "",
   observacao: "",
   status: "agendado",
-  motivo_cancelamento: "", // Adicionado para o formulário principal
+  motivo_cancelamento: "",
 };
 
 const STATUS_ORDER = ["agendado", "realizada", "cancelada"];
@@ -42,6 +58,114 @@ const STATUS_LABEL = {
   cancelada: "Cancelada",
 };
 
+/* ============== helpers de status (pill/agrupamento) ============== */
+function normalizeStatus(raw) {
+  const s = String(raw || "").trim().toLowerCase();
+  if (s.includes("agend")) return "agendado";
+  if (s.includes("realiz") || s.includes("feito") || s.includes("conclu"))
+    return "realizada";
+  if (s.includes("cancel")) return "cancelada";
+  return "agendado";
+}
+function StatusPill({ status }) {
+  const st = normalizeStatus(status);
+  return <span className={`pill pill-${st}`}>{STATUS_LABEL[st] || status || "—"}</span>;
+}
+function groupByStatus(visitas) {
+  const map = { agendado: [], realizada: [], cancelada: [] };
+  for (const v of visitas || []) {
+    const key = normalizeStatus(v.status);
+    (map[key] || map.agendado).push(v);
+  }
+  return map;
+}
+
+/* ============== Accordion para MOBILE ============== */
+function MobileAccordionVisitas({
+  visitas,
+  onEdit,
+  onAskCancel,
+}) {
+  const groups = useMemo(() => groupByStatus(visitas), [visitas]);
+  const counts = {
+    agendado: groups.agendado.length,
+    realizada: groups.realizada.length,
+    cancelada: groups.cancelada.length,
+  };
+  const sections = [
+    { key: "agendado", title: `Agendadas (${counts.agendado})` },
+    { key: "realizada", title: `Realizadas (${counts.realizada})` },
+    { key: "cancelada", title: `Canceladas (${counts.cancelada})` },
+  ];
+  const [openKey, setOpenKey] = useState("agendado");
+
+  return (
+    <div className="accordion">
+      {sections.map((sec) => (
+        <div key={sec.key} className="accordion-item">
+          <button
+            className="accordion-header"
+            aria-expanded={openKey === sec.key}
+            onClick={() => setOpenKey((k) => (k === sec.key ? "" : sec.key))}
+          >
+            <span>{sec.title}</span>
+            <span className="chevron" aria-hidden>▾</span>
+          </button>
+
+          <div className={`accordion-content ${openKey === sec.key ? "open" : ""}`}>
+            {groups[sec.key].length === 0 ? (
+              <div className="empty">Sem registros</div>
+            ) : (
+              <ul className="accordion-list">
+                {groups[sec.key].map((v) => (
+                  <li key={v.id} className="accordion-card">
+                    <div className="card-main">
+                      <div className="card-title">
+                        <strong>{v.empresa || "—"}</strong>
+                      </div>
+                      <div className="card-meta">
+                        <span>{formatDateBR(v.data)}</span>
+                        <span>•</span>
+                        <span>{formatHour(v.hora)}</span>
+                      </div>
+                      {v?.responsavel?.nome_completo && (
+                        <div className="card-meta secondary">
+                          <span>Resp.: {v.responsavel.nome_completo}</span>
+                        </div>
+                      )}
+                      {v.obs && <div className="kobs">{v.obs}</div>}
+                      {v.status === "cancelada" && v.motivo_cancelamento && (
+                        <div className="kobs-cancelada">
+                          <strong>Motivo:</strong> {v.motivo_cancelamento}
+                        </div>
+                      )}
+                      <div className="card-status">
+                        <StatusPill status={v.status} />
+                      </div>
+                    </div>
+
+                    {normalizeStatus(v.status) === "agendado" && (
+                      <div className="card-actions">
+                        <button className="btn-light" onClick={() => onEdit(v)}>
+                          Editar
+                        </button>
+                        <button className="btn-danger" onClick={() => onAskCancel(v)}>
+                          Cancelar
+                        </button>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ============== Componente principal ============== */
 export default function AgendaComercial() {
   // mês exibido (inicia no mês atual)
   const [currentMonth, setCurrentMonth] = useState(() => {
@@ -74,24 +198,24 @@ export default function AgendaComercial() {
   // quando o cancelamento é disparado a partir do modal de edição
   const [pendingCancelFromEdit, setPendingCancelFromEdit] = useState(null); // { visitaId } | null
 
+  const isMobile = useIsMobile(768);
+
   const fetchVisitas = useCallback(async () => {
     try {
       setLoading(true);
       setErro("");
 
-      // Extrai o ano e o mês do estado 'currentMonth'
+      // ano/mês do estado
       const ano = currentMonth.getFullYear();
-      const mes = currentMonth.getMonth() + 1; // getMonth() é 0-indexado (0-11)
+      const mes = currentMonth.getMonth() + 1;
 
-      // Chama o serviço passando o ano e o mês
+      // Serviço agora recebe ano/mes
       const response = await AgendaComercialService.getVisitas(ano, mes);
       let visitasDoMes = Array.isArray(response?.results)
         ? response.results
         : [];
 
-      // O filtro de mês foi REMOVIDO daqui, pois o backend já faz isso.
-
-      // Aplica o filtro de busca por empresa (este continua no frontend)
+      // (back já filtra por mês) — aqui só filtramos por empresa
       if (filters.empresa) {
         const t = filters.empresa.toLowerCase();
         visitasDoMes = visitasDoMes.filter((v) =>
@@ -101,8 +225,7 @@ export default function AgendaComercial() {
 
       // Ordena por data e hora
       visitasDoMes.sort((a, b) => {
-        if (a.data === b.data)
-          return (a.hora || "").localeCompare(b.hora || "");
+        if (a.data === b.data) return (a.hora || "").localeCompare(b.hora || "");
         return a.data.localeCompare(b.data);
       });
 
@@ -119,18 +242,18 @@ export default function AgendaComercial() {
     fetchVisitas();
   }, [fetchVisitas]);
 
-  // Agrupa para Kanban
+  // Agrupa para Kanban (desktop)
   const columns = useMemo(() => {
     const map = { agendado: [], realizada: [], cancelada: [] };
     for (const v of visitas) {
-      const s = (v.status || "agendado").toLowerCase();
+      const s = normalizeStatus(v.status);
       if (map[s]) map[s].push(v);
       else map.agendado.push(v);
     }
     return map;
   }, [visitas]);
 
-  // CRUD / Modais
+  /* ============== CRUD / Modais ============== */
   function openCreate() {
     setEditId(null);
     setForm(EMPTY_FORM);
@@ -139,7 +262,7 @@ export default function AgendaComercial() {
 
   function openEdit(v) {
     // só permite editar se status for "agendado"
-    if ((v.status || "").toLowerCase() !== "agendado") return;
+    if (normalizeStatus(v.status) !== "agendado") return;
     setEditId(v.id);
     setForm({
       empresa: v.empresa || "",
@@ -147,7 +270,7 @@ export default function AgendaComercial() {
       hora: v.hora || "",
       observacao: v.obs || "",
       status: v.status || "agendado",
-      motivo_cancelamento: v.motivo_cancelamento || "", // Adicionado
+      motivo_cancelamento: v.motivo_cancelamento || "",
     });
     setModalOpen(true);
   }
@@ -165,7 +288,7 @@ export default function AgendaComercial() {
       return;
     }
 
-    // Validação do motivo de cancelamento diretamente no formulário principal
+    // Validação do motivo de cancelamento
     if (form.status === "cancelada" && !form.motivo_cancelamento.trim()) {
       setErro("Para o status 'Cancelada', o motivo é obrigatório.");
       return;
@@ -179,7 +302,7 @@ export default function AgendaComercial() {
         hora: form.hora,
         obs: form.observacao,
         status: form.status,
-        motivo_cancelamento: form.motivo_cancelamento, // Adicionado ao payload
+        motivo_cancelamento: form.motivo_cancelamento,
       };
       if (isEditing) {
         await AgendaComercialService.confirmarVisita(editId, payload);
@@ -210,7 +333,7 @@ export default function AgendaComercial() {
 
   // Drag & Drop — habilita só para "agendado"
   function onDragStart(e, visita) {
-    if ((visita.status || "").toLowerCase() !== "agendado") return;
+    if (normalizeStatus(visita.status) !== "agendado") return;
     e.dataTransfer.setData("text/plain", String(visita.id));
   }
   function onDragOver(e) {
@@ -222,27 +345,24 @@ export default function AgendaComercial() {
     const visita = visitas.find((v) => String(v.id) === id);
     if (!visita) return;
 
-    // só permite arrastar a partir de "agendado"
-    if ((visita.status || "").toLowerCase() !== "agendado") return;
+    if (normalizeStatus(visita.status) !== "agendado") return;
 
-    // Se o destino for "cancelada", exigir motivo via modal (não atualiza direto)
     if (targetStatus === "cancelada") {
-      setPendingCancelFromEdit(null); // drop não veio do modal de edição
+      setPendingCancelFromEdit(null);
       setCancelarModal({ aberto: true, visita });
       setMotivoCancelamento("");
       setErroCancelamento("");
       return;
     }
 
-    // Para outros destinos (ex.: realizada), atualiza normalmente
-    if ((visita.status || "agendado") !== targetStatus) {
+    if (normalizeStatus(visita.status) !== targetStatus) {
       updateStatus(visita.id, targetStatus);
     }
   }
 
   // Cancelamento (sempre com motivo)
   function openCancelarModal(visita) {
-    setPendingCancelFromEdit(null); // botão do card, não é fluxo do modal de edição
+    setPendingCancelFromEdit(null);
     setCancelarModal({ aberto: true, visita });
     setMotivoCancelamento("");
     setErroCancelamento("");
@@ -343,7 +463,15 @@ export default function AgendaComercial() {
 
       {loading ? (
         <div className="skeleton">Carregando visitas…</div>
+      ) : isMobile ? (
+        /* ======== MOBILE: Accordion por status ======== */
+        <MobileAccordionVisitas
+          visitas={visitas}
+          onEdit={openEdit}
+          onAskCancel={openCancelarModal}
+        />
       ) : (
+        /* ======== DESKTOP: Kanban c/ DnD ======== */
         <div className="kanban" role="list">
           {STATUS_ORDER.map((status) => (
             <section
@@ -366,11 +494,13 @@ export default function AgendaComercial() {
                     <article
                       key={v.id}
                       className={`kcard ${v.status} ${
-                        v.status === "agendado" ? "is-draggable" : "is-locked"
+                        normalizeStatus(v.status) === "agendado"
+                          ? "is-draggable"
+                          : "is-locked"
                       }`}
-                      draggable={v.status === "agendado"}
+                      draggable={normalizeStatus(v.status) === "agendado"}
                       onDragStart={
-                        v.status === "agendado"
+                        normalizeStatus(v.status) === "agendado"
                           ? (e) => onDragStart(e, v)
                           : undefined
                       }
@@ -394,15 +524,16 @@ export default function AgendaComercial() {
                           </div>
                         )}
                         {v.obs && <div className="kobs">{v.obs}</div>}
-                        {v.status === "cancelada" && v.motivo_cancelamento && (
-                          <div className="kobs-cancelada">
-                            <strong>Motivo:</strong> {v.motivo_cancelamento}
-                          </div>
-                        )}
+                        {normalizeStatus(v.status) === "cancelada" &&
+                          v.motivo_cancelamento && (
+                            <div className="kobs-cancelada">
+                              <strong>Motivo:</strong> {v.motivo_cancelamento}
+                            </div>
+                          )}
                       </div>
 
                       <div className="kcard-actions">
-                        {v.status === "agendado" && (
+                        {normalizeStatus(v.status) === "agendado" && (
                           <>
                             <button
                               className="btn-light"
@@ -513,7 +644,6 @@ export default function AgendaComercial() {
                   />
                 </label>
 
-                {/* Campo condicional para motivo de cancelamento */}
                 {form.status === "cancelada" && (
                   <label className="full">
                     Motivo do Cancelamento*
