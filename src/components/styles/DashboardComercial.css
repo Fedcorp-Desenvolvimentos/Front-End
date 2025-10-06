@@ -1354,8 +1354,14 @@
     transform: rotate(-90deg);
   }
 
-  .kcard {
-    padding: 10px;
+  .accordion .accordion-content {
+    padding-left: 1px;
+  }
+
+  .accordion .accordion-card,
+  .accordion .kcard {
+    margin-left: 1px;
+    margin-right: 1px;
+  }
 
   }
-}
