@@ -698,11 +698,11 @@ const ConsultaCNPJ = () => {
           </div>
 
           {/* Natureza Jurídica */}
-          <label>Natureza Jurídica:</label>
+          <label>Porte:</label>
           <div className="input-copy-group">
             <input
               type="text"
-              value={cnpjData.natureza_juridica || "N/A"}
+              value={cnpjData.porte|| "N/A"}
               disabled
             />
             <button
