@@ -59,7 +59,7 @@
 /* Filtros */
 .cc-filters .cc-filters-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
   gap: 14px;
   align-items: end;
 }
@@ -116,6 +116,12 @@
 
 .cc-btn-export:hover {
   filter: brightness(1.05);
+}
+
+.cc-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
 }
 
 /* KPIs */
