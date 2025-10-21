@@ -344,7 +344,7 @@ const ConsultaComercial = () => {
         </div>
 
         {/* Accordion Painéis - NOVO */}
-        <div className="accordion-card">
+        {/* <div className="accordion-card">
           <button
             className="accordion-header"
             onClick={() =>
@@ -370,7 +370,7 @@ const ConsultaComercial = () => {
               </div>
             </div>
           )}
-        </div>
+        </div> */}
       </div>
 
       {activeCard === "cnpj" && (

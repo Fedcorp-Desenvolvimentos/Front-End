@@ -146,6 +146,17 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 </Link>
               </li>
             )}
+
+             {/* {["admin", "financeiro"].includes(nivelAcesso) && (
+              <li className={location.pathname === "/agenda" ? "active" : ""}>
+                <Link to="/financeiro">
+                  <div className="sidebar-icon-tooltip">
+                    <i className="bi bi-cash"></i>
+                    <span>Financeiro</span>
+                  </div>
+                </Link>
+              </li>
+            )} */}
           </ul>
         </nav>
         <Dropdown sidebarOpen={sidebarOpen} />
