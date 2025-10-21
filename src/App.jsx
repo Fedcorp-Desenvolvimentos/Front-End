@@ -24,6 +24,7 @@ import AgendaSala from './components/Agenda/AgendaSala';
 
 import Acompanhamento from './components/Comercial/DashboardComercial'
 import AgendaComercial from './components/Comercial/AgendaComercial'
+import Financeiro from './components/Comercial/Financeiro'
 
 import Conta from './components/Dropdown/dropItens/conta';
 import Config from './components/Dropdown/dropItens/Configuracoes';
@@ -89,6 +90,7 @@ function AppRoutes() {
             <Route path="/agenda" element={<AgendaSala />} />
             <Route path="/acompanhamento" element={<Acompanhamento />} />
             <Route path="/agenda-comercial" element={<AgendaComercial />} />
+            <Route path="/financeiro" element={<Financeiro />} />
           </Route>
         </Route>
       </Routes>
