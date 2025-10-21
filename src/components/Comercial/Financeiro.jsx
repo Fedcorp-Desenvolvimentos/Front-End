@@ -4,20 +4,18 @@ import * as XLSX from "xlsx";
 import "../styles/Financeiro.css";
 
 const CommissionControl = () => {
-  // Período em formato YYYY-MM para funcionar com <input type="month" />
   const [selectedPeriod, setSelectedPeriod] = useState("2025-10");
   const [selectedCommercial, setSelectedCommercial] = useState("todos");
 
-  // Dados de exemplo (sem status)
   const commissionsData = [
-    { id: 1, date: "2025-10-15", adm: "Protest", product: "BOAT",               value: 5000, commission: 500, commercial: "João Silva" },
-    { id: 2, date: "2025-10-12", adm: "Protest", product: "Total Vida",         value: 8000, commission: 800, commercial: "Maria Santos" },
-    { id: 3, date: "2025-10-10", adm: "Protest", product: "BAPS",               value: 2000, commission: 200, commercial: "João Silva" },
-    { id: 4, date: "2025-10-08", adm: "Protest", product: "Total Funeral",      value: 3000, commission: 300, commercial: "Pedro Costa" },
-    { id: 5, date: "2025-10-05", adm: "Protest", product: "Incêndio Conteúdo",  value: 5000, commission: 500, commercial: "Maria Santos" },
-    { id: 6, date: "2025-10-03", adm: "Protest", product: "Incêndio Conteúdo",  value: 4000, commission: 400, commercial: "Pedro Costa" },
-    { id: 7, date: "2025-10-28", adm: "Protest", product: "Incêndio Locação",   value: 5000, commission: 500, commercial: "João Silva" },
-    { id: 8, date: "2025-10-25", adm: "Protest", product: "BAPS",               value: 3000, commission: 300, commercial: "Maria Santos" },
+    { id: 1, date: "2025-10-15", adm: "Protest", product: "BOAT", value: 5000, commission: 500, commercial: "João Silva" },
+    { id: 2, date: "2025-10-12", adm: "Protest", product: "Total Vida", value: 8000, commission: 800, commercial: "Maria Santos" },
+    { id: 3, date: "2025-10-10", adm: "Protest", product: "BAPS", value: 2000, commission: 200, commercial: "João Silva" },
+    { id: 4, date: "2025-10-08", adm: "Protest", product: "Total Funeral", value: 3000, commission: 300, commercial: "Pedro Costa" },
+    { id: 5, date: "2025-10-05", adm: "Protest", product: "Incêndio Conteúdo", value: 5000, commission: 500, commercial: "Maria Santos" },
+    { id: 6, date: "2025-10-03", adm: "Protest", product: "Incêndio Conteúdo", value: 4000, commission: 400, commercial: "Pedro Costa" },
+    { id: 7, date: "2025-10-28", adm: "Protest", product: "Incêndio Locação", value: 5000, commission: 500, commercial: "João Silva" },
+    { id: 8, date: "2025-10-25", adm: "Protest", product: "BAPS", value: 3000, commission: 300, commercial: "Maria Santos" },
   ];
 
   const commercials = ["João Silva", "Maria Santos", "Pedro Costa"];
@@ -32,7 +30,7 @@ const CommissionControl = () => {
     });
   }, [commissionsData, selectedPeriod, selectedCommercial]);
 
-  // KPIs: Total Comissões, Total Vendas, Média Comissão
+  // KPIs: Total Comissões, Total Vendas
   const totals = useMemo(() => {
     const totalCommission = filteredData.reduce((s, i) => s + i.commission, 0);
     const totalSales = filteredData.reduce((s, i) => s + i.value, 0);
@@ -41,7 +39,7 @@ const CommissionControl = () => {
     return { totalCommission, totalSales, avgCommission };
   }, [filteredData]);
 
-  // Divisão por comercial (somente totais)
+  // Divisão por comercial 
   const commissionByCommercial = useMemo(() => {
     return filteredData.reduce((acc, item) => {
       if (!acc[item.commercial]) {
@@ -54,7 +52,7 @@ const CommissionControl = () => {
     }, {});
   }, [filteredData]);
 
-  // Exportar para Excel (sem status)
+  // Exportar para Excel 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       filteredData.map((item) => ({
@@ -98,8 +96,7 @@ const CommissionControl = () => {
   return (
     <div className="cc-page">
       <div className="cc-container">
-        {/* Header */}
-        <div className="cc-header">
+                <div className="cc-header">
           <h1>Controle de Comissões</h1>
         </div>
 
@@ -142,7 +139,7 @@ const CommissionControl = () => {
         </div>
 
         {/* KPIs */}
-        <div className="cc-grid-3 cc-kpis">
+        <div className="cc-grid-2 cc-kpis">
           <div className="cc-card">
             <div className="cc-card-head">
               <span>Total Comissões</span>
@@ -165,16 +162,6 @@ const CommissionControl = () => {
             <p className="cc-kpi-sub">Valor bruto</p>
           </div>
 
-          <div className="cc-card">
-            <div className="cc-card-head">
-              <span>Média Comissão</span>
-              <TrendingUp className="cc-icon cc-icon-orange" size={22} />
-            </div>
-            <p className="cc-kpi">
-              R$ {totals.avgCommission.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-            </p>
-            <p className="cc-kpi-sub">Por lançamento</p>
-          </div>
         </div>
 
         {/* Divisão por Comercial */}
@@ -208,7 +195,7 @@ const CommissionControl = () => {
         </div>
 
         {/* Tabela */}
-        <div className="cc-card">
+        {/* <div className="cc-card">
           <div className="cc-table-head">
             <h2>Histórico de Comissões</h2>
           </div>
@@ -243,7 +230,7 @@ const CommissionControl = () => {
               </div>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
