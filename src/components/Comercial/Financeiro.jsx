@@ -4,11 +4,9 @@ import * as XLSX from "xlsx";
 import "../styles/Financeiro.css";
 
 const CommissionControl = () => {
-  // Período em formato YYYY-MM para funcionar com <input type="month" />
   const [selectedPeriod, setSelectedPeriod] = useState("2025-10");
   const [selectedCommercial, setSelectedCommercial] = useState("todos");
 
-  // Dados de exemplo (sem status)
   const commissionsData = [
     { id: 1, date: "2025-10-15", adm: "Protest", product: "BOAT", value: 5000, commission: 500, commercial: "João Silva" },
     { id: 2, date: "2025-10-12", adm: "Protest", product: "Total Vida", value: 8000, commission: 800, commercial: "Maria Santos" },
@@ -32,7 +30,7 @@ const CommissionControl = () => {
     });
   }, [commissionsData, selectedPeriod, selectedCommercial]);
 
-  // KPIs: Total Comissões, Total Vendas, Média Comissão
+  // KPIs: Total Comissões, Total Vendas
   const totals = useMemo(() => {
     const totalCommission = filteredData.reduce((s, i) => s + i.commission, 0);
     const totalSales = filteredData.reduce((s, i) => s + i.value, 0);
@@ -41,7 +39,7 @@ const CommissionControl = () => {
     return { totalCommission, totalSales, avgCommission };
   }, [filteredData]);
 
-  // Divisão por comercial (somente totais)
+  // Divisão por comercial 
   const commissionByCommercial = useMemo(() => {
     return filteredData.reduce((acc, item) => {
       if (!acc[item.commercial]) {
@@ -54,7 +52,7 @@ const CommissionControl = () => {
     }, {});
   }, [filteredData]);
 
-  // Exportar para Excel (sem status)
+  // Exportar para Excel 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       filteredData.map((item) => ({
@@ -98,8 +96,7 @@ const CommissionControl = () => {
   return (
     <div className="cc-page">
       <div className="cc-container">
-        {/* Header */}
-        <div className="cc-header">
+                <div className="cc-header">
           <h1>Controle de Comissões</h1>
         </div>
 
