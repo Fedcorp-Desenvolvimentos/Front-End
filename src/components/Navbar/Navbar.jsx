@@ -114,7 +114,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               </li>
             )}
 
-            {["admin", "comercial"].includes(nivelAcesso) && (
+            {["admin"].includes(nivelAcesso) && (
               <li>
                 <Link to="/metricas">
                   <div className="sidebar-icon-tooltip">
