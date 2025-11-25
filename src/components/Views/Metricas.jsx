@@ -4,19 +4,19 @@ import "../styles/Ferramentas.css";
 const ferramentas = [
   {
     nome: "Dashboard Peaga",
-    url: "https://app.powerbi.com/view?r=eyJrIjoiY2FmMTk4ODQtMTc0Yi00YjQ0LTlkZjUtOWM2NjMyMWQyYjNkIiwidCI6IjhlODdmY2FjLTBhZTctNDBlYy1hMDVhLTZiMTRmZTE5ZDRiYiJ9",
+    url: "https://app.powerbi.com/view?r=eyJrIjoiNzQ2NzYxNDktNDQ5My00MWNiLWE0ZDUtOWQxMzMwMzkzNDUxIiwidCI6IjVhMjY0OWI1LTAzODMtNDA4Ni04MzYwLTJlNGI2YmZmMGEzZSJ9",
     descricao: "Acompanhe as métricas da organização de forma única.",
     logo: "/imagens/Logo-Peaga.jpg",
   },
   {
     nome: "Dashboard FedCorp Adm",
-    url: "https://app.powerbi.com/view?r=eyJrIjoiMzkxMjc2YTUtOTlkYS00ZGYzLWEyODYtZDI5ZmI3ZjUzMDFiIiwidCI6IjhlODdmY2FjLTBhZTctNDBlYy1hMDVhLTZiMTRmZTE5ZDRiYiJ9",
+    url: "https://app.powerbi.com/view?r=eyJrIjoiYTc1ZGU2MjItNjNiNS00MTQ5LTk2YjgtYWQzOGYxM2QyYjAwIiwidCI6IjVhMjY0OWI1LTAzODMtNDA4Ni04MzYwLTJlNGI2YmZmMGEzZSJ9",
     descricao: "Acompanhe as métricas da organização de forma única.",
     logo: "/imagens/LOGO.png",
   },
   {
     nome: "Dashboard Condomed",
-    url: "https://app.powerbi.com/view?r=eyJrIjoiNzQ1NGUwZDYtN2E2Yy00MjY2LThlNWEtZGE4MzQ5NjcyMzk4IiwidCI6IjhlODdmY2FjLTBhZTctNDBlYy1hMDVhLTZiMTRmZTE5ZDRiYiJ9",
+    url: "https://app.powerbi.com/view?r=eyJrIjoiZjE5ODFiZDUtM2U2NS00NzI1LTkzZTktNmE4ZTgxOTAwZjI0IiwidCI6IjVhMjY0OWI1LTAzODMtNDA4Ni04MzYwLTJlNGI2YmZmMGEzZSJ9",
     descricao: "Acompanhe as métricas da organização de forma única.",
     logo: "/imagens/logo-Condomed.png",
   },
