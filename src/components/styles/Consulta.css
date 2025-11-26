@@ -2,7 +2,7 @@
 .consulta-container04 {
   padding: 30px 16px 24px 16px;
   max-width: 880px;
-  margin: 0 auto;
+  margin-left: 220px !important;
   border-radius: 16px;
   box-sizing: border-box;
 }
