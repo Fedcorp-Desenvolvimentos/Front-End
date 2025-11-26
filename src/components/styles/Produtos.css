@@ -415,6 +415,9 @@
 }
 
 @media (max-width: 768px) {
+.page-container {
+margin-left: 30px;}
+
   .produtos-grid {
     grid-template-columns: 1fr;
   }
@@ -460,6 +463,19 @@
   .viewer-dot--active {
     width: 30px;
   }
+
+  .btn-outline {
+  background: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  margin-left: 2rem;
+}
+
+.btn-outline:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+}
 }
 
 .chip--active:hover {
