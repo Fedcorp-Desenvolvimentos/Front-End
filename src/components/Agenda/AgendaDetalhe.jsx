@@ -14,7 +14,7 @@ export default function AgendaDetalhe({ reserva, onClose, onDelete }) {
     .toLowerCase()
     .trim();
 
-  const canSeeSensitive = ["admin", "gestor", "coordenador"].includes(access);
+  const canSeeSensitive = ["admin", "gestor", "coordenador", "ti"].includes(access);
   const canManage = canSeeSensitive && typeof onDelete === "function";
 
   if (!reserva) return null;
